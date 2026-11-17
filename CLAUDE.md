@@ -11,6 +11,7 @@
 - **ui-ux-reviewer**: lanzarlo cuando se trabaje en el frontend, para auditar las interfaces.
 - **researcher**: lanzarlo únicamente cuando haga falta explorar el código o la web para responder preguntas relacionadas con este proyecto. No usar el modelo principal para estos fines.
 - **security-auditor**: no se automatiza. Recomendar su lanzamiento al usuario cuando se considere necesario (por ejemplo, al tocar auth, pagos, uploads o APIs, o antes de un release).
+- **git-committer**: lanzarlo cuando se pida commitear y pushear los cambios realizados. Usar siempre este sub-agente para ese fin.
 
 ## Proyecto
 
@@ -23,7 +24,7 @@ Sitio público de servicios (desarrollo web/escritorio + servicio técnico de PC
 | `pnpm i` | Instala dependencias (y corre `prisma generate`) |
 | `pnpm db:setup` | Crea rol y bases `services_app_dev` / `services_app_test` en el Postgres local (usa `POSTGRES_ADMIN_URL`) |
 | `pnpm db:migrate` | `prisma migrate dev` sobre la base de desarrollo |
-| `pnpm db:seed` | Seed idempotente |
+| `pnpm db:seed` | Seed idempotente (requiere `ADMIN_EMAIL` / `ADMIN_PASSWORD`) |
 | `pnpm dev` | API (`:3000`, tsx watch) + web (`:5173`, Vite con proxy `/api`) |
 | `pnpm build` | Compila shared → api → web |
 | `pnpm lint` / `pnpm typecheck` / `pnpm test` | ESLint, `tsc --noEmit` y Vitest en todos los paquetes |
@@ -80,6 +81,12 @@ scripts/         db-setup.ts
 - Hash de contraseñas: `@node-rs/argon2` (argon2id con binarios precompilados), sin fallback a bcrypt.
 - Prisma 7: la URL directa de migraciones va en `prisma.config.ts` (no en `schema.prisma`).
 - `Job` guarda además `servicePriceSnapshot` y `servicePriceTypeSnapshot`; `serviceNameSnapshot` es nullable (trabajos sin servicio del catálogo).
+- WhatsApp: `Settings` tiene dos plantillas globales, `bookingWhatsappTemplate` ("Reservar turno") e `inquiryWhatsappTemplate` ("Hacer una consulta"), en lugar de `defaultWhatsappTemplate`. `Service.whatsappTemplate` reemplaza solo a la de reserva. Variables: `{{servicio}}`, `{{precio}}`, `{{negocio}}`.
+- Seed no destructivo (lógica en `prisma/seed-runner.ts`): settings solo si no existe la fila; catálogo de ejemplo solo si no hay ninguna categoría; admin solo si no existe ninguno (sistema de un único admin). Nunca pisa ni recrea lo gestionado desde el panel.
+- Orden público de servicios: primero por `sortOrder` de la categoría, luego por `sortOrder` del servicio y por nombre.
+- Búsqueda pública (`q`): `contains` insensible a mayúsculas sobre `name` y `shortDescription`, con comodines LIKE escapados (`escapeLikePattern`). Distingue tildes ("termica" ≠ "térmica"); si molesta, evaluar la extensión `unaccent` más adelante.
+- Tests de integración de la API contra `services_app_test` (se migra en `test/global-setup.ts` y se vacía con `resetDatabase`). Archivos en serie (`fileParallelism: false`).
+- Respuestas públicas no paginadas envueltas en `{ data }`. Los montos `Decimal` se exponen como `number`.
 - Exportación de clientes/trabajos: PDF + CSV.
 - TypeScript 6.0 (typescript-eslint aún no soporta TS 7) y React Router 7 (React Router 8 exige Node ≥ 22.22).
 - Restricciones CHECK escritas a mano en la migración `init` (Prisma no las modela): Settings fila única, `priceAmount` null ⇔ `QUOTE`, montos ≥ 0. Si una migración futura recrea esas tablas, hay que conservarlas.

@@ -22,6 +22,12 @@ pnpm dev                # API en http://localhost:3000 · web en http://localhos
 
 En Windows (PowerShell), el primer paso es `Copy-Item .env.example .env`.
 
+Para cargar los datos de ejemplo (configuración, categorías, servicios y el admin), completá `ADMIN_EMAIL` y `ADMIN_PASSWORD` (mínimo 12 caracteres) en el `.env` y corré `pnpm db:seed`. El seed es idempotente: crea solo lo que falta y nunca pisa lo editado desde el panel. El admin se crea una única vez; cambiar `ADMIN_EMAIL` después no crea otro.
+
+## Tests
+
+`pnpm test` necesita Postgres corriendo: los tests de integración de la API usan la base `services_app_test` (`TEST_DATABASE_URL`), que se migra automáticamente y se vacía en cada corrida. Por seguridad, el nombre de esa base debe terminar en `_test`.
+
 ## Scripts
 
 | Comando           | Descripción                                                         |
@@ -37,10 +43,18 @@ En Windows (PowerShell), el primer paso es `Copy-Item .env.example .env`.
 | `pnpm db:migrate` | Crea/aplica migraciones en desarrollo                               |
 | `pnpm db:seed`    | Carga datos iniciales (idempotente)                                 |
 
-## Endpoints de salud
+## API
 
-- `GET /api/health`: responde 200 sin consultar la base. Lo usará el monitor externo para evitar el arranque en frío.
-- `GET /api/health/db`: verifica la conexión a PostgreSQL (503 si no está disponible).
+Respuestas en JSON. Las no paginadas vienen como `{ data }`, y los errores como `{ error: { code, message, details? } }`.
+
+| Endpoint                         | Descripción                                                                                            |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `GET /api/health`                | 200 sin consultar la base. Lo usará el monitor externo para evitar el arranque en frío.                |
+| `GET /api/health/db`             | Verifica la conexión a PostgreSQL (503 si no está disponible).                                         |
+| `GET /api/public/settings`       | Datos públicos del negocio y plantillas de WhatsApp.                                                   |
+| `GET /api/public/categories`     | Categorías activas, ordenadas.                                                                         |
+| `GET /api/public/services`       | Servicios activos. Filtros opcionales: `?category=<slug>` y `?q=<texto>` (nombre o descripción corta). |
+| `GET /api/public/services/:slug` | Detalle de un servicio activo (incluye la descripción en markdown).                                    |
 
 ## Variables de entorno
 
