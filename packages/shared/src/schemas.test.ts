@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { SLUG_PATTERN, publicServicesQuerySchema, slugSchema } from './schemas.js';
+import { publicServicesQuerySchema, slugSchema } from './schemas.js';
+import { SLUG_PATTERN, isValidSlug } from './constraints.js';
 
 describe('slugSchema', () => {
   it.each(['windows', 'instalacion-de-windows', 'pc-2024', '123', 'a'])(
@@ -37,6 +38,12 @@ describe('slugSchema', () => {
 
   it('expone el patrón usado', () => {
     expect(SLUG_PATTERN.test('ok-slug')).toBe(true);
+  });
+
+  it('isValidSlug (sin Zod, para el front) coincide con slugSchema', () => {
+    for (const value of ['ok-slug', 'a'.repeat(120), 'a'.repeat(121), 'Mal Slug', '', '-a']) {
+      expect(isValidSlug(value)).toBe(slugSchema.safeParse(value).success);
+    }
   });
 });
 
