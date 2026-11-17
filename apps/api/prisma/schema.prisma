@@ -164,6 +164,8 @@ model Settings {
   // Service.whatsappTemplate, si existe, reemplaza a la de reserva para ese servicio.
   bookingWhatsappTemplate String   @map("booking_whatsapp_template")
   inquiryWhatsappTemplate String   @map("inquiry_whatsapp_template")
+  // Para contactos sin servicio puntual (botón flotante, CTA del inicio y de contacto).
+  generalWhatsappTemplate String   @map("general_whatsapp_template")
   heroTitle               String   @map("hero_title")
   heroSubtitle            String?  @map("hero_subtitle")
   businessHours           String?  @map("business_hours")

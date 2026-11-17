@@ -1,6 +1,6 @@
 import request from 'supertest';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import type { PublicServiceSummary } from '@sch/shared';
+import { DEFAULT_GENERAL_WHATSAPP_TEMPLATE, type PublicServiceSummary } from '@sch/shared';
 import { runSeed } from '../prisma/seed-runner.js';
 import { createApp } from '../src/app.js';
 import { createLogger } from '../src/lib/logger.js';
@@ -57,6 +57,7 @@ describe('GET /api/public/settings', () => {
     });
     expect(res.body.data.bookingWhatsappTemplate).toContain('{{servicio}}');
     expect(res.body.data.inquiryWhatsappTemplate).toContain('{{servicio}}');
+    expect(res.body.data.generalWhatsappTemplate).toBe(DEFAULT_GENERAL_WHATSAPP_TEMPLATE);
     expect(res.body.data).not.toHaveProperty('id');
     expect(res.body.data).not.toHaveProperty('updatedAt');
   });

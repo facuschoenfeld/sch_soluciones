@@ -8,6 +8,8 @@ export interface PublicSettings {
   whatsappNumber: string;
   bookingWhatsappTemplate: string;
   inquiryWhatsappTemplate: string;
+  /** Para contactos sin un servicio puntual (botón flotante, CTA generales). */
+  generalWhatsappTemplate: string;
   heroTitle: string;
   heroSubtitle: string | null;
   businessHours: string | null;

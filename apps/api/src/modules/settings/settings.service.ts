@@ -14,6 +14,7 @@ export async function getPublicSettings(prisma: PrismaClient): Promise<PublicSet
       whatsappNumber: true,
       bookingWhatsappTemplate: true,
       inquiryWhatsappTemplate: true,
+      generalWhatsappTemplate: true,
       heroTitle: true,
       heroSubtitle: true,
       businessHours: true,

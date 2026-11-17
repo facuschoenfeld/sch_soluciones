@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   DEFAULT_BOOKING_WHATSAPP_TEMPLATE,
+  DEFAULT_GENERAL_WHATSAPP_TEMPLATE,
   DEFAULT_INQUIRY_WHATSAPP_TEMPLATE,
   buildWhatsappMessage,
   buildWhatsappUrl,
@@ -24,6 +25,14 @@ describe('buildWhatsappMessage', () => {
     });
     expect(message).toContain('"Landing page"');
     expect(message).not.toContain('{{');
+  });
+
+  it('la plantilla general no depende de un servicio', () => {
+    // Se usa en el botón flotante, donde no hay servicio ni precio que insertar.
+    expect(DEFAULT_GENERAL_WHATSAPP_TEMPLATE).not.toMatch(/\{\{\s*(servicio|precio)\s*\}\}/);
+    expect(buildWhatsappMessage(DEFAULT_GENERAL_WHATSAPP_TEMPLATE, {})).toBe(
+      DEFAULT_GENERAL_WHATSAPP_TEMPLATE,
+    );
   });
 
   it('reemplaza todas las apariciones y admite espacios dentro de las llaves', () => {

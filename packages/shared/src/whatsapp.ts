@@ -9,6 +9,10 @@ export const DEFAULT_BOOKING_WHATSAPP_TEMPLATE =
 export const DEFAULT_INQUIRY_WHATSAPP_TEMPLATE =
   '¡Hola! 👋 Vi en tu página el servicio "{{servicio}}" y tengo una consulta al respecto. *Describe abajo tu consulta* ⏬';
 
+/** Para contactos sin un servicio puntual (botón flotante, CTA del inicio y de contacto). */
+export const DEFAULT_GENERAL_WHATSAPP_TEMPLATE =
+  '¡Hola! 👋 Vi tu página y quisiera hacerte una consulta. *Describe abajo tu consulta* ⏬';
+
 // Admite espacios internos: {{servicio}} y {{ servicio }}.
 const VARIABLE_PATTERN = /\{\{\s*([a-zA-Z]+)\s*\}\}/g;
 

@@ -1,6 +1,7 @@
 // Datos iniciales de ejemplo. Los precios y textos son placeholders para editar desde el panel.
 import {
   DEFAULT_BOOKING_WHATSAPP_TEMPLATE,
+  DEFAULT_GENERAL_WHATSAPP_TEMPLATE,
   DEFAULT_INQUIRY_WHATSAPP_TEMPLATE,
   type Currency,
   type PriceType,
@@ -14,6 +15,7 @@ export const seedSettings = {
   whatsappNumber: '5491100000000',
   bookingWhatsappTemplate: DEFAULT_BOOKING_WHATSAPP_TEMPLATE,
   inquiryWhatsappTemplate: DEFAULT_INQUIRY_WHATSAPP_TEMPLATE,
+  generalWhatsappTemplate: DEFAULT_GENERAL_WHATSAPP_TEMPLATE,
   heroTitle: 'Soluciones en desarrollo y servicio técnico',
   heroSubtitle:
     'Páginas web, aplicaciones de escritorio y mantenimiento de PC para tu casa o negocio.',
