@@ -1,0 +1,7 @@
+# Fines de línea LF en todo el repo (Prettier usa LF; evita diffs por CRLF en Windows).
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.ico binary
+*.woff2 binary
