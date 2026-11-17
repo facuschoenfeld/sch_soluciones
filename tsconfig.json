@@ -1,0 +1,9 @@
+{
+  // Solo para los scripts de la raíz; cada paquete tiene su propio tsconfig.
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "types": ["node"]
+  },
+  "include": ["scripts"]
+}

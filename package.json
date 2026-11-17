@@ -1,0 +1,38 @@
+{
+  "name": "sch-soluciones",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@12.16.1",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "pnpm --parallel --filter @sch/api --filter @sch/web dev",
+    "build": "pnpm -r build",
+    "start": "pnpm --filter @sch/api start",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit && pnpm -r typecheck",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "pnpm -r test",
+    "db:setup": "tsx scripts/db-setup.ts",
+    "db:migrate": "pnpm --filter @sch/api db:migrate",
+    "db:seed": "pnpm --filter @sch/api db:seed"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^22.19.0",
+    "@types/pg": "^8.23.1",
+    "dotenv": "^18.0.10",
+    "eslint": "^10.15.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.8",
+    "globals": "^17.14.0",
+    "pg": "^8.23.1",
+    "prettier": "^3.10.1",
+    "prettier-plugin-tailwindcss": "^0.8.1",
+    "tsx": "^4.23.15",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.73.0"
+  }
+}
