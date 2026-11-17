@@ -36,9 +36,12 @@ Sitio público de servicios (desarrollo web/escritorio + servicio técnico de PC
 ```
 apps/web         React + Vite + React Router + TanStack Query + Tailwind v4 + shadcn/ui
   src/components/ui      componentes shadcn (se agregan con `pnpm dlx shadcn@latest add <x>` desde apps/web)
-  src/components/layout  header, footer, layouts
+  src/components/layout  header, footer, layouts, toggle de tema
+  src/components/whatsapp  botón + diálogo de WhatsApp (mensaje pre-cargado y editable)
+  src/components/services · feedback  tarjetas de servicio · estados de error/vacío/carga lenta
   src/pages              una página por archivo
-  src/lib                api-client, query-client, utils
+  src/lib                api-client, query-client, public-api (hooks de TanStack Query), utils
+  src/test               fixtures y helper de render para tests de componentes (jsdom)
 apps/api         Express 5 + Prisma 7 (driver adapter pg)
   prisma/                schema.prisma, migrations/, seed.ts
   prisma.config.ts       URLs de conexión (DIRECT_URL para migraciones)
@@ -81,7 +84,7 @@ scripts/         db-setup.ts
 - Hash de contraseñas: `@node-rs/argon2` (argon2id con binarios precompilados), sin fallback a bcrypt.
 - Prisma 7: la URL directa de migraciones va en `prisma.config.ts` (no en `schema.prisma`).
 - `Job` guarda además `servicePriceSnapshot` y `servicePriceTypeSnapshot`; `serviceNameSnapshot` es nullable (trabajos sin servicio del catálogo).
-- WhatsApp: `Settings` tiene dos plantillas globales, `bookingWhatsappTemplate` ("Reservar turno") e `inquiryWhatsappTemplate` ("Hacer una consulta"), en lugar de `defaultWhatsappTemplate`. `Service.whatsappTemplate` reemplaza solo a la de reserva. Variables: `{{servicio}}`, `{{precio}}`, `{{negocio}}`.
+- WhatsApp: `Settings` tiene tres plantillas globales en lugar de `defaultWhatsappTemplate`: `bookingWhatsappTemplate` ("Reservar turno"), `inquiryWhatsappTemplate` ("Hacer una consulta") y `generalWhatsappTemplate` (botón flotante y CTA sin servicio puntual). `Service.whatsappTemplate` reemplaza solo a la de reserva. Una plantilla vacía cae a la de fábrica (`DEFAULT_*_WHATSAPP_TEMPLATE`). Variables: `{{servicio}}`, `{{precio}}`, `{{negocio}}`.
 - Seed no destructivo (lógica en `prisma/seed-runner.ts`): settings solo si no existe la fila; catálogo de ejemplo solo si no hay ninguna categoría; admin solo si no existe ninguno (sistema de un único admin). Nunca pisa ni recrea lo gestionado desde el panel.
 - Orden público de servicios: primero por `sortOrder` de la categoría, luego por `sortOrder` del servicio y por nombre.
 - Búsqueda pública (`q`): `contains` insensible a mayúsculas sobre `name` y `shortDescription`, con comodines LIKE escapados (`escapeLikePattern`). Distingue tildes ("termica" ≠ "térmica"); si molesta, evaluar la extensión `unaccent` más adelante.
@@ -93,3 +96,9 @@ scripts/         db-setup.ts
 - `NODE_ENV` es obligatoria (sin valor por defecto) para que producción nunca arranque en modo desarrollo.
 - `/api/health/db` cachea el último ping exitoso durante 15 s (limita pings, pero no evita que alguien mantenga Neon despierto). **Pendiente Fase 7:** protegerlo o limitarlo antes de producción.
 - Logs: los errores de Prisma se registran sin `message` (solo name/code/modelName), porque el mensaje puede incluir datos de clientes. `CLAUDE.md` está excluido de Prettier.
+- Sitio público (Fase 3): rutas en español (`/`, `/servicios`, `/servicios/:slug`, `/contacto`); los filtros del listado viven en la URL (`?linea=desarrollo|servicio-tecnico&categoria=<slug>&q=`) y el front los normaliza con los límites de `@sch/shared` (`constraints.ts`) para no pedir nada que la API rechace con 400.
+- Dependencias de la Fase 3: `react-markdown` (descripción de servicios; con `skipHtml`, sin imágenes y cargado con `lazy` solo en el detalle), `@fontsource-variable/inter` (fuente autoalojada, sin terceros), `jsdom` 29 + Testing Library (tests de componentes; jsdom 30+ exige Node ≥ 22.22).
+- Modo claro/oscuro: sigue al sistema hasta que el visitante elige; el script inline de `index.html` aplica el tema antes del primer pintado. **Pendiente Fase 7:** permitirlo por hash en la CSP.
+- Vite: no usar `loadEnv` sobre el `.env` raíz (su `NODE_ENV=development` forzaba un build de desarrollo); el puerto se lee con `parseEnv`. `@sch/shared` se resuelve por la condición `@sch/source` (cliente y SSR/Vitest) y declara `sideEffects: false`: lo que el front no importa (Zod) queda fuera del bundle. No importar `schemas.ts` desde el front.
+- Títulos de pestaña con `usePageTitle` (`document.title`), sin `react-helmet-async`.
+- El texto "Sobre mí" de `/contacto` está escrito en el código (Settings no tiene un campo para eso). **Pendiente Fase 5:** evaluar un campo editable.

@@ -24,9 +24,22 @@ En Windows (PowerShell), el primer paso es `Copy-Item .env.example .env`.
 
 Para cargar los datos de ejemplo (configuración, categorías, servicios y el admin), completá `ADMIN_EMAIL` y `ADMIN_PASSWORD` (mínimo 12 caracteres) en el `.env` y corré `pnpm db:seed`. El seed es idempotente: crea solo lo que falta y nunca pisa lo editado desde el panel. El admin se crea una única vez; cambiar `ADMIN_EMAIL` después no crea otro.
 
+## Sitio público
+
+Con `pnpm dev` corriendo, el sitio queda en http://localhost:5173:
+
+| Ruta               | Contenido                                                                         |
+| ------------------ | --------------------------------------------------------------------------------- |
+| `/`                | Inicio: hero, líneas de servicio, destacados, cómo funciona y CTA de WhatsApp     |
+| `/servicios`       | Listado con buscador y filtros por línea y categoría (`?linea=&categoria=&q=`)    |
+| `/servicios/:slug` | Detalle del servicio (descripción en markdown, precio, tiempo estimado, WhatsApp) |
+| `/contacto`        | Datos del negocio, horarios, zona de atención y redes                             |
+
+Los botones de WhatsApp abren un diálogo con el mensaje pre-cargado desde las plantillas de la configuración. El visitante puede editarlo antes de abrir `wa.me`. Para probar el build de producción: `pnpm build` y luego `pnpm --filter @sch/web preview` (http://localhost:4173, con la API corriendo).
+
 ## Tests
 
-`pnpm test` necesita Postgres corriendo: los tests de integración de la API usan la base `services_app_test` (`TEST_DATABASE_URL`), que se migra automáticamente y se vacía en cada corrida. Por seguridad, el nombre de esa base debe terminar en `_test`.
+`pnpm test` necesita Postgres corriendo: los tests de integración de la API usan la base `services_app_test` (`TEST_DATABASE_URL`), que se migra automáticamente y se vacía en cada corrida. Por seguridad, el nombre de esa base debe terminar en `_test`. Los tests del front corren en jsdom y no necesitan la API.
 
 ## Scripts
 
@@ -51,7 +64,7 @@ Respuestas en JSON. Las no paginadas vienen como `{ data }`, y los errores como 
 | -------------------------------- | ------------------------------------------------------------------------------------------------------ |
 | `GET /api/health`                | 200 sin consultar la base. Lo usará el monitor externo para evitar el arranque en frío.                |
 | `GET /api/health/db`             | Verifica la conexión a PostgreSQL (503 si no está disponible).                                         |
-| `GET /api/public/settings`       | Datos públicos del negocio y plantillas de WhatsApp.                                                   |
+| `GET /api/public/settings`       | Datos públicos del negocio y plantillas de WhatsApp (reserva, consulta y general).                     |
 | `GET /api/public/categories`     | Categorías activas, ordenadas.                                                                         |
 | `GET /api/public/services`       | Servicios activos. Filtros opcionales: `?category=<slug>` y `?q=<texto>` (nombre o descripción corta). |
 | `GET /api/public/services/:slug` | Detalle de un servicio activo (incluye la descripción en markdown).                                    |
