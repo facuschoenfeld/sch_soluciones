@@ -11,6 +11,10 @@ export default defineConfig({
   test: {
     environment: 'node',
     include: ['src/**/*.test.ts', 'test/**/*.test.ts'],
+    // Migra la base de tests (services_app_test) antes de empezar.
+    globalSetup: ['./test/global-setup.ts'],
+    // Los tests de integración comparten la base de tests: se corren de a un archivo.
+    fileParallelism: false,
     env: {
       NODE_ENV: 'test',
       LOG_LEVEL: 'silent',
