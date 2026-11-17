@@ -87,7 +87,7 @@ model Service {
   currency         Currency  @default(ARS)
   priceUnit        String?   @map("price_unit")
   estimatedTime    String?   @map("estimated_time")
-  // Si es null se usa la plantilla global de Settings.
+  // Plantilla de reserva propia; si es null se usa Settings.bookingWhatsappTemplate.
   whatsappTemplate String?   @map("whatsapp_template")
   // "Quitar" un servicio = archivarlo (isActive = false).
   isActive         Boolean   @default(true) @map("is_active")
@@ -160,7 +160,10 @@ model Settings {
   tagline                 String?
   // Formato internacional sin "+", ej. 5491122334455.
   whatsappNumber          String   @map("whatsapp_number")
-  defaultWhatsappTemplate String   @map("default_whatsapp_template")
+  // Plantillas globales del diálogo de WhatsApp ("Reservar turno" / "Hacer una consulta").
+  // Service.whatsappTemplate, si existe, reemplaza a la de reserva para ese servicio.
+  bookingWhatsappTemplate String   @map("booking_whatsapp_template")
+  inquiryWhatsappTemplate String   @map("inquiry_whatsapp_template")
   heroTitle               String   @map("hero_title")
   heroSubtitle            String?  @map("hero_subtitle")
   businessHours           String?  @map("business_hours")
