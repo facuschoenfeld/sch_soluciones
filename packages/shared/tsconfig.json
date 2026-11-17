@@ -1,7 +1,10 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "noEmit": true
+    "noEmit": true,
+    // Solo para los tests (URL, etc.). El build (tsconfig.build.json) no usa tipos de Node:
+    // shared corre también en el navegador.
+    "types": ["node"]
   },
   "include": ["src"]
 }

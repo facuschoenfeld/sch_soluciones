@@ -19,6 +19,11 @@ export interface Paginated<T> {
   meta: PaginationMeta;
 }
 
+/** Envoltorio de las respuestas no paginadas. */
+export interface DataResponse<T> {
+  data: T;
+}
+
 export interface HealthResponse {
   status: 'ok';
   uptimeSeconds: number;
