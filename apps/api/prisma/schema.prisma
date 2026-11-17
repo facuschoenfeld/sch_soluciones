@@ -1,0 +1,175 @@
+// Esquema de la base. Identificadores en inglés; tablas y columnas en snake_case vía @map.
+// Las URLs de conexión se configuran en prisma.config.ts (Prisma 7).
+
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  moduleFormat        = "esm"
+  importFileExtension = "js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Los enums se replican en packages/shared/src/enums.ts.
+
+enum ServiceLine {
+  DEVELOPMENT
+  TECH_SUPPORT
+}
+
+enum PriceType {
+  FIXED
+  FROM
+  QUOTE
+}
+
+enum Currency {
+  ARS
+  USD
+}
+
+enum ClientSource {
+  WHATSAPP
+  REFERRAL
+  WEB
+  OTHER
+}
+
+enum JobStatus {
+  QUOTED
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  DELIVERED
+  CANCELLED
+}
+
+model AdminUser {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@map("admin_users")
+}
+
+model Category {
+  id          Int         @id @default(autoincrement())
+  name        String
+  slug        String      @unique
+  description String?
+  // Nombre de ícono de lucide-react (ej. "monitor").
+  icon        String?
+  line        ServiceLine
+  sortOrder   Int         @default(0) @map("sort_order")
+  isActive    Boolean     @default(true) @map("is_active")
+  services    Service[]
+
+  @@index([line, isActive])
+  @@map("categories")
+}
+
+model Service {
+  id               Int       @id @default(autoincrement())
+  categoryId       Int       @map("category_id")
+  // Restrict: una categoría con servicios no se puede borrar; se desactiva.
+  category         Category  @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  name             String
+  slug             String    @unique
+  shortDescription String    @map("short_description")
+  // Markdown.
+  description      String    @default("")
+  priceType        PriceType @map("price_type")
+  // Null cuando priceType = QUOTE.
+  priceAmount      Decimal?  @map("price_amount") @db.Decimal(12, 2)
+  currency         Currency  @default(ARS)
+  priceUnit        String?   @map("price_unit")
+  estimatedTime    String?   @map("estimated_time")
+  // Si es null se usa la plantilla global de Settings.
+  whatsappTemplate String?   @map("whatsapp_template")
+  // "Quitar" un servicio = archivarlo (isActive = false).
+  isActive         Boolean   @default(true) @map("is_active")
+  isFeatured       Boolean   @default(false) @map("is_featured")
+  sortOrder        Int       @default(0) @map("sort_order")
+  priceUpdatedAt   DateTime  @default(now()) @map("price_updated_at")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+  jobs             Job[]
+
+  @@index([categoryId, isActive])
+  @@map("services")
+}
+
+model Client {
+  id        Int          @id @default(autoincrement())
+  fullName  String       @map("full_name")
+  phone     String
+  email     String?
+  address   String?
+  source    ClientSource @default(WHATSAPP)
+  notes     String?
+  createdAt DateTime     @default(now()) @map("created_at")
+  updatedAt DateTime     @updatedAt @map("updated_at")
+  jobs      Job[]
+
+  @@index([fullName])
+  @@index([phone])
+  @@map("clients")
+}
+
+model Job {
+  id                       Int        @id @default(autoincrement())
+  clientId                 Int        @map("client_id")
+  // Restrict: no se borra un cliente con trabajos registrados (integridad histórica).
+  client                   Client     @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  serviceId                Int?       @map("service_id")
+  service                  Service?   @relation(fields: [serviceId], references: [id], onDelete: SetNull)
+  // Snapshot del servicio al crear el trabajo: cambiar el catálogo no altera el historial.
+  // Null si el trabajo no se asoció a un servicio del catálogo.
+  serviceNameSnapshot      String?    @map("service_name_snapshot")
+  servicePriceSnapshot     Decimal?   @map("service_price_snapshot") @db.Decimal(12, 2)
+  servicePriceTypeSnapshot PriceType? @map("service_price_type_snapshot")
+  title                    String
+  description              String?
+  // { brand, model, serialNumber, reportedIssue, ... } validado con Zod en la API.
+  deviceInfo               Json?      @map("device_info")
+  status                   JobStatus  @default(QUOTED)
+  amountCharged            Decimal    @default(0) @map("amount_charged") @db.Decimal(12, 2)
+  currency                 Currency   @default(ARS)
+  amountPaid               Decimal    @default(0) @map("amount_paid") @db.Decimal(12, 2)
+  receivedAt               DateTime?  @map("received_at")
+  scheduledAt              DateTime?  @map("scheduled_at")
+  completedAt              DateTime?  @map("completed_at")
+  internalNotes            String?    @map("internal_notes")
+  createdAt                DateTime   @default(now()) @map("created_at")
+  updatedAt                DateTime   @updatedAt @map("updated_at")
+
+  @@index([clientId])
+  @@index([status])
+  @@index([serviceId])
+  @@map("jobs")
+}
+
+// Fila única (id = 1, garantizado con CHECK en la migración init), se lee/escribe con upsert.
+// Otras restricciones CHECK (precio según priceType, montos >= 0) también viven en esa migración.
+model Settings {
+  id                      Int      @id @default(1)
+  businessName            String   @map("business_name")
+  tagline                 String?
+  // Formato internacional sin "+", ej. 5491122334455.
+  whatsappNumber          String   @map("whatsapp_number")
+  defaultWhatsappTemplate String   @map("default_whatsapp_template")
+  heroTitle               String   @map("hero_title")
+  heroSubtitle            String?  @map("hero_subtitle")
+  businessHours           String?  @map("business_hours")
+  serviceArea             String?  @map("service_area")
+  instagramUrl            String?  @map("instagram_url")
+  githubUrl               String?  @map("github_url")
+  linkedinUrl             String?  @map("linkedin_url")
+  email                   String?
+  updatedAt               DateTime @updatedAt @map("updated_at")
+
+  @@map("settings")
+}
