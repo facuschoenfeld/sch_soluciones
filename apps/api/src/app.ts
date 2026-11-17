@@ -2,13 +2,16 @@ import cors from 'cors';
 import express, { type Express } from 'express';
 import helmet from 'helmet';
 import { pinoHttp } from 'pino-http';
+import type { PrismaClient } from './generated/prisma/client.js';
 import type { Logger } from './lib/logger.js';
-import type { DbPinger } from './lib/prisma.js';
 import { createErrorHandler, notFoundHandler } from './middlewares/error-handler.js';
+import { createCategoriesPublicRouter } from './modules/categories/categories.routes.js';
 import { createHealthRouter } from './modules/health/health.routes.js';
+import { createServicesPublicRouter } from './modules/services/services.routes.js';
+import { createSettingsPublicRouter } from './modules/settings/settings.routes.js';
 
 export interface AppDeps {
-  db: DbPinger;
+  db: PrismaClient;
   logger: Logger;
   corsOrigins: string[];
 }
@@ -45,6 +48,11 @@ export function createApp({ db, logger, corsOrigins }: AppDeps): Express {
   app.use(express.json({ limit: '100kb' }));
 
   app.use('/api/health', createHealthRouter(db));
+
+  // API pública (sin auth): solo datos del catálogo y del negocio, nunca de clientes.
+  app.use('/api/public/settings', createSettingsPublicRouter(db));
+  app.use('/api/public/categories', createCategoriesPublicRouter(db));
+  app.use('/api/public/services', createServicesPublicRouter(db));
 
   app.use(notFoundHandler);
   app.use(createErrorHandler(logger));

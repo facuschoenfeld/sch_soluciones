@@ -1,6 +1,7 @@
 import request from 'supertest';
 import { describe, expect, it, vi } from 'vitest';
 import { createApp } from '../src/app.js';
+import type { PrismaClient } from '../src/generated/prisma/client.js';
 import { createLogger } from '../src/lib/logger.js';
 import type { DbPinger } from '../src/lib/prisma.js';
 import { DB_HEALTH_CACHE_MS, createDbHealthChecker } from '../src/modules/health/health.service.js';
@@ -13,7 +14,9 @@ function fakeDb(queryRaw: ReturnType<typeof vi.fn>): DbPinger {
 }
 
 function buildApp(queryRaw: ReturnType<typeof vi.fn> = vi.fn()) {
-  return createApp({ db: fakeDb(queryRaw), logger, corsOrigins: [ALLOWED_ORIGIN] });
+  // Los health checks solo usan $queryRaw: alcanza con un cliente falso.
+  const db = fakeDb(queryRaw) as unknown as PrismaClient;
+  return createApp({ db, logger, corsOrigins: [ALLOWED_ORIGIN] });
 }
 
 describe('GET /api/health', () => {
