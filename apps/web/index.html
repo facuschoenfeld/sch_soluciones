@@ -3,13 +3,32 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#0f172a" />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>SCH Soluciones</title>
     <meta
       name="description"
       content="Desarrollo de páginas web y aplicaciones de escritorio. Servicio técnico de PC: mantenimiento, reparación y diagnóstico."
     />
     <!-- Open Graph estático (Fase 7): los rastreadores de Instagram/WhatsApp no ejecutan JS. -->
+    <!--
+      Aplica el tema antes del primer pintado para evitar el parpadeo claro→oscuro.
+      Debe coincidir con src/lib/theme.ts. Fase 7: al definir la CSP, permitir este script por hash.
+    -->
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem('theme');
+          var dark =
+            stored === 'dark' ||
+            (stored !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+          if (dark) {
+            document.documentElement.classList.add('dark');
+            document.querySelector('meta[name="theme-color"]').setAttribute('content', '#020618');
+          }
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
