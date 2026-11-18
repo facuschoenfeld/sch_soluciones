@@ -6,7 +6,13 @@ import { connectWithRetry, createPrismaClient } from './lib/prisma.js';
 const env = loadEnv();
 const logger = createLogger(env);
 const prisma = createPrismaClient(env.DATABASE_URL);
-const app = createApp({ db: prisma, logger, corsOrigins: env.CORS_ORIGIN });
+const app = createApp({
+  db: prisma,
+  logger,
+  allowedOrigins: env.ALLOWED_ORIGINS,
+  jwtSecret: env.JWT_SECRET,
+  isProduction: env.NODE_ENV === 'production',
+});
 
 const server = app.listen(env.PORT, (error?: Error) => {
   if (error) {
