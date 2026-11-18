@@ -61,6 +61,7 @@ scripts/         db-setup.ts
 
 - **Idioma:** interfaz y textos visibles en español (es-AR). Código, nombres de archivos, rutas de la API, tablas, columnas, enums y migraciones en **inglés**. Commits y comentarios técnicos en **español**.
 - **Commits:** Conventional Commits con tipo en inglés y descripción en español (ej.: `feat(services): agrega actualización masiva de precios`).
+- **Trailer de atribución:** cada commit termina con exactamente `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`. Es la atribución de la sesión principal, que escribe el código. Se usa esta línea aunque el commit lo haga un sub-agente (ej. `git-committer`) que corra con otro modelo o reciba otra sugerencia de atribución.
 - **TypeScript** `strict` en todo el repo, sin `any` (ESLint lo marca como error). Imports de tipos con `import type`.
 - **API:** imports relativos con extensión `.js` (ESM NodeNext). Errores con `AppError(status, code, message)`; formato uniforme `{ error: { code, message, details? } }`. Paginación `?page=&pageSize=` → `{ data, meta: { page, pageSize, total } }`.
 - **Base de datos:** modelos en PascalCase; tablas y columnas en snake_case vía `@map`/`@@map`. Los enums de Prisma se replican en `packages/shared/src/enums.ts` (hay un test que fija sus valores).
