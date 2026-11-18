@@ -1,0 +1,70 @@
+import { Eye, EyeOff } from 'lucide-react';
+import { useState, type ComponentProps, type ReactNode } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { cn } from '@/lib/utils';
+
+interface FormFieldProps {
+  id: string;
+  label: string;
+  error?: string;
+  hint?: string;
+  children: (aria: {
+    id: string;
+    'aria-invalid': boolean;
+    'aria-describedby': string | undefined;
+  }) => ReactNode;
+}
+
+/** Label + control + ayuda + error, con los atributos aria conectados. */
+export function FormField({ id, label, error, hint, children }: FormFieldProps) {
+  const hintId = hint ? `${id}-hint` : undefined;
+  const errorId = error ? `${id}-error` : undefined;
+  const describedBy = [hintId, errorId].filter(Boolean).join(' ') || undefined;
+
+  return (
+    <div className="grid gap-2">
+      <Label htmlFor={id}>{label}</Label>
+      {children({ id, 'aria-invalid': Boolean(error), 'aria-describedby': describedBy })}
+      {hint && (
+        <p id={hintId} className="text-sm text-muted-foreground">
+          {hint}
+        </p>
+      )}
+      {error && (
+        <p id={errorId} className="text-sm font-medium text-destructive">
+          {error}
+        </p>
+      )}
+    </div>
+  );
+}
+
+/** Input de contraseña con botón para mostrarla (útil en el celular). */
+export function PasswordInput({ className, ...props }: ComponentProps<typeof Input>) {
+  const [visible, setVisible] = useState(false);
+  const label = visible ? 'Ocultar contraseña' : 'Mostrar contraseña';
+
+  return (
+    <div className="relative">
+      <Input
+        {...props}
+        type={visible ? 'text' : 'password'}
+        className={cn('h-11 pr-12', className)}
+      />
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        className="absolute top-0 right-0 size-11"
+        onClick={() => setVisible((value) => !value)}
+        aria-label={label}
+        aria-pressed={visible}
+        title={label}
+      >
+        {visible ? <EyeOff aria-hidden="true" /> : <Eye aria-hidden="true" />}
+      </Button>
+    </div>
+  );
+}

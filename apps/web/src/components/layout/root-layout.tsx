@@ -1,29 +1,10 @@
 import { MessageCircle } from 'lucide-react';
-import { useEffect, useRef } from 'react';
-import { Outlet, ScrollRestoration, useLocation } from 'react-router';
+import { Outlet, ScrollRestoration } from 'react-router';
 import { SlowLoadingNotice } from '@/components/feedback/slow-loading-notice';
 import { WhatsappButton } from '@/components/whatsapp/whatsapp-button';
+import { useFocusMainOnNavigation } from '@/lib/use-focus-main';
 import { SiteFooter } from './site-footer';
 import { SiteHeader } from './site-header';
-
-/**
- * Al navegar a otra página, el foco pasa al contenido principal para que un lector de pantalla
- * anuncie el cambio (en una SPA no hay recarga). No aplica a la carga inicial ni a cambios de
- * filtros (?linea=…), que no cambian la ruta.
- */
-function useFocusMainOnNavigation() {
-  const { pathname } = useLocation();
-  const mainRef = useRef<HTMLElement>(null);
-  const previousPathname = useRef(pathname);
-
-  useEffect(() => {
-    if (previousPathname.current === pathname) return;
-    previousPathname.current = pathname;
-    mainRef.current?.focus({ preventScroll: true });
-  }, [pathname]);
-
-  return mainRef;
-}
 
 export function RootLayout() {
   const mainRef = useFocusMainOnNavigation();

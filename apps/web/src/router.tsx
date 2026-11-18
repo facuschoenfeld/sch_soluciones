@@ -1,4 +1,5 @@
 import { createBrowserRouter } from 'react-router';
+import { AdminEntry } from '@/components/admin/admin-entry';
 import { RootLayout } from '@/components/layout/root-layout';
 import { ContactPage } from '@/pages/contact-page';
 import { HomePage } from '@/pages/home-page';
@@ -18,6 +19,11 @@ export const routes = [
       { path: 'contacto', element: <ContactPage /> },
       { path: '*', element: <NotFoundPage /> },
     ],
+  },
+  {
+    // Fuera de RootLayout: el panel tiene su propio layout (sin header público ni WhatsApp).
+    path: '/admin/*',
+    element: <AdminEntry />,
   },
 ];
 

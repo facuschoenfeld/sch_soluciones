@@ -11,6 +11,7 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import { useBusinessName } from '@/lib/public-api';
+import { keepFocusInMain } from '@/lib/use-focus-main';
 import { cn } from '@/lib/utils';
 import { NAV_LINKS } from './nav-links';
 import { ThemeToggle } from './theme-toggle';
@@ -65,16 +66,7 @@ export function SiteHeader() {
                 <Menu aria-hidden="true" />
               </Button>
             </SheetTrigger>
-            <SheetContent
-              side="right"
-              // Al navegar desde el menú, el layout ya movió el foco al <main>: se evita que
-              // Radix lo devuelva al botón "Abrir menú" al cerrar.
-              onCloseAutoFocus={(event) => {
-                if (document.getElementById('main')?.contains(document.activeElement)) {
-                  event.preventDefault();
-                }
-              }}
-            >
+            <SheetContent side="right" onCloseAutoFocus={keepFocusInMain}>
               <SheetHeader>
                 <SheetTitle>{businessName}</SheetTitle>
                 <SheetDescription className="sr-only">Menú de navegación</SheetDescription>
