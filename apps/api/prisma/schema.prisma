@@ -50,6 +50,8 @@ model AdminUser {
   id           Int      @id @default(autoincrement())
   email        String   @unique
   passwordHash String   @map("password_hash")
+  // Se incrementa al cambiar la contraseña: invalida todas las sesiones (JWT) emitidas antes.
+  tokenVersion Int      @default(0) @map("token_version")
   createdAt    DateTime @default(now()) @map("created_at")
 
   @@map("admin_users")
