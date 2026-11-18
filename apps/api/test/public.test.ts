@@ -2,13 +2,11 @@ import request from 'supertest';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { DEFAULT_GENERAL_WHATSAPP_TEMPLATE, type PublicServiceSummary } from '@sch/shared';
 import { runSeed } from '../prisma/seed-runner.js';
-import { createApp } from '../src/app.js';
-import { createLogger } from '../src/lib/logger.js';
+import { createTestApp } from './helpers/test-app.js';
 import { getTestPrisma, resetDatabase } from './helpers/test-db.js';
 
 const prisma = getTestPrisma();
-const logger = createLogger({ NODE_ENV: 'test', LOG_LEVEL: 'silent' });
-const app = createApp({ db: prisma, logger, corsOrigins: ['http://localhost:5173'] });
+const app = createTestApp(prisma);
 
 beforeAll(async () => {
   await resetDatabase(prisma);

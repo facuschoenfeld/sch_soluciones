@@ -1,13 +1,9 @@
 import request from 'supertest';
 import { describe, expect, it, vi } from 'vitest';
-import { createApp } from '../src/app.js';
 import type { PrismaClient } from '../src/generated/prisma/client.js';
-import { createLogger } from '../src/lib/logger.js';
 import type { DbPinger } from '../src/lib/prisma.js';
 import { DB_HEALTH_CACHE_MS, createDbHealthChecker } from '../src/modules/health/health.service.js';
-
-const logger = createLogger({ NODE_ENV: 'test', LOG_LEVEL: 'silent' });
-const ALLOWED_ORIGIN = 'http://localhost:5173';
+import { createTestApp } from './helpers/test-app.js';
 
 function fakeDb(queryRaw: ReturnType<typeof vi.fn>): DbPinger {
   return { $queryRaw: queryRaw } as unknown as DbPinger;
@@ -16,7 +12,7 @@ function fakeDb(queryRaw: ReturnType<typeof vi.fn>): DbPinger {
 function buildApp(queryRaw: ReturnType<typeof vi.fn> = vi.fn()) {
   // Los health checks solo usan $queryRaw: alcanza con un cliente falso.
   const db = fakeDb(queryRaw) as unknown as PrismaClient;
-  return createApp({ db, logger, corsOrigins: [ALLOWED_ORIGIN] });
+  return createTestApp(db);
 }
 
 describe('GET /api/health', () => {
@@ -90,18 +86,12 @@ describe('createDbHealthChecker', () => {
   });
 });
 
-describe('CORS', () => {
-  it('permite el origen configurado con credenciales', async () => {
-    const res = await request(buildApp()).get('/api/health').set('Origin', ALLOWED_ORIGIN);
-
-    expect(res.headers['access-control-allow-origin']).toBe(ALLOWED_ORIGIN);
-    expect(res.headers['access-control-allow-credentials']).toBe('true');
-  });
-
-  it('no habilita orígenes no configurados', async () => {
+describe('sin CORS (front y API comparten origen)', () => {
+  it('no habilita orígenes cruzados, ni siquiera el del front', async () => {
     const res = await request(buildApp()).get('/api/health').set('Origin', 'https://evil.example');
 
     expect(res.headers['access-control-allow-origin']).toBeUndefined();
+    expect(res.headers['access-control-allow-credentials']).toBeUndefined();
   });
 });
 
