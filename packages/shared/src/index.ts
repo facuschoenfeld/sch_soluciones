@@ -1,4 +1,5 @@
 export * from './api.js';
+export * from './auth.js';
 export * from './enums.js';
 export * from './price.js';
 export * from './public.js';

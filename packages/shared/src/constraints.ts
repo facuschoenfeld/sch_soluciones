@@ -7,3 +7,9 @@ export const SEARCH_QUERY_MAX_LENGTH = 100;
 export function isValidSlug(value: string): boolean {
   return value.length <= SLUG_MAX_LENGTH && SLUG_PATTERN.test(value);
 }
+
+// Contraseña del admin. El máximo evita gastar argon2 (CPU y ~19 MiB de memoria por
+// verificación) en entradas enormes.
+export const PASSWORD_MIN_LENGTH = 12;
+export const PASSWORD_MAX_LENGTH = 256;
+export const EMAIL_MAX_LENGTH = 254;
