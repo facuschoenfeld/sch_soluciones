@@ -2,11 +2,17 @@
 import type { PublicServiceDetail } from '@sch/shared';
 import { cleanup, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { publicQueryKeys } from '@/lib/public-api';
 import { settingsFixture, windowsService } from '@/test/fixtures';
 import { createTestQueryClient, renderWithProviders } from '@/test/render';
 import { ServiceDetailPage } from './service-detail-page';
+
+// El markdown se carga con React.lazy: se precarga el módulo para que, con toda la suite
+// corriendo en paralelo, la primera carga no supere el timeout de findBy.
+beforeAll(async () => {
+  await import('@/components/markdown');
+});
 
 afterEach(() => {
   cleanup();
