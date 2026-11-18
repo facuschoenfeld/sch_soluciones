@@ -37,6 +37,12 @@ Con `pnpm dev` corriendo, el sitio queda en http://localhost:5173:
 
 Los botones de WhatsApp abren un diálogo con el mensaje pre-cargado desde las plantillas de la configuración. El visitante puede editarlo antes de abrir `wa.me`. Para probar el build de producción: `pnpm build` y luego `pnpm --filter @sch/web preview` (http://localhost:4173, con la API corriendo).
 
+## Panel de administración
+
+En http://localhost:5173/admin (redirige a `/admin/login` si no hay sesión). Se ingresa con el admin que creó `pnpm db:seed` (`ADMIN_EMAIL` / `ADMIN_PASSWORD`). La contraseña se cambia desde **Configuración**; al cambiarla se cierran las sesiones abiertas en otros dispositivos. Desde ahí también podés cerrar la sesión en todos los dispositivos (por ejemplo, si perdiste el celular).
+
+La sesión es una cookie httpOnly (`SameSite=Strict`; en producción `Secure` con prefijo `__Host-`) que dura 12 h y se renueva sola con el uso, hasta un máximo de 7 días desde el login. Los intentos fallidos de login (y de contraseña actual) se limitan: 10 por hora por IP y 50 por hora en total. El límite total no se aplica a los navegadores donde ya iniciaste sesión, que reciben una cookie de dispositivo de confianza (con su propio límite de 10 por hora): un ataque distribuido no te deja afuera desde tu PC o tu celular. Cambiar `JWT_SECRET` cierra todas las sesiones.
+
 ## Tests
 
 `pnpm test` necesita Postgres corriendo: los tests de integración de la API usan la base `services_app_test` (`TEST_DATABASE_URL`), que se migra automáticamente y se vacía en cada corrida. Por seguridad, el nombre de esa base debe terminar en `_test`. Los tests del front corren en jsdom y no necesitan la API.
@@ -58,7 +64,7 @@ Los botones de WhatsApp abren un diálogo con el mensaje pre-cargado desde las p
 
 ## API
 
-Respuestas en JSON. Las no paginadas vienen como `{ data }`, y los errores como `{ error: { code, message, details? } }`.
+Respuestas en JSON. Las no paginadas vienen como `{ data }`, y los errores como `{ error: { code, message, details? } }`. Todo `/api/admin/*` responde 401 sin sesión. Las escrituras en `/api/auth` y `/api/admin` exigen `Content-Type: application/json` y un `Origin` incluido en `ALLOWED_ORIGINS` (defensa CSRF). Hay un límite global de 300 peticiones cada 15 minutos por IP (salvo `/api/health`), y las respuestas públicas se cachean 30 s en memoria.
 
 | Endpoint                         | Descripción                                                                                            |
 | -------------------------------- | ------------------------------------------------------------------------------------------------------ |
@@ -68,6 +74,11 @@ Respuestas en JSON. Las no paginadas vienen como `{ data }`, y los errores como 
 | `GET /api/public/categories`     | Categorías activas, ordenadas.                                                                         |
 | `GET /api/public/services`       | Servicios activos. Filtros opcionales: `?category=<slug>` y `?q=<texto>` (nombre o descripción corta). |
 | `GET /api/public/services/:slug` | Detalle de un servicio activo (incluye la descripción en markdown).                                    |
+| `POST /api/auth/login`           | Inicia sesión (`{ email, password }`) y deja la cookie de sesión.                                      |
+| `POST /api/auth/logout`          | Cierra la sesión (borra la cookie).                                                                    |
+| `GET /api/auth/me`               | Admin de la sesión (`{ data: { email } }`), o `{ data: null }` sin sesión.                             |
+| `POST /api/admin/password`       | Cambia la contraseña (`{ currentPassword, newPassword }`). Requiere sesión.                            |
+| `POST /api/admin/logout-all`     | Cierra la sesión en todos los dispositivos (incluido el actual). Requiere sesión.                      |
 
 ## Variables de entorno
 

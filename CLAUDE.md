@@ -42,13 +42,15 @@ apps/web         React + Vite + React Router + TanStack Query + Tailwind v4 + sh
   src/pages              una página por archivo
   src/lib                api-client, query-client, public-api (hooks de TanStack Query), utils
   src/test               fixtures y helper de render para tests de componentes (jsdom)
+  src/admin-app.tsx      panel /admin/* (se carga con lazy); src/components/admin, src/pages/admin
 apps/api         Express 5 + Prisma 7 (driver adapter pg)
   prisma/                schema.prisma, migrations/, seed.ts
   prisma.config.ts       URLs de conexión (DIRECT_URL para migraciones)
   src/app.ts             arma la app (testeable con Supertest); src/server.ts la levanta
   src/config/env.ts      validación de variables de entorno con Zod
   src/modules/<x>/       <x>.routes.ts · <x>.controller.ts · <x>.service.ts
-  src/middlewares/       manejo de errores, auth (Fase 4)
+  src/middlewares/       errores, sesión/requireAuth, seguridad (CSRF, no-store, rate limits)
+  src/modules/auth/      login/logout/me, cambio de contraseña, JWT + cookie (session.ts)
   src/generated/         cliente Prisma generado (no se versiona)
   test/                  tests de la API
 packages/shared  esquemas Zod, tipos y utilidades compartidas (@sch/shared)
@@ -62,7 +64,7 @@ scripts/         db-setup.ts
 - **TypeScript** `strict` en todo el repo, sin `any` (ESLint lo marca como error). Imports de tipos con `import type`.
 - **API:** imports relativos con extensión `.js` (ESM NodeNext). Errores con `AppError(status, code, message)`; formato uniforme `{ error: { code, message, details? } }`. Paginación `?page=&pageSize=` → `{ data, meta: { page, pageSize, total } }`.
 - **Base de datos:** modelos en PascalCase; tablas y columnas en snake_case vía `@map`/`@@map`. Los enums de Prisma se replican en `packages/shared/src/enums.ts` (hay un test que fija sus valores).
-- **`@sch/shared`:** en desarrollo se consume desde el código fuente (condición `@sch/source` en tsc/tsx, alias en Vite/Vitest); en el build de la API, desde su `dist`.
+- **`@sch/shared`:** en desarrollo se consume desde el código fuente (condición `@sch/source` en tsc, tsx y Vite; alias en el Vitest de la API); en el build de la API, desde su `dist`.
 - **Env:** un único `.env` en la raíz (ver `.env.example`). Toda variable nueva se agrega a `.env.example` y a `src/config/env.ts`.
 - **Front:** alias `@/` → `apps/web/src`. Archivos de componentes en kebab-case.
 - **Precios:** ARS por defecto, USD opcional por servicio; formato `es-AR` (`$ 25.000`).
@@ -102,3 +104,25 @@ scripts/         db-setup.ts
 - Vite: no usar `loadEnv` sobre el `.env` raíz (su `NODE_ENV=development` forzaba un build de desarrollo); el puerto se lee con `parseEnv`. `@sch/shared` se resuelve por la condición `@sch/source` (cliente y SSR/Vitest) y declara `sideEffects: false`: lo que el front no importa (Zod) queda fuera del bundle. No importar `schemas.ts` desde el front.
 - Títulos de pestaña con `usePageTitle` (`document.title`), sin `react-helmet-async`.
 - El texto "Sobre mí" de `/contacto` está escrito en el código (Settings no tiene un campo para eso). **Pendiente Fase 5:** evaluar un campo editable.
+- Auditoría de seguridad previa a la Fase 4 (2026-11-18), **implementada en la Fase 4**. Decidido con el usuario:
+  - **En la Fase 4:**
+    - `trust proxy = 1` solo en producción.
+    - Rate limit global en `/api`.
+    - Caché corta de las respuestas públicas.
+    - Se **quita `cors`** (y `CORS_ORIGIN`): front y API comparten origen. Como defensa CSRF, las escrituras de `/api/auth` y `/api/admin` exigen `Content-Type: application/json` y un header `Origin` permitido.
+  - **Diseño de auth (checklist del auditor):**
+    - JWT HS256 con `jose`; claims `sub` y `tv` (tokenVersion en `AdminUser`), sin email.
+    - Vencimiento de 8-12 h con renovación deslizante y tope absoluto.
+    - Cookie `httpOnly` + `SameSite=Strict`, `__Host-` en producción.
+    - Login con mensaje genérico y hash ficticio para igualar tiempos.
+    - Rate limit de fallos (login y contraseña actual): 10/h por IP, 10/h por dispositivo de confianza y 50/h global. El global no aplica a navegadores con cookie de "dispositivo de confianza": un JWT firmado con audiencia propia, `jti` y `tv`, de 90 días, que se emite en cada login correcto (patrón de OWASP). Así un ataque distribuido no bloquea al admin. Su límite propio impide la fuerza bruta con una cookie robada, y el `tv` la revoca al cambiar la contraseña o cerrar todas las sesiones.
+    - `POST /api/admin/logout-all` (botón "Cerrar sesión en todos los dispositivos" en Configuración): `tokenVersion++`, invalida todas las sesiones y dispositivos de confianza. El logout normal solo borra la cookie de ese navegador.
+    - `JWT_SECRET`: mínimo 43 caracteres y al menos 16 distintos (rechaza secretos armados a mano).
+    - `redact` de body, email y contraseñas en el logger.
+  - **Regla de logs:** ningún mensaje de error interpola datos de entrada.
+  - Implementación: `GET /api/auth/me` responde `{ data: null }` (200) sin sesión, para que el front consulte el estado sin errores en consola; todo `/api/admin/*` responde 401 sin sesión (requireAuth antes del router, incluso en rutas inexistentes). Cambio de contraseña en `POST /api/admin/password` (comparte el limitador de intentos con el login). El panel (`/admin/*`) se carga con `lazy`: React Hook Form y Zod quedan fuera del bundle público. Limitadores en memoria (una sola instancia; se reinician al dormirse Render).
+  - **Pendientes:**
+    - Token para `/api/health/db` (Fase 7).
+    - Verificar en el primer deploy (Fase 7) que con `trust proxy = 1` `req.ip` sea la IP real del visitante en Render (endpoint temporal) y anotar el resultado acá.
+    - Validar `https:` y email en Settings (Fase 5).
+    - `picomatch` (solo desarrollo) cuando salga el parche.
