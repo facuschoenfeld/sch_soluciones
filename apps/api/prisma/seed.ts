@@ -7,7 +7,14 @@ import { runSeed } from './seed-runner.js';
 
 const seedEnvSchema = z.object({
   DATABASE_URL: z.string().min(1),
-  ADMIN_EMAIL: z.string().trim().pipe(z.email('ADMIN_EMAIL debe ser un email válido')),
+  ADMIN_EMAIL: z
+    .string()
+    .trim()
+    .pipe(z.email('ADMIN_EMAIL debe ser un email válido'))
+    .refine(
+      (value) => !value.toLowerCase().endsWith('@example.com'),
+      'ADMIN_EMAIL sigue con el valor de ejemplo',
+    ),
   ADMIN_PASSWORD: z
     .string()
     .min(12, 'ADMIN_PASSWORD debe tener al menos 12 caracteres')

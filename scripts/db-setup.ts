@@ -50,6 +50,11 @@ async function main(): Promise<void> {
   if (!role || !password) {
     throw new Error('DATABASE_URL debe incluir usuario y contraseña del rol de la app.');
   }
+  if (password.startsWith('CAMBIAR')) {
+    throw new Error(
+      'La contraseña del rol en DATABASE_URL sigue con el valor de ejemplo: elegí una propia (y usá la misma en DIRECT_URL y TEST_DATABASE_URL).',
+    );
+  }
 
   const devDb = databaseName(appUrl);
   const testDb = process.env.TEST_DATABASE_URL
