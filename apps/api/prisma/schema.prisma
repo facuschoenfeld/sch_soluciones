@@ -170,6 +170,9 @@ model Settings {
   generalWhatsappTemplate String   @map("general_whatsapp_template")
   heroTitle               String   @map("hero_title")
   heroSubtitle            String?  @map("hero_subtitle")
+  // Texto "Sobre mí" de /contacto (texto plano; los párrafos se separan con una línea en blanco).
+  // Null = se muestra el texto genérico del front.
+  aboutText               String?  @map("about_text")
   businessHours           String?  @map("business_hours")
   serviceArea             String?  @map("service_area")
   instagramUrl            String?  @map("instagram_url")
