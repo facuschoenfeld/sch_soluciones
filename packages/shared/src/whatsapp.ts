@@ -47,3 +47,25 @@ export function buildWhatsappUrl(number: string, message: string): string {
   const base = `https://wa.me/${number}`;
   return message ? `${base}?text=${encodeURIComponent(message)}` : base;
 }
+
+/**
+ * Aviso (no bloqueante) para números de Argentina mal armados. En `wa.me` un celular va como
+ * 549 + código de área sin el 0 + número sin el 15: 13 dígitos (ej. 5491122334455).
+ * Devuelve null si no hay nada que advertir (incluye números de otros países).
+ */
+export function whatsappNumberWarning(number: string): string | null {
+  if (number.startsWith('0')) {
+    return 'No va el 0 inicial: empezá con el código de país (54 para Argentina).';
+  }
+  if (!number.startsWith('54')) return null;
+  if (!number.startsWith('549')) {
+    return 'Para un celular de Argentina, después del 54 va un 9 (ej. 5491122334455).';
+  }
+  if (number.startsWith('5490')) {
+    return 'Sacá el 0 del código de área (ej. 549 11…, no 549 011…).';
+  }
+  if (number.length !== 13) {
+    return 'Un celular de Argentina tiene 13 dígitos: 549 + código de área sin 0 + número sin 15.';
+  }
+  return null;
+}

@@ -12,6 +12,8 @@ export interface PublicSettings {
   generalWhatsappTemplate: string;
   heroTitle: string;
   heroSubtitle: string | null;
+  /** "Sobre mí" de /contacto, texto plano. Null = el front muestra un texto genérico. */
+  aboutText: string | null;
   businessHours: string | null;
   serviceArea: string | null;
   instagramUrl: string | null;
