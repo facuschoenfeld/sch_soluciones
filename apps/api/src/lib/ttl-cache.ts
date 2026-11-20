@@ -5,7 +5,7 @@
  */
 export interface TtlCache {
   get<T>(key: string, load: () => Promise<T>): Promise<T>;
-  /** Para la Fase 5: al editar el catálogo desde el panel. */
+  /** Descarta todo (se llama al editar el catálogo o la configuración desde el panel). */
   clear(): void;
 }
 

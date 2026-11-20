@@ -14,7 +14,8 @@ import {
   protectWrites,
   type RateLimitOptions,
 } from './middlewares/security.js';
-import { createAdminRouter, createAuthRouter } from './modules/auth/auth.routes.js';
+import { createAdminRouter } from './modules/admin/admin.routes.js';
+import { createAuthRouter } from './modules/auth/auth.routes.js';
 import { createSessionConfig } from './modules/auth/session.js';
 import { createCategoriesPublicRouter } from './modules/categories/categories.routes.js';
 import { createHealthRouter } from './modules/health/health.routes.js';
@@ -114,7 +115,13 @@ export function createApp({
     '/api/admin',
     ...guarded,
     requireAuth,
-    createAdminRouter({ db, session, credentialsLimiters: limiters.credentials }),
+    createAdminRouter({
+      db,
+      session,
+      credentialsLimiters: limiters.credentials,
+      // Un cambio desde el panel se ve en el sitio al recargar: se descarta la caché pública.
+      onPublicDataChange: () => publicCache.clear(),
+    }),
   );
 
   app.use(notFoundHandler);

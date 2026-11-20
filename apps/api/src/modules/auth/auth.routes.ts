@@ -25,8 +25,12 @@ export function createAuthRouter({ db, session, credentialsLimiters }: AuthRoute
   return router;
 }
 
-/** `/api/admin` (ya protegido por requireAuth). En la Fase 5 se suman catálogo y configuración. */
-export function createAdminRouter({ db, session, credentialsLimiters }: AuthRouterDeps): Router {
+/** Rutas de la cuenta dentro de `/api/admin` (ya protegido por requireAuth). */
+export function createAuthAdminRouter({
+  db,
+  session,
+  credentialsLimiters,
+}: AuthRouterDeps): Router {
   const router = Router();
   const controller = createAuthController(db, session);
 
