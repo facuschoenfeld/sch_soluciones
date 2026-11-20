@@ -40,7 +40,7 @@ apps/web         React + Vite + React Router + TanStack Query + Tailwind v4 + sh
   src/components/whatsapp  botón + diálogo de WhatsApp (mensaje pre-cargado y editable)
   src/components/services · feedback  tarjetas de servicio · estados de error/vacío/carga lenta
   src/pages              una página por archivo
-  src/lib                api-client, query-client, public-api (hooks de TanStack Query), utils
+  src/lib                api-client, query-client, public-api y admin-api (hooks de TanStack Query), utils
   src/test               fixtures y helper de render para tests de componentes (jsdom)
   src/admin-app.tsx      panel /admin/* (se carga con lazy); src/components/admin, src/pages/admin
 apps/api         Express 5 + Prisma 7 (driver adapter pg)
@@ -51,6 +51,7 @@ apps/api         Express 5 + Prisma 7 (driver adapter pg)
   src/modules/<x>/       <x>.routes.ts · <x>.controller.ts · <x>.service.ts
   src/middlewares/       errores, sesión/requireAuth, seguridad (CSRF, no-store, rate limits)
   src/modules/auth/      login/logout/me, cambio de contraseña, JWT + cookie (session.ts)
+  src/modules/admin/     compone /api/admin (cuenta, categories, services, settings)
   src/generated/         cliente Prisma generado (no se versiona)
   test/                  tests de la API
 packages/shared  esquemas Zod, tipos y utilidades compartidas (@sch/shared)
@@ -104,7 +105,7 @@ scripts/         db-setup.ts
 - Modo claro/oscuro: sigue al sistema hasta que el visitante elige; el script inline de `index.html` aplica el tema antes del primer pintado. **Pendiente Fase 7:** permitirlo por hash en la CSP.
 - Vite: no usar `loadEnv` sobre el `.env` raíz (su `NODE_ENV=development` forzaba un build de desarrollo); el puerto se lee con `parseEnv`. `@sch/shared` se resuelve por la condición `@sch/source` (cliente y SSR/Vitest) y declara `sideEffects: false`: lo que el front no importa (Zod) queda fuera del bundle. No importar `schemas.ts` desde el front.
 - Títulos de pestaña con `usePageTitle` (`document.title`), sin `react-helmet-async`.
-- El texto "Sobre mí" de `/contacto` está escrito en el código (Settings no tiene un campo para eso). **Pendiente Fase 5:** evaluar un campo editable.
+- "Sobre mí" de `/contacto` sale de `Settings.aboutText` (texto plano; párrafos separados por una línea en blanco). Si es null se muestra `DEFAULT_ABOUT_TEXT` (`apps/web/src/lib/about-text.ts`).
 - Auditoría de seguridad previa a la Fase 4 (2026-11-18), **implementada en la Fase 4**. Decidido con el usuario:
   - **En la Fase 4:**
     - `trust proxy = 1` solo en producción.
@@ -125,5 +126,20 @@ scripts/         db-setup.ts
   - **Pendientes:**
     - Token para `/api/health/db` (Fase 7).
     - Verificar en el primer deploy (Fase 7) que con `trust proxy = 1` `req.ip` sea la IP real del visitante en Render (endpoint temporal) y anotar el resultado acá.
-    - Validar `https:` y email en Settings (Fase 5).
-    - `picomatch` (solo desarrollo) cuando salga el parche.
+    - `effect` (ReDoS, solo desarrollo, vía la CLI de Prisma): override `effect >= 3.22.1` o esperar a que Prisma lo actualice. `picomatch` ya no aparece en `pnpm audit` (2026-11-20).
+    - Auditoría de la Fase 5 (2026-11-20, sin hallazgos críticos/altos/medios): evaluar pedir la contraseña actual (o al menos mostrar "última modificación") al cambiar el número de WhatsApp o el email en Configuración, por si alguien usa una sesión abierta.
+- Panel de catálogo (Fase 5):
+  - API del panel en el mismo módulo que la pública (`create<X>AdminRouter` / `create<X>AdminController`), compuesta en `modules/admin/admin.routes.ts`. Cada escritura llama a `onPublicDataChange` → `publicCache.clear()`.
+  - Escrituras parciales con `PATCH` (el formulario manda todo; la tabla, solo lo que cambia). En "a consultar" la API ignora el monto y guarda null. `priceUpdatedAt` cambia solo si cambian tipo, monto o moneda. Un servicio que cambia de categoría va al final de la nueva.
+  - Borrado físico solo sin dependencias (servicio sin trabajos, categoría sin servicios; 409 si no): condición y borrado en un mismo `deleteMany`. Lo demás se archiva/oculta.
+  - Reordenar = `PUT .../order` con la lista completa (de la categoría, para servicios); si no coincide con lo guardado, 409 `ORDER_MISMATCH`. En el front: botones subir/bajar con actualización optimista; en Servicios, solo filtrando por una categoría, sin búsqueda y en "Orden del sitio".
+  - Actualización masiva: `applyPriceAdjustment` (`@sch/shared`, con `bigint`) corre igual en la vista previa y en la API; redondea siempre al entero (decisión del usuario). Todo o nada; un monto fijo exige una sola moneda; los "a consultar" se omiten.
+  - Errores por campo de la API con el formato de Zod (`details: [{ path, message }]`, ver `fieldValidationError` / `slugTakenError`) para marcarlos en el formulario (`applyFieldErrors`).
+  - Montos en inputs de texto con formato es-AR (`parseAmountInput`: "25.000", "1.500,50"). Número de WhatsApp: la API guarda solo dígitos; `whatsappNumberWarning` avisa (sin bloquear) celulares argentinos mal armados. Links de redes: solo `https:`.
+  - Filtros del listado de servicios del panel en la URL (`?q=&categoria=<id>&estado=&orden=`), filtrado en el navegador (catálogo chico, sin paginar).
+  - Dependencia: `sonner` (toasts, solo en el chunk del panel). Selects nativos (`ui/native-select.tsx`) en vez del Select de Radix.
+  - `@sch/shared` no tiene tipos de Node ni DOM en su build: `URL` se declara localmente en `schemas.ts`.
+  - Concurrencia y timeouts: las transacciones con un update por ítem usan `BATCH_TRANSACTION_OPTIONS` (20 s) y hasta `BULK_MAX_ITEMS` = 200. La actualización masiva escribe con guarda optimista (`updateMany` con el precio leído); si cambió, 409 `PRICE_CHANGED` y no guarda nada. P2025/P2003 en escrituras del panel → 404/400, no 500.
+  - Tras editar desde la tabla (precio, destacar, archivar) se reemplaza la fila en la caché con la respuesta, sin refetch del listado: así editar precios uno por uno no se acerca al rate limit de `/api`.
+  - Accesibilidad del panel: botones que guardan en línea o reordenan usan `aria-disabled` + guarda en el `onClick` (no `disabled`, que hace perder el foco); subir/bajar se anuncia en una región `aria-live`; tras borrar o archivar una fila que desaparece, el foco va a `#main` (`lib/focus.ts`). Avisos de error sobre fondo tintado con `text-destructive-text` (contraste AA).
+  - Toasts arriba al centro (abajo están las barras de selección y de guardado); errores y "Deshacer" duran 10 s (`lib/notify.ts`). Formularios largos (servicio, Configuración) avisan al salir con cambios sin guardar (`useUnsavedChangesGuard`, con `useBlocker` + `beforeunload`).

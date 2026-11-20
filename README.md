@@ -33,13 +33,22 @@ Con `pnpm dev` corriendo, el sitio queda en http://localhost:5173:
 | `/`                | Inicio: hero, líneas de servicio, destacados, cómo funciona y CTA de WhatsApp     |
 | `/servicios`       | Listado con buscador y filtros por línea y categoría (`?linea=&categoria=&q=`)    |
 | `/servicios/:slug` | Detalle del servicio (descripción en markdown, precio, tiempo estimado, WhatsApp) |
-| `/contacto`        | Datos del negocio, horarios, zona de atención y redes                             |
+| `/contacto`        | "Sobre mí", horarios, zona de atención y redes                                    |
 
 Los botones de WhatsApp abren un diálogo con el mensaje pre-cargado desde las plantillas de la configuración. El visitante puede editarlo antes de abrir `wa.me`. Para probar el build de producción: `pnpm build` y luego `pnpm --filter @sch/web preview` (http://localhost:4173, con la API corriendo).
 
 ## Panel de administración
 
 En http://localhost:5173/admin (redirige a `/admin/login` si no hay sesión). Se ingresa con el admin que creó `pnpm db:seed` (`ADMIN_EMAIL` / `ADMIN_PASSWORD`). La contraseña se cambia desde **Configuración**; al cambiarla se cierran las sesiones abiertas en otros dispositivos. Desde ahí también podés cerrar la sesión en todos los dispositivos (por ejemplo, si perdiste el celular).
+
+| Sección           | Qué se hace                                                                                                                                                                              |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Servicios**     | Buscar y filtrar (categoría, estado, orden); editar el precio en la tabla; destacar; archivar/restaurar; borrar (solo sin trabajos); reordenar (filtrando por categoría); alta y edición |
+| **Precios**       | Seleccioná servicios → **Actualizar precios**: +/- % o monto fijo, con vista previa antes/después. El resultado se redondea al entero                                                    |
+| **Categorías**    | Crear, editar, subir/bajar, ocultar/mostrar (oculta también sus servicios) y borrar (solo sin servicios)                                                                                 |
+| **Configuración** | Datos del negocio, textos del inicio, "Sobre mí", contacto, redes y las tres plantillas de WhatsApp (con vista previa); contraseña y sesiones                                            |
+
+Los cambios se ven en el sitio al recargar: cada escritura del panel descarta la caché pública.
 
 La sesión es una cookie httpOnly (`SameSite=Strict`; en producción `Secure` con prefijo `__Host-`) que dura 12 h y se renueva sola con el uso, hasta un máximo de 7 días desde el login. Los intentos fallidos de login (y de contraseña actual) se limitan: 10 por hora por IP y 50 por hora en total. El límite total no se aplica a los navegadores donde ya iniciaste sesión, que reciben una cookie de dispositivo de confianza (con su propio límite de 10 por hora): un ataque distribuido no te deja afuera desde tu PC o tu celular. Cambiar `JWT_SECRET` cierra todas las sesiones.
 
@@ -79,6 +88,19 @@ Respuestas en JSON. Las no paginadas vienen como `{ data }`, y los errores como 
 | `GET /api/auth/me`               | Admin de la sesión (`{ data: { email } }`), o `{ data: null }` sin sesión.                             |
 | `POST /api/admin/password`       | Cambia la contraseña (`{ currentPassword, newPassword }`). Requiere sesión.                            |
 | `POST /api/admin/logout-all`     | Cierra la sesión en todos los dispositivos (incluido el actual). Requiere sesión.                      |
+
+Panel (todo requiere sesión; las altas responden 201, los borrados y reordenamientos 204):
+
+| Endpoint                                   | Descripción                                                                                                        |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------ |
+| `GET/POST /api/admin/categories`           | Lista (con cantidad de servicios) / alta.                                                                          |
+| `PATCH/DELETE /api/admin/categories/:id`   | Edición parcial / borrado (409 `CATEGORY_HAS_SERVICES` si tiene servicios).                                        |
+| `PUT /api/admin/categories/order`          | `{ ids }` con todas las categorías en el orden nuevo.                                                              |
+| `GET/POST /api/admin/services`             | Lista completa (activos y archivados, con cantidad de trabajos) / alta.                                            |
+| `GET/PATCH/DELETE /api/admin/services/:id` | Detalle / edición parcial (archivar = `{ isActive: false }`) / borrado (409 `SERVICE_HAS_JOBS` si tiene trabajos). |
+| `PUT /api/admin/services/order`            | `{ categoryId, ids }` con todos los servicios de la categoría en el orden nuevo.                                   |
+| `POST /api/admin/services/bulk-price`      | `{ serviceIds, adjustment: { kind, value } }` (`PERCENT` o `AMOUNT`). Todo o nada; omite los "a consultar".        |
+| `GET/PUT /api/admin/settings`              | Configuración del negocio (el PUT reemplaza todos los campos).                                                     |
 
 ## Variables de entorno
 
