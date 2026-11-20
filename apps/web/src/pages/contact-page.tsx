@@ -4,6 +4,7 @@ import { QueryError } from '@/components/feedback/query-error';
 import { SocialLinks } from '@/components/layout/social-links';
 import { Skeleton } from '@/components/ui/skeleton';
 import { WhatsappButton } from '@/components/whatsapp/whatsapp-button';
+import { aboutParagraphs } from '@/lib/about-text';
 import { usePageTitle } from '@/lib/hooks';
 import { useSettings } from '@/lib/public-api';
 
@@ -43,12 +44,11 @@ export function ContactPage() {
                 Sobre mí
               </h2>
               {settings.data.tagline && <p className="font-medium">{settings.data.tagline}</p>}
-              <p className="text-muted-foreground">
-                Trabajo de forma independiente en dos líneas: desarrollo de páginas web y
-                aplicaciones de escritorio a medida, y servicio técnico de PC (mantenimiento,
-                reparación, diagnóstico e instalación de software). Atención personalizada y
-                presupuestos claros.
-              </p>
+              {aboutParagraphs(settings.data.aboutText).map((paragraph, index) => (
+                <p key={index} className="break-words whitespace-pre-line text-foreground/90">
+                  {paragraph}
+                </p>
+              ))}
             </section>
 
             <section
@@ -58,18 +58,20 @@ export function ContactPage() {
               <h2 id="datos-titulo" className="text-xl font-semibold tracking-tight">
                 Datos de contacto
               </h2>
-              <dl className="space-y-4">
-                {settings.data.businessHours && (
-                  <ContactItem icon={Clock} label="Horarios">
-                    {settings.data.businessHours}
-                  </ContactItem>
-                )}
-                {settings.data.serviceArea && (
-                  <ContactItem icon={MapPin} label="Zona de atención">
-                    {settings.data.serviceArea}
-                  </ContactItem>
-                )}
-              </dl>
+              {(settings.data.businessHours || settings.data.serviceArea) && (
+                <dl className="space-y-4">
+                  {settings.data.businessHours && (
+                    <ContactItem icon={Clock} label="Horarios">
+                      {settings.data.businessHours}
+                    </ContactItem>
+                  )}
+                  {settings.data.serviceArea && (
+                    <ContactItem icon={MapPin} label="Zona de atención">
+                      {settings.data.serviceArea}
+                    </ContactItem>
+                  )}
+                </dl>
+              )}
               <SocialLinks settings={settings.data} />
               <WhatsappButton variant="whatsapp" size="lg" className="min-h-11 w-full">
                 <MessageCircle aria-hidden="true" />

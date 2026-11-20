@@ -1,12 +1,16 @@
-import { ClipboardList, Package, Tags, Users } from 'lucide-react';
+import { ClipboardList, Users } from 'lucide-react';
 import { useEffect } from 'react';
 import { Navigate, Route, Routes } from 'react-router';
 import { AdminLayout } from '@/components/admin/admin-layout';
 import { RequireAuth } from '@/components/admin/require-auth';
+import { Toaster } from '@/components/admin/toaster';
 import { SlowLoadingNotice } from '@/components/feedback/slow-loading-notice';
 import { UpcomingSectionPage } from '@/pages/admin/admin-section-page';
+import { CategoriesPage } from '@/pages/admin/categories-page';
 import { DashboardPage } from '@/pages/admin/dashboard-page';
 import { LoginPage } from '@/pages/admin/login-page';
+import { ServiceFormPage } from '@/pages/admin/service-form-page';
+import { ServicesPage } from '@/pages/admin/services-page';
 import { SettingsPage } from '@/pages/admin/settings-page';
 
 /** El panel no debe aparecer en buscadores (Fase 7: además `X-Robots-Tag` desde el servidor). */
@@ -34,26 +38,10 @@ export default function AdminApp() {
         <Route element={<RequireAuth />}>
           <Route element={<AdminLayout />}>
             <Route index element={<DashboardPage />} />
-            <Route
-              path="servicios"
-              element={
-                <UpcomingSectionPage
-                  title="Servicios"
-                  icon={Package}
-                  description="Desde acá vas a poder crear, editar y archivar servicios, y actualizar los precios."
-                />
-              }
-            />
-            <Route
-              path="categorias"
-              element={
-                <UpcomingSectionPage
-                  title="Categorías"
-                  icon={Tags}
-                  description="Desde acá vas a poder crear categorías, ordenarlas y ocultarlas."
-                />
-              }
-            />
+            <Route path="servicios" element={<ServicesPage />} />
+            <Route path="servicios/nuevo" element={<ServiceFormPage />} />
+            <Route path="servicios/:id" element={<ServiceFormPage />} />
+            <Route path="categorias" element={<CategoriesPage />} />
             <Route
               path="clientes"
               element={
@@ -80,6 +68,7 @@ export default function AdminApp() {
         </Route>
       </Routes>
       <SlowLoadingNotice />
+      <Toaster />
     </>
   );
 }

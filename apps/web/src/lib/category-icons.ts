@@ -31,6 +31,21 @@ const CATEGORY_ICONS: Record<string, LucideIcon> = {
 
 export const CATEGORY_ICON_NAMES = Object.keys(CATEGORY_ICONS);
 
+/** Nombres en español para el selector del panel. */
+export const CATEGORY_ICON_LABELS: Record<string, string> = {
+  'app-window': 'Ventana de aplicación',
+  code: 'Código',
+  cpu: 'Procesador',
+  download: 'Descarga',
+  globe: 'Web (globo)',
+  'hard-drive': 'Disco',
+  laptop: 'Notebook',
+  monitor: 'Monitor',
+  settings: 'Engranaje',
+  'shield-check': 'Escudo',
+  wrench: 'Llave (herramienta)',
+};
+
 /** Ícono de la categoría; si el nombre no está en la lista, uno genérico. */
 export function getCategoryIcon(name: string | null | undefined): LucideIcon {
   return (name && CATEGORY_ICONS[name]) || Settings;

@@ -8,7 +8,7 @@ const SECTION_DESCRIPTIONS: Record<string, string> = {
   '/admin/categorias': 'Orden y visibilidad de las categorías.',
   '/admin/clientes': 'Datos de contacto e historial de cada cliente.',
   '/admin/trabajos': 'Estado, cobros y datos del equipo de cada trabajo.',
-  '/admin/configuracion': 'Datos del negocio y tu contraseña.',
+  '/admin/configuracion': 'Datos del negocio, mensajes de WhatsApp y tu contraseña.',
 };
 
 export function DashboardPage() {
@@ -16,7 +16,7 @@ export function DashboardPage() {
     <div className="mx-auto max-w-5xl space-y-8 px-4 py-8 sm:px-6">
       <AdminPageHeader
         title="Inicio"
-        description="Hola. Desde acá vas a manejar el catálogo, tus clientes y los trabajos."
+        description="Hola. Desde acá manejás el catálogo y, más adelante, tus clientes y trabajos."
       />
 
       <p className="text-muted-foreground">

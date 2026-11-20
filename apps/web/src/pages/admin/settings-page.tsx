@@ -4,6 +4,7 @@ import { CircleCheck, KeyRound, LogOut, MonitorSmartphone } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+import { BusinessSettingsSection } from '@/components/admin/business-settings-form';
 import { FormField, PasswordInput } from '@/components/admin/form-field';
 import { Button } from '@/components/ui/button';
 import {
@@ -49,13 +50,19 @@ const FIELDS = ['currentPassword', 'newPassword', 'confirmPassword'] as const;
 
 export function SettingsPage() {
   return (
-    <div className="mx-auto max-w-5xl space-y-8 px-4 py-8 sm:px-6">
+    <div className="mx-auto max-w-3xl space-y-8 px-4 py-8 sm:px-6">
       <AdminPageHeader
         title="Configuración"
-        description="Cambiá tu contraseña. Los datos del negocio y los mensajes de WhatsApp se van a poder editar acá más adelante."
+        description="Datos del negocio, mensajes de WhatsApp y la seguridad de tu cuenta."
       />
-      <ChangePasswordSection />
-      <SessionsSection />
+      <BusinessSettingsSection />
+      <section aria-labelledby="cuenta-titulo" className="space-y-4">
+        <h2 id="cuenta-titulo" className="text-xl font-semibold">
+          Tu cuenta
+        </h2>
+        <ChangePasswordSection />
+        <SessionsSection />
+      </section>
     </div>
   );
 }
@@ -107,16 +114,16 @@ function ChangePasswordSection() {
   return (
     <section
       aria-labelledby="cambiar-contrasena-titulo"
-      className="max-w-xl space-y-5 rounded-xl border bg-card p-6 shadow-sm"
+      className="space-y-5 rounded-xl border bg-card p-5 shadow-sm sm:p-6"
     >
       <div className="space-y-1">
-        <h2
+        <h3
           id="cambiar-contrasena-titulo"
           className="flex items-center gap-2 text-lg font-semibold"
         >
           <KeyRound className="size-5 text-primary" aria-hidden="true" />
           Cambiar contraseña
-        </h2>
+        </h3>
         <p className="text-sm text-muted-foreground">
           Al cambiarla se cierran las sesiones abiertas en otros dispositivos.
         </p>
@@ -133,7 +140,7 @@ function ChangePasswordSection() {
       {generalError && (
         <p
           role="alert"
-          className="rounded-md bg-destructive/10 px-3 py-2 text-sm font-medium text-destructive"
+          className="rounded-md bg-destructive/10 px-3 py-2 text-sm font-medium text-destructive-text"
         >
           {generalError}
         </p>
@@ -214,13 +221,13 @@ function SessionsSection() {
   return (
     <section
       aria-labelledby="sesiones-titulo"
-      className="max-w-xl space-y-4 rounded-xl border bg-card p-6 shadow-sm"
+      className="space-y-4 rounded-xl border bg-card p-5 shadow-sm sm:p-6"
     >
       <div className="space-y-1">
-        <h2 id="sesiones-titulo" className="flex items-center gap-2 text-lg font-semibold">
+        <h3 id="sesiones-titulo" className="flex items-center gap-2 text-lg font-semibold">
           <MonitorSmartphone className="size-5 text-primary" aria-hidden="true" />
           Sesiones
-        </h2>
+        </h3>
         <p className="text-sm text-muted-foreground">
           Si dejaste la sesión abierta en otra computadora o perdiste el celular, podés cerrarla en
           todos lados. Vas a tener que volver a ingresar también acá.
@@ -246,7 +253,7 @@ function SessionsSection() {
           {logoutAll.isError && (
             <p
               role="alert"
-              className="rounded-md bg-destructive/10 px-3 py-2 text-sm font-medium text-destructive"
+              className="rounded-md bg-destructive/10 px-3 py-2 text-sm font-medium text-destructive-text"
             >
               No se pudieron cerrar las sesiones. Intentá de nuevo en unos segundos.
             </p>
@@ -263,7 +270,7 @@ function SessionsSection() {
               disabled={logoutAll.isPending}
               onClick={() => logoutAll.mutate()}
             >
-              {logoutAll.isPending ? 'Cerrando…' : 'Cerrar todas'}
+              {logoutAll.isPending ? 'Cerrando…' : 'Cerrar todas las sesiones'}
             </Button>
           </DialogFooter>
         </DialogContent>
