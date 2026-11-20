@@ -35,7 +35,7 @@ export function stubMatchMedia() {
   );
 }
 
-/** Simula la API: sesión, logout, ajustes públicos y las rutas que defina `handler`. */
+/** Simula la API: sesión, logout, ajustes (públicos y del panel) y las rutas de `handler`. */
 export function stubAdminApi({ session = null, meStatus, handler }: AdminApiOptions = {}) {
   const state = { session };
   const calls: ApiCall[] = [];
@@ -62,7 +62,10 @@ export function stubAdminApi({ session = null, meStatus, handler }: AdminApiOpti
       state.session = null;
       return new Response(null, { status: 204 });
     }
-    if (method === 'GET' && url.pathname === '/api/public/settings') {
+    if (
+      method === 'GET' &&
+      (url.pathname === '/api/public/settings' || url.pathname === '/api/admin/settings')
+    ) {
       return Response.json({ data: settingsFixture });
     }
     return errorResponse(404, 'NOT_FOUND', 'No');

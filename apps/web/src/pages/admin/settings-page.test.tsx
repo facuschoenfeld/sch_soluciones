@@ -179,7 +179,7 @@ describe('SettingsPage (cerrar sesión en todos los dispositivos)', () => {
     await user.click(
       screen.getByRole('button', { name: 'Cerrar sesión en todos los dispositivos' }),
     );
-    await user.click(await screen.findByRole('button', { name: 'Cerrar todas' }));
+    await user.click(await screen.findByRole('button', { name: 'Cerrar todas las sesiones' }));
 
     await waitFor(() => expect(router.state.location.pathname).toBe('/admin/login'));
     expect(calls.some((c) => c.method === 'POST' && c.path === '/api/admin/logout-all')).toBe(true);
@@ -191,7 +191,7 @@ describe('SettingsPage (cerrar sesión en todos los dispositivos)', () => {
     await user.click(
       screen.getByRole('button', { name: 'Cerrar sesión en todos los dispositivos' }),
     );
-    await user.click(await screen.findByRole('button', { name: 'Cerrar todas' }));
+    await user.click(await screen.findByRole('button', { name: 'Cerrar todas las sesiones' }));
 
     expect(await screen.findByText(/No se pudieron cerrar las sesiones/)).toBeTruthy();
     expect(router.state.location.pathname).toBe('/admin/configuracion');

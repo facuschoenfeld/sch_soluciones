@@ -16,6 +16,7 @@ export const settingsFixture: PublicSettings = {
   generalWhatsappTemplate: DEFAULT_GENERAL_WHATSAPP_TEMPLATE,
   heroTitle: 'Título',
   heroSubtitle: 'Subtítulo',
+  aboutText: null,
   businessHours: 'Lunes a viernes de 9 a 18 h',
   serviceArea: 'Zona oeste',
   instagramUrl: 'https://instagram.com/sch',
