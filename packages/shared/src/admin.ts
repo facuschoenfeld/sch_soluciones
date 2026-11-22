@@ -53,3 +53,14 @@ export interface BulkPriceResult {
 
 /** Settings completos (el panel edita todo; hoy coincide con lo público). */
 export type AdminSettings = PublicSettings;
+
+type ContactSettings = Pick<PublicSettings, 'whatsappNumber' | 'email'>;
+
+/**
+ * True si cambian los datos a los que llegan los clientes (WhatsApp o email). Con una sesión
+ * ajena abierta, cambiarlos desviaría los contactos sin que el dueño lo note: la API pide la
+ * contraseña actual. Compara valores ya normalizados (solo dígitos, email en minúsculas).
+ */
+export function contactSettingsChanged(before: ContactSettings, after: ContactSettings): boolean {
+  return before.whatsappNumber !== after.whatsappNumber || before.email !== after.email;
+}

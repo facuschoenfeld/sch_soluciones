@@ -284,7 +284,7 @@ export const whatsappNumberSchema = z
       .regex(/^\d{8,15}$/, 'Solo números, con código de país (ej. 5491122334455)'),
   );
 
-/** `PUT /api/admin/settings`. */
+/** Campos de la configuración del negocio (lo que edita el formulario). */
 export const settingsInputSchema = z.object({
   businessName: requiredText(BUSINESS_NAME_MAX_LENGTH, 'Ingresá el nombre del negocio'),
   tagline: optionalText(TAGLINE_MAX_LENGTH),
@@ -304,3 +304,13 @@ export const settingsInputSchema = z.object({
 });
 export type SettingsInput = z.input<typeof settingsInputSchema>;
 export type SettingsInputParsed = z.output<typeof settingsInputSchema>;
+
+/**
+ * `PUT /api/admin/settings`: la configuración más la contraseña actual, que se exige solo si
+ * cambian los datos de contacto (ver `contactSettingsChanged`).
+ */
+export const settingsUpdateSchema = settingsInputSchema.extend({
+  currentPassword: z.string().min(1, 'Ingresá tu contraseña').max(PASSWORD_MAX_LENGTH).optional(),
+});
+export type SettingsUpdate = z.input<typeof settingsUpdateSchema>;
+export type SettingsUpdateParsed = z.output<typeof settingsUpdateSchema>;
