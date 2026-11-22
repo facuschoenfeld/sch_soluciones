@@ -219,9 +219,12 @@ describe('ServicesPage (listado y filtros)', () => {
 });
 
 describe('ServicesPage (archivar y deshacer)', () => {
-  /** Con el filtro "activos", la fila archivada desaparece junto con su componente. */
-  function setupWithToaster(extra?: (call: ApiCall) => Response | undefined) {
-    const result = setup({ route: '/admin/servicios?estado=activos', extra });
+  /** Con el filtro "activos" (por defecto), la fila archivada desaparece con su componente. */
+  function setupWithToaster(
+    extra?: (call: ApiCall) => Response | undefined,
+    route = '/admin/servicios?estado=activos',
+  ) {
+    const result = setup({ route, extra });
     render(<Toaster />);
     return result;
   }
@@ -273,6 +276,40 @@ describe('ServicesPage (archivar y deshacer)', () => {
     await user.click(await screen.findByRole('button', { name: 'Deshacer' }));
 
     expect(await screen.findByText('No se pudo restaurar')).toBeTruthy();
+  });
+
+  it('si "Destacar" falla después de tocar "Deshacer" en la misma fila, avisa el error', async () => {
+    const isFeaturedPatch = (init?: RequestInit) =>
+      init?.method === 'PATCH' && String(init.body).includes('isFeatured');
+    const { user, fetchMock } = setupWithToaster(
+      (call) =>
+        call.method === 'PATCH' && 'isFeatured' in (call.body as object)
+          ? errorResponse(409, 'CONFLICT', 'No se pudo destacar')
+          : undefined,
+      '/admin/servicios?estado=todos',
+    );
+    // "Destacar" queda guardando hasta que se suelte: mientras, se toca "Deshacer".
+    let releaseFeatured = () => {};
+    const featuredGate = new Promise<void>((resolve) => {
+      releaseFeatured = resolve;
+    });
+    vi.stubGlobal('fetch', async (input: string, init?: RequestInit) => {
+      if (isFeaturedPatch(init)) await featuredGate;
+      return fetchMock(input, init);
+    });
+
+    await user.click(
+      await screen.findByRole('button', { name: 'Archivar Instalación de Windows' }),
+    );
+    const undo = await screen.findByRole('button', { name: 'Deshacer' });
+    await user.click(screen.getByRole('button', { name: 'Destacar Instalación de Windows' }));
+    await user.click(undo);
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Archivar Instalación de Windows' })).toBeTruthy(),
+    );
+    releaseFeatured();
+
+    expect(await screen.findByText('No se pudo destacar')).toBeTruthy();
   });
 });
 

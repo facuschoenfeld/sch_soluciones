@@ -1,4 +1,9 @@
-import { SEARCH_QUERY_MAX_LENGTH, type AdminCategory, type AdminServiceSummary } from '@sch/shared';
+import {
+  SEARCH_QUERY_MAX_LENGTH,
+  type AdminCategory,
+  type AdminServiceDetail,
+  type AdminServiceSummary,
+} from '@sch/shared';
 import {
   Archive,
   ArchiveRestore,
@@ -471,9 +476,8 @@ function ServiceList({
 }
 
 /**
- * Destacar y archivar/restaurar. Cada fila tiene su propia mutación: TanStack Query solo corre
- * los callbacks de `mutate` de la última llamada, así que con una compartida se perderían los
- * avisos (y los errores) de una fila al tocar otra.
+ * Destacar y archivar/restaurar. Cada fila tiene su propia mutación, con su propio `isPending`:
+ * guardar en una fila no bloquea los botones de las demás.
  */
 function ServiceStatusButtons({ service }: { service: AdminServiceSummary }) {
   const update = useUpdateService();
@@ -482,55 +486,51 @@ function ServiceStatusButtons({ service }: { service: AdminServiceSummary }) {
 
   // Mientras se guarda, los botones quedan con aria-disabled (no `disabled`): así no pierden el
   // foco, y el clic se ignora.
+  //
+  // Todo con mutateAsync y no con los callbacks de `mutate`: estos solo corren para la última
+  // llamada de la mutación y con el componente montado. "Deshacer" (el toast dura 30 s) usa la
+  // misma mutación de la fila y puede tocarse con la fila ya desmontada o mientras otro cambio
+  // de la fila se guarda: con callbacks, un aviso o un error se perderían. La promesa no.
+  // `onError` va como segundo argumento de `then`: solo avisa si falla el guardado, no si falla
+  // algo al mostrar el aviso de éxito.
   const toggleActive = () => {
     if (update.isPending) return;
     const isActive = !service.isActive;
-    update.mutate(
-      { id: service.id, patch: { isActive } },
-      {
-        onSuccess: (saved) => {
-          // Con el filtro de estado, la fila puede desaparecer junto con el botón enfocado.
-          focusMainIfLost();
-          toast.success(
-            isActive ? `"${saved.name}" vuelve a verse en el sitio` : `"${saved.name}" archivado`,
-            // Archivar no es destructivo, pero se puede deshacer al toque.
-            isActive
-              ? undefined
-              : {
-                  duration: UNDO_TOAST_MS,
-                  action: {
-                    label: 'Deshacer',
-                    // mutateAsync y no mutate: el toast dura 30 s y para entonces la fila (y
-                    // este componente) puede no existir; los callbacks de `mutate` no correrían
-                    // y un error pasaría en silencio. La promesa se rechaza igual.
-                    onClick: () => {
-                      update
-                        .mutateAsync({ id: saved.id, patch: { isActive: true } })
-                        .catch(onError);
-                    },
-                  },
+    const onSaved = (saved: AdminServiceDetail) => {
+      // Con el filtro de estado, la fila puede desaparecer junto con el botón enfocado.
+      focusMainIfLost();
+      toast.success(
+        isActive ? `"${saved.name}" vuelve a verse en el sitio` : `"${saved.name}" archivado`,
+        // Archivar no es destructivo, pero se puede deshacer al toque.
+        isActive
+          ? undefined
+          : {
+              duration: UNDO_TOAST_MS,
+              action: {
+                label: 'Deshacer',
+                onClick: () => {
+                  update.mutateAsync({ id: saved.id, patch: { isActive: true } }).catch(onError);
                 },
-          );
-        },
-        onError,
-      },
-    );
+              },
+            },
+      );
+    };
+    update.mutateAsync({ id: service.id, patch: { isActive } }).then(onSaved, onError);
   };
 
   const toggleFeatured = () => {
     if (update.isPending) return;
-    update.mutate(
-      { id: service.id, patch: { isFeatured: !service.isFeatured } },
-      {
-        onSuccess: (saved) =>
+    update
+      .mutateAsync({ id: service.id, patch: { isFeatured: !service.isFeatured } })
+      .then(
+        (saved) =>
           toast.success(
             saved.isFeatured
               ? `"${saved.name}" aparece en destacados`
               : `"${saved.name}" ya no está en destacados`,
           ),
         onError,
-      },
-    );
+      );
   };
 
   return (
