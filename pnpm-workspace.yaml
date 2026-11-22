@@ -21,3 +21,7 @@ minimumReleaseAgeExclude:
   - '@typescript-eslint/visitor-keys@8.73.0'
   - lucide-react@1.74.0
   - typescript-eslint@8.73.0
+# Parche de seguridad transitivo (ReDoS en effect < 3.22.1, vía @prisma/config). Se mantiene en
+# la 3.x, que es la que usa Prisma 7. Quitar cuando Prisma lo actualice.
+overrides:
+  '@prisma/config>effect': '>=3.22.1 <4'
