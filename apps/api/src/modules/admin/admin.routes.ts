@@ -26,7 +26,8 @@ export function createAdminRouter({
   router.use(createAuthAdminRouter({ db, session, credentialsLimiters }));
   router.use('/categories', createCategoriesAdminRouter(db, onPublicDataChange));
   router.use('/services', createServicesAdminRouter(db, onPublicDataChange));
-  router.use('/settings', createSettingsAdminRouter(db, onPublicDataChange));
+  // El cambio de datos de contacto pide la contraseña: comparte los limitadores del login.
+  router.use('/settings', createSettingsAdminRouter(db, onPublicDataChange, credentialsLimiters));
 
   return router;
 }

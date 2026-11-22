@@ -38,14 +38,15 @@ export async function authenticate(
 }
 
 /**
- * Cambia la contraseña e incrementa `tokenVersion` en la misma operación: todas las sesiones
- * emitidas antes quedan inválidas. Devuelve la versión nueva para reemitir la sesión actual.
+ * Confirma la contraseña del admin de la sesión antes de una acción sensible (cambiar la
+ * contraseña, los datos de contacto). Las rutas que la usan van detrás de los limitadores de
+ * intentos fallidos: la contraseña actual funciona como oráculo.
  */
-export async function changePassword(
+export async function verifyCurrentPassword(
   db: PrismaClient,
   adminId: number,
-  { currentPassword, newPassword }: { currentPassword: string; newPassword: string },
-): Promise<{ tokenVersion: number }> {
+  currentPassword: string,
+): Promise<void> {
   const admin = await db.adminUser.findUnique({
     where: { id: adminId },
     select: { passwordHash: true },
@@ -56,6 +57,18 @@ export async function changePassword(
       { path: ['currentPassword'], message: 'La contraseña actual no es correcta' },
     ]);
   }
+}
+
+/**
+ * Cambia la contraseña e incrementa `tokenVersion` en la misma operación: todas las sesiones
+ * emitidas antes quedan inválidas. Devuelve la versión nueva para reemitir la sesión actual.
+ */
+export async function changePassword(
+  db: PrismaClient,
+  adminId: number,
+  { currentPassword, newPassword }: { currentPassword: string; newPassword: string },
+): Promise<{ tokenVersion: number }> {
+  await verifyCurrentPassword(db, adminId, currentPassword);
 
   return db.adminUser.update({
     where: { id: adminId },

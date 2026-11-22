@@ -42,15 +42,32 @@ export async function getPublicSettings(prisma: PrismaClient): Promise<PublicSet
 
 export const getAdminSettings: (prisma: PrismaClient) => Promise<AdminSettings> = getPublicSettings;
 
-/** Reemplaza la configuración completa. Si la fila no existe (sin seed), la crea. */
+/** Datos de contacto guardados (null si todavía no hay configuración). */
+export function getContactSettings(
+  prisma: PrismaClient,
+): Promise<{ whatsappNumber: string; email: string | null } | null> {
+  return prisma.settings.findUnique({
+    where: { id: SETTINGS_ID },
+    select: { whatsappNumber: true, email: true },
+  });
+}
+
+/**
+ * Reemplaza la configuración. Si la fila no existe (sin seed), la crea.
+ * Con `includeContact: false` el update no toca WhatsApp ni email: así un guardado sin
+ * contraseña nunca puede pisar un contacto que otra petición cambió (con contraseña) entre la
+ * lectura y la escritura.
+ */
 export function updateSettings(
   prisma: PrismaClient,
   input: SettingsInputParsed,
+  { includeContact }: { includeContact: boolean },
 ): Promise<AdminSettings> {
+  const { whatsappNumber: _whatsappNumber, email: _email, ...withoutContact } = input;
   return prisma.settings.upsert({
     where: { id: SETTINGS_ID },
     create: { id: SETTINGS_ID, ...input },
-    update: input,
+    update: includeContact ? input : withoutContact,
     select: settingsSelect,
   });
 }
