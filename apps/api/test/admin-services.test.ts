@@ -4,6 +4,9 @@ import type { AdminServiceDetail, AdminServiceSummary, BulkPriceResult } from '@
 import { adminClient, loginAsAdmin, type AdminClient } from './helpers/admin-session.js';
 import { TEST_ORIGIN, createTestApp } from './helpers/test-app.js';
 import { getTestPrisma, resetDatabase } from './helpers/test-db.js';
+import type { PrismaClient } from '../src/generated/prisma/client.js';
+import { AppError } from '../src/lib/app-error.js';
+import { bulkUpdatePrices } from '../src/modules/services/services.service.js';
 
 const prisma = getTestPrisma();
 const app = createTestApp(prisma);
@@ -395,6 +398,58 @@ describe('POST /api/admin/services/bulk-price', () => {
       adjustment: { kind: 'PERCENT', value: 5 },
     });
     expect(res.body.error.code).toBe('NOTHING_TO_UPDATE');
+  });
+});
+
+describe('bulkUpdatePrices con un cambio concurrente', () => {
+  /**
+   * Cliente que, dentro de la transacción y justo después de leer los precios, cambia uno desde
+   * otra conexión (como si lo editaran en otra pestaña).
+   */
+  function racingClient(serviceId: number, newAmount: number): PrismaClient {
+    return {
+      $transaction: (fn: (tx: unknown) => Promise<unknown>, options: unknown) =>
+        prisma.$transaction(
+          async (tx) => {
+            const service = new Proxy(tx.service, {
+              get(target, key) {
+                if (key === 'findMany') {
+                  return async (args: Parameters<typeof tx.service.findMany>[0]) => {
+                    const rows = await target.findMany(args);
+                    await prisma.service.update({
+                      where: { id: serviceId },
+                      data: { priceAmount: newAmount },
+                    });
+                    return rows;
+                  };
+                }
+                const value: unknown = Reflect.get(target, key);
+                return typeof value === 'function' ? value.bind(target) : value;
+              },
+            });
+            return fn(
+              new Proxy(tx, { get: (t, k) => (k === 'service' ? service : Reflect.get(t, k)) }),
+            );
+          },
+          options as Parameters<typeof prisma.$transaction>[1],
+        ),
+    } as unknown as PrismaClient;
+  }
+
+  it('responde 409 PRICE_CHANGED y no guarda ningún precio', async () => {
+    const a = await createService({ name: 'A', slug: 'a', priceAmount: 10000 });
+    const b = await createService({ name: 'B', slug: 'b', priceAmount: 20000 });
+
+    const error = await bulkUpdatePrices(racingClient(b.id, 25000), {
+      serviceIds: [a.id, b.id],
+      adjustment: { kind: 'PERCENT', value: 10 },
+    }).catch((caught: unknown) => caught);
+
+    expect(error).toBeInstanceOf(AppError);
+    expect(error).toMatchObject({ status: 409, code: 'PRICE_CHANGED' });
+    const stored = await prisma.service.findMany({ orderBy: { id: 'asc' } });
+    // A se habría actualizado primero: la transacción lo deshace.
+    expect(stored.map((s) => s.priceAmount?.toNumber())).toEqual([10000, 25000]);
   });
 });
 

@@ -5,7 +5,7 @@ import { hashPassword } from '../../src/lib/password.js';
 import { TEST_ORIGIN } from './test-app.js';
 
 export const ADMIN_EMAIL = 'admin@sch.test';
-const ADMIN_PASSWORD = 'contraseña-del-admin-123';
+export const ADMIN_PASSWORD = 'contraseña-del-admin-123';
 
 /** Inicia sesión con el admin ya creado y devuelve la cookie ("sch_session=…"). */
 export async function loginAdmin(app: Express): Promise<string> {
