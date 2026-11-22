@@ -10,7 +10,7 @@ import type {
   DataResponse,
   ServiceInput,
   ServiceUpdate,
-  SettingsInput,
+  SettingsUpdate,
 } from '@sch/shared';
 import { useMutation, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query';
 import { ApiError, apiGet, apiSend } from '@/lib/api-client';
@@ -227,15 +227,29 @@ export function useBulkPrice() {
     mutationFn: (input: BulkPriceInput) =>
       sendData<BulkPriceResult>('POST', '/admin/services/bulk-price', input),
     onSuccess: () => invalidateCatalog(queryClient),
+    // 404 (se borró un servicio) o 409 (cambió un precio): se recarga la lista para que la
+    // vista previa muestre lo que hay ahora, sin tener que recargar la página.
+    onError: (error) => {
+      if (error instanceof ApiError && (error.status === 404 || error.status === 409)) {
+        return invalidateCatalog(queryClient);
+      }
+    },
   });
 }
 
 // --- Configuración ---------------------------------------------------------
 
+const fetchAdminSettings = () => getData<AdminSettings>('/admin/settings');
+
 export function useAdminSettings() {
-  return useQuery({
+  return useQuery({ queryKey: adminQueryKeys.settings, queryFn: fetchAdminSettings, staleTime: 0 });
+}
+
+/** Lee la configuración guardada ahora (sin caché) y actualiza la del panel. */
+export function refetchAdminSettings(queryClient: QueryClient): Promise<AdminSettings> {
+  return queryClient.fetchQuery({
     queryKey: adminQueryKeys.settings,
-    queryFn: () => getData<AdminSettings>('/admin/settings'),
+    queryFn: fetchAdminSettings,
     staleTime: 0,
   });
 }
@@ -243,7 +257,7 @@ export function useAdminSettings() {
 export function useSaveSettings() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (input: SettingsInput) => sendData<AdminSettings>('PUT', '/admin/settings', input),
+    mutationFn: (input: SettingsUpdate) => sendData<AdminSettings>('PUT', '/admin/settings', input),
     onSuccess: (settings) => {
       queryClient.setQueryData(adminQueryKeys.settings, settings);
       // El nombre del negocio y las plantillas también se usan en el panel y en el sitio.

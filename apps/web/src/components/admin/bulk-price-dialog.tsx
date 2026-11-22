@@ -1,4 +1,5 @@
 import {
+  BULK_MAX_ITEMS,
   applyPriceAdjustment,
   bulkPriceSchema,
   formatAmount,
@@ -21,6 +22,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { BULK_PRICE_MUTATION_KEY, mutationErrorMessage, useBulkPrice } from '@/lib/admin-api';
+import { ApiError } from '@/lib/api-client';
 import { parseAmountInput } from '@/lib/amount-input';
 import { cn } from '@/lib/utils';
 import { FormField } from './form-field';
@@ -59,6 +61,9 @@ export function BulkPriceDialog({ open, onOpenChange, services, onDone }: BulkPr
     </Dialog>
   );
 }
+
+/** Filas de la vista previa: con selecciones grandes, el resto se resume. */
+const PREVIEW_MAX_ROWS = 20;
 
 interface PreviewRow {
   service: AdminServiceSummary;
@@ -99,7 +104,9 @@ function BulkPriceForm({
     validation && !validation.success
       ? (validation.error.issues.find((issue) => issue.path[0] === 'adjustment')?.message ?? null)
       : null;
-  const ready = Boolean(adjustment && validation?.success && !mixedCurrencies);
+  // La API acepta hasta BULK_MAX_ITEMS por vez (el esquema lo rechazaría sin explicar por qué).
+  const tooMany = services.length > BULK_MAX_ITEMS;
+  const ready = Boolean(adjustment && validation?.success && !mixedCurrencies && !tooMany);
 
   const preview: PreviewRow[] = priced.map((service) => {
     const before = service.priceAmount ?? 0;
@@ -107,7 +114,11 @@ function BulkPriceForm({
     return { service, before, after, valid: isValidAdjustedPrice(after) };
   });
   const invalidCount = preview.filter((row) => !row.valid).length;
+  // Las filas inválidas primero: con la vista previa resumida, siempre se ven.
+  const previewRows = [...preview].sort((a, b) => Number(a.valid) - Number(b.valid));
   const canSubmit = ready && invalidCount === 0 && priced.length > 0 && !bulk.isPending;
+  const noticesId = useId();
+  const hasNotice = tooMany || mixedCurrencies || invalidCount > 0;
 
   const submit = () => {
     if (!adjustment || !canSubmit) return;
@@ -187,20 +198,29 @@ function BulkPriceForm({
         )}
       </FormField>
 
-      {mixedCurrencies && (
-        <Notice>
-          Hay servicios en pesos y en dólares: para sumar o restar un monto fijo, elegí servicios de
-          una sola moneda (o usá un porcentaje).
-        </Notice>
-      )}
-      {invalidCount > 0 && (
-        <Notice>
-          {invalidCount === 1
-            ? 'Un precio quedaría negativo o demasiado grande'
-            : `${invalidCount} precios quedarían negativos o demasiado grandes`}
-          . Cambiá el ajuste.
-        </Notice>
-      )}
+      {/* Región siempre montada: un aviso que aparece ya con texto no siempre se anuncia. */}
+      <div id={noticesId} role="status" className="space-y-2 empty:hidden">
+        {tooMany && (
+          <Notice>
+            Elegiste {services.length} servicios: se pueden actualizar hasta {BULK_MAX_ITEMS} por
+            vez. Filtrá por categoría o quitá algunos de la selección.
+          </Notice>
+        )}
+        {mixedCurrencies && (
+          <Notice>
+            Hay servicios en pesos y en dólares: para sumar o restar un monto fijo, elegí servicios
+            de una sola moneda (o usá un porcentaje).
+          </Notice>
+        )}
+        {invalidCount > 0 && (
+          <Notice>
+            {invalidCount === 1
+              ? 'Un precio quedaría negativo o demasiado grande'
+              : `${invalidCount} precios quedarían negativos o demasiado grandes`}
+            . Cambiá el ajuste.
+          </Notice>
+        )}
+      </div>
 
       <div className="space-y-2">
         <h3 className="text-sm font-semibold">
@@ -236,7 +256,7 @@ function BulkPriceForm({
                 </tr>
               </thead>
               <tbody>
-                {preview.map(({ service, before, after, valid }) => (
+                {previewRows.slice(0, PREVIEW_MAX_ROWS).map(({ service, before, after, valid }) => (
                   <tr key={service.id} className="border-t">
                     <th scope="row" className="px-3 py-2 text-left font-normal">
                       {service.name}
@@ -259,6 +279,11 @@ function BulkPriceForm({
                 ))}
               </tbody>
             </table>
+            {preview.length > PREVIEW_MAX_ROWS && (
+              <p className="border-t px-3 py-2 text-sm text-muted-foreground">
+                Y {preview.length - PREVIEW_MAX_ROWS} más con el mismo ajuste.
+              </p>
+            )}
           </div>
         )}
         {skipped.length > 0 && (
@@ -273,7 +298,7 @@ function BulkPriceForm({
           role="alert"
           className="rounded-md bg-destructive/10 px-3 py-2 text-sm font-medium text-destructive-text"
         >
-          {mutationErrorMessage(bulk.error, 'No se pudieron actualizar los precios')}
+          {bulkErrorMessage(bulk.error)}
         </p>
       )}
 
@@ -287,23 +312,37 @@ function BulkPriceForm({
         >
           Cancelar
         </Button>
-        <Button type="button" className="min-h-11" disabled={!canSubmit} onClick={submit}>
+        {/* aria-disabled (no disabled): conserva el foco y queda asociado al motivo. */}
+        <Button
+          type="button"
+          className="min-h-11"
+          aria-disabled={!canSubmit}
+          aria-describedby={hasNotice ? noticesId : undefined}
+          onClick={submit}
+        >
           {bulk.isPending
             ? 'Aplicando…'
-            : `Aplicar a ${priced.length} ${priced.length === 1 ? 'servicio' : 'servicios'}`}
+            : tooMany || priced.length === 0
+              ? 'Aplicar'
+              : `Aplicar a ${priced.length} ${priced.length === 1 ? 'servicio' : 'servicios'}`}
         </Button>
       </DialogFooter>
     </div>
   );
 }
 
-/** Aviso que cambia mientras se escribe: `status` para no interrumpir en cada tecla. */
+/** Ante 404/409 la lista ya se recargó (ver useBulkPrice): la vista previa está al día. */
+function bulkErrorMessage(error: unknown): string {
+  if (error instanceof ApiError && (error.status === 404 || error.status === 409)) {
+    return 'Un precio o un servicio cambió desde que abriste este diálogo. Actualizamos la vista previa con los datos actuales: revisala y aplicá de nuevo.';
+  }
+  return mutationErrorMessage(error, 'No se pudieron actualizar los precios');
+}
+
+/** Aviso dentro de la región `status` del formulario (no interrumpe en cada tecla). */
 function Notice({ children }: { children: ReactNode }) {
   return (
-    <p
-      role="status"
-      className="flex items-start gap-2 rounded-md bg-destructive/10 px-3 py-2 text-sm font-medium text-destructive-text"
-    >
+    <p className="flex items-start gap-2 rounded-md bg-destructive/10 px-3 py-2 text-sm font-medium text-destructive-text">
       <TriangleExclamationPoint className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
       <span>{children}</span>
     </p>

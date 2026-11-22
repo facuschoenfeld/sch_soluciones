@@ -6,11 +6,13 @@ import {
   DEFAULT_GENERAL_WHATSAPP_TEMPLATE,
   DEFAULT_INQUIRY_WHATSAPP_TEMPLATE,
   EMAIL_MAX_LENGTH,
+  PASSWORD_MAX_LENGTH,
   HERO_SUBTITLE_MAX_LENGTH,
   HERO_TITLE_MAX_LENGTH,
   SHORT_TEXT_MAX_LENGTH,
   TAGLINE_MAX_LENGTH,
   URL_MAX_LENGTH,
+  contactSettingsChanged,
   settingsInputSchema,
   whatsappNumberWarning,
   type AdminSettings,
@@ -18,20 +20,35 @@ import {
   type SettingsInputParsed,
 } from '@sch/shared';
 import { TriangleExclamationPoint } from 'lucide-react';
-import { useId, useState, type ReactNode } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { useEffect, useId, useRef, useState, type FormEvent, type ReactNode } from 'react';
 import { Controller, useForm, useWatch, type Path } from 'react-hook-form';
 import { toast } from 'sonner';
 import { QueryError } from '@/components/feedback/query-error';
 import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Textarea } from '@/components/ui/textarea';
 import { DEFAULT_ABOUT_TEXT } from '@/lib/about-text';
-import { mutationErrorMessage, useAdminSettings, useSaveSettings } from '@/lib/admin-api';
+import {
+  mutationErrorMessage,
+  refetchAdminSettings,
+  useAdminSettings,
+  useSaveSettings,
+} from '@/lib/admin-api';
+import { ApiError, fieldErrors } from '@/lib/api-client';
 import { notifyError } from '@/lib/notify';
 import { ConfirmDialog } from './confirm-dialog';
 import { applyFieldErrors } from './form-errors';
-import { FormField } from './form-field';
+import { FormField, PasswordInput } from './form-field';
 import { TemplateField } from './template-field';
 import { useUnsavedChangesGuard } from './unsaved-changes-guard';
 
@@ -126,6 +143,13 @@ function BusinessSettingsForm({ settings }: { settings: AdminSettings }) {
   const { errors, isDirty } = form.formState;
   const guard = useUnsavedChangesGuard(isDirty);
   const [confirmDiscard, setConfirmDiscard] = useState(false);
+  const queryClient = useQueryClient();
+  // Cambios de contacto a la espera de la contraseña (null = diálogo cerrado).
+  const [pendingContact, setPendingContact] = useState<PendingContact | null>(null);
+  // `attempt` cambia en cada error: el diálogo vuelve a enfocar el campo aunque el texto se repita.
+  const [passwordError, setPasswordError] = useState<{ message: string; attempt: number } | null>(
+    null,
+  );
   const [businessName = '', whatsappNumber = ''] = useWatch({
     control: form.control,
     name: ['businessName', 'whatsappNumber'],
@@ -137,22 +161,99 @@ function BusinessSettingsForm({ settings }: { settings: AdminSettings }) {
     negocio: businessName.trim() || settings.businessName,
   };
 
-  const onSubmit = form.handleSubmit((input) => {
-    // Botón con aria-disabled (no pierde el foco): sin cambios o guardando, no hace nada.
-    if (!isDirty || save.isPending) return;
-    save.mutate(input, {
-      onSuccess: (saved) => {
-        // El formulario pasa a reflejar lo guardado (ya normalizado por la API).
-        form.reset(toFormValues(saved));
-        toast.success('Configuración guardada. Ya se ve en el sitio.');
+  const askPassword = (input: SettingsInputParsed) => {
+    setPasswordError(null);
+    setPendingContact({ input, fields: changedContactFields(settings, input) });
+  };
+
+  const showPasswordError = (message: string) =>
+    setPasswordError((current) => ({ message, attempt: (current?.attempt ?? 0) + 1 }));
+
+  const saveSettings = (input: SettingsInputParsed, currentPassword?: string) => {
+    // React procesa el re-render de un clic antes del siguiente: con isPending alcanza para no
+    // mandar dos veces (un intento de más contaría como fallo en el límite de contraseñas).
+    if (save.isPending) return;
+    // Los campos no se bloquean mientras guarda (perderían el foco): si se siguió escribiendo,
+    // el reset posterior conserva esas ediciones como cambios pendientes.
+    const submitted = form.getValues();
+    save.mutate(
+      { ...input, currentPassword },
+      {
+        onSuccess: (saved) => {
+          setPendingContact(null);
+          const current = form.getValues();
+          // El formulario pasa a reflejar lo guardado (ya normalizado por la API)...
+          form.reset(toFormValues(saved));
+          // ...salvo los campos que se editaron después de enviar: esos quedan como cambios
+          // pendientes (solo esos; lo enviado se ve normalizado).
+          for (const field of FIELDS) {
+            if (current[field] !== submitted[field]) {
+              form.setValue(field, current[field], { shouldDirty: true });
+            }
+          }
+          toast.success('Configuración guardada. Ya se ve en el sitio.');
+        },
+        onError: (error) => {
+          if (error instanceof ApiError) {
+            // El contacto se cambió desde otro dispositivo (esta pestaña tenía el anterior y no
+            // lo tocó). Pedir la contraseña acá revertiría ese cambio: se toma el contacto
+            // guardado y se avisa para que revise y vuelva a guardar.
+            if (error.code === 'CURRENT_PASSWORD_REQUIRED') {
+              setPendingContact(null);
+              void refetchAdminSettings(queryClient)
+                .then((fresh) => {
+                  const values = toFormValues(fresh);
+                  form.resetField('whatsappNumber', { defaultValue: values.whatsappNumber });
+                  form.resetField('email', { defaultValue: values.email });
+                  notifyError(
+                    'El número de WhatsApp o el email se cambiaron desde otro dispositivo. Ya los actualizamos acá: revisá y guardá de nuevo.',
+                  );
+                })
+                .catch(() =>
+                  notifyError('No se pudo guardar. Recargá la página e intentá de nuevo.'),
+                );
+              return;
+            }
+            // Los errores de la contraseña se muestran en su diálogo, que queda abierto.
+            if (currentPassword !== undefined) {
+              const fieldMessage = fieldErrors(error).currentPassword;
+              if (error.status === 429) {
+                showPasswordError('Demasiados intentos. Esperá unos minutos y probá de nuevo.');
+                return;
+              }
+              if (error.code === 'INVALID_CURRENT_PASSWORD' || fieldMessage) {
+                showPasswordError(fieldMessage ?? error.message);
+                return;
+              }
+            }
+          }
+          setPendingContact(null);
+          if (!applyFieldErrors(form, FIELDS, error)) {
+            notifyError(mutationErrorMessage(error, 'No se pudo guardar la configuración'));
+          }
+        },
       },
-      onError: (error) => {
-        if (!applyFieldErrors(form, FIELDS, error)) {
-          notifyError(mutationErrorMessage(error, 'No se pudo guardar la configuración'));
-        }
-      },
-    });
+    );
+  };
+
+  const validateAndSave = form.handleSubmit((input) => {
+    // Cambiar a dónde llegan los clientes pide la contraseña (lo exige también la API).
+    if (contactSettingsChanged(settings, input)) {
+      askPassword(input);
+      return;
+    }
+    saveSettings(input);
   });
+
+  const onSubmit = (event: FormEvent<HTMLFormElement>) => {
+    // Botón con aria-disabled (no pierde el foco): sin cambios o guardando, no hace nada (ni
+    // siquiera valida).
+    if (!isDirty || save.isPending) {
+      event.preventDefault();
+      return;
+    }
+    void validateAndSave(event);
+  };
 
   const text = (
     name: (typeof FIELDS)[number],
@@ -180,7 +281,7 @@ function BusinessSettingsForm({ settings }: { settings: AdminSettings }) {
   );
 
   return (
-    <form noValidate onSubmit={(event) => void onSubmit(event)} className="space-y-6">
+    <form noValidate onSubmit={onSubmit} aria-busy={save.isPending} className="space-y-6">
       <Card title="Negocio">
         {text('businessName', 'Nombre del negocio', BUSINESS_NAME_MAX_LENGTH)}
         {text('tagline', 'Frase corta (opcional)', TAGLINE_MAX_LENGTH, {
@@ -328,7 +429,7 @@ function BusinessSettingsForm({ settings }: { settings: AdminSettings }) {
           className="basis-full text-sm text-muted-foreground sm:mr-auto sm:basis-auto"
           aria-live="polite"
         >
-          {isDirty ? 'Hay cambios sin guardar' : 'Sin cambios'}
+          {save.isPending ? 'Guardando…' : isDirty ? 'Hay cambios sin guardar' : 'Sin cambios'}
         </p>
         <Button
           type="button"
@@ -354,7 +455,189 @@ function BusinessSettingsForm({ settings }: { settings: AdminSettings }) {
           setConfirmDiscard(false);
         }}
       />
+      <ContactPasswordDialog
+        pendingContact={pendingContact}
+        pending={save.isPending}
+        error={passwordError}
+        onClearError={() => setPasswordError(null)}
+        onCancel={() => setPendingContact(null)}
+        onConfirm={(password) => {
+          if (pendingContact) saveSettings(pendingContact.input, password);
+        }}
+        // Al cancelar, el foco vuelve al dato de contacto que se cambió.
+        focusChangedField={(field) => form.setFocus(field)}
+      />
       {guard.dialog}
+    </form>
+  );
+}
+
+type ContactField = 'whatsappNumber' | 'email';
+
+interface PendingContact {
+  input: SettingsInputParsed;
+  fields: ContactField[];
+}
+
+function changedContactFields(
+  before: Pick<AdminSettings, ContactField>,
+  after: Pick<SettingsInputParsed, ContactField>,
+): ContactField[] {
+  return (['whatsappNumber', 'email'] as const).filter((field) => before[field] !== after[field]);
+}
+
+function describeChange(fields: ContactField[]): string {
+  if (fields.length === 1 && fields[0] === 'whatsappNumber') return 'el número de WhatsApp';
+  if (fields.length === 1 && fields[0] === 'email') return 'el email';
+  return 'el número de WhatsApp y el email';
+}
+
+interface ContactPasswordDialogProps {
+  pendingContact: PendingContact | null;
+  pending: boolean;
+  error: { message: string; attempt: number } | null;
+  onClearError: () => void;
+  onCancel: () => void;
+  onConfirm: (password: string) => void;
+  focusChangedField: (field: ContactField) => void;
+}
+
+/** Confirmación con la contraseña antes de cambiar el número de WhatsApp o el email. */
+function ContactPasswordDialog({
+  pendingContact,
+  pending,
+  error,
+  onClearError,
+  onCancel,
+  onConfirm,
+  focusChangedField,
+}: ContactPasswordDialogProps) {
+  // Se recuerda el último pedido para que el texto no cambie durante la animación de cierre.
+  const [shown, setShown] = useState(pendingContact);
+  if (pendingContact && pendingContact !== shown) setShown(pendingContact);
+  const cancelled = useRef(false);
+  const what = describeChange(shown?.fields ?? []);
+
+  const cancel = () => {
+    if (pending) return;
+    cancelled.current = true;
+    onCancel();
+  };
+  // Mientras guarda no se cierra (Escape, clic afuera): un error no tendría dónde mostrarse.
+  const blockWhilePending = (event: Event) => {
+    if (pending) event.preventDefault();
+  };
+
+  return (
+    <Dialog open={pendingContact !== null} onOpenChange={(next) => !next && cancel()}>
+      <DialogContent
+        className="sm:max-w-md"
+        showCloseButton={!pending}
+        onEscapeKeyDown={blockWhilePending}
+        onInteractOutside={blockWhilePending}
+        onOpenAutoFocus={() => {
+          cancelled.current = false;
+        }}
+        onCloseAutoFocus={(event) => {
+          const field = shown?.fields[0];
+          if (cancelled.current && field) {
+            event.preventDefault();
+            focusChangedField(field);
+          }
+        }}
+      >
+        <DialogHeader>
+          <DialogTitle>Confirmá con tu contraseña</DialogTitle>
+          <DialogDescription>
+            Cambiaste {what}, que es por donde te contactan los clientes. Por seguridad, ingresá tu
+            contraseña para guardar el cambio.
+          </DialogDescription>
+        </DialogHeader>
+        {/* Se monta en cada apertura: el campo arranca vacío. */}
+        <ContactPasswordForm
+          pending={pending}
+          error={error}
+          onClearError={onClearError}
+          onCancel={cancel}
+          onConfirm={onConfirm}
+        />
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function ContactPasswordForm({
+  pending,
+  error,
+  onClearError,
+  onCancel,
+  onConfirm,
+}: Pick<ContactPasswordDialogProps, 'pending' | 'error' | 'onClearError' | 'onConfirm'> & {
+  onCancel: () => void;
+}) {
+  const [password, setPassword] = useState('');
+  const [emptyError, setEmptyError] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Tras un error (contraseña incorrecta, demasiados intentos) el foco vuelve al campo, con el
+  // texto seleccionado para reescribirlo.
+  useEffect(() => {
+    if (!error) return;
+    inputRef.current?.focus();
+    inputRef.current?.select();
+  }, [error]);
+
+  // Formulario propio (no anidado en el de Configuración: el diálogo se renderiza en un portal).
+  const submit = (event: FormEvent) => {
+    event.preventDefault();
+    // En React los eventos atraviesan el portal: sin esto, el submit llegaría también al
+    // formulario de Configuración.
+    event.stopPropagation();
+    if (pending) return;
+    if (!password) {
+      setEmptyError(true);
+      return;
+    }
+    onConfirm(password);
+  };
+
+  return (
+    <form noValidate onSubmit={submit} className="space-y-4">
+      <FormField
+        id="contact-current-password"
+        label="Contraseña actual"
+        error={emptyError ? 'Ingresá tu contraseña' : error?.message}
+      >
+        {(aria) => (
+          <PasswordInput
+            {...aria}
+            ref={inputRef}
+            value={password}
+            onChange={(event) => {
+              setPassword(event.target.value);
+              setEmptyError(false);
+              if (error) onClearError();
+            }}
+            maxLength={PASSWORD_MAX_LENGTH}
+            autoComplete="current-password"
+            autoFocus
+          />
+        )}
+      </FormField>
+      <DialogFooter>
+        <Button
+          type="button"
+          variant="outline"
+          className="min-h-11"
+          aria-disabled={pending}
+          onClick={onCancel}
+        >
+          Cancelar
+        </Button>
+        <Button type="submit" className="min-h-11" aria-disabled={pending}>
+          {pending ? 'Guardando…' : 'Confirmar y guardar'}
+        </Button>
+      </DialogFooter>
     </form>
   );
 }
