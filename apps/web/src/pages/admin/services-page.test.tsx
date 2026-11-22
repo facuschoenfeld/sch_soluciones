@@ -430,7 +430,7 @@ describe('ServicesPage (actualización masiva de precios)', () => {
     const apply = within(dialog).getByRole('button', {
       name: 'Aplicar a 2 servicios',
     }) as HTMLButtonElement;
-    expect(apply.disabled).toBe(true);
+    expect(apply.getAttribute('aria-disabled')).toBe('true');
     expect(bulkCalls(calls)).toHaveLength(0);
   });
 
@@ -454,8 +454,9 @@ describe('ServicesPage (actualización masiva de precios)', () => {
 
     expect((await within(dialog).findByRole('status')).textContent).toMatch(/negativo/);
     expect(
-      (within(dialog).getByRole('button', { name: 'Aplicar a 1 servicio' }) as HTMLButtonElement)
-        .disabled,
+      within(dialog)
+        .getByRole('button', { name: 'Aplicar a 1 servicio' })
+        .getAttribute('aria-disabled') === 'true',
     ).toBe(true);
     expect(bulkCalls(calls)).toHaveLength(0);
   });
@@ -468,8 +469,9 @@ describe('ServicesPage (actualización masiva de precios)', () => {
 
     expect(await within(dialog).findByText('El ajuste no puede ser 0')).toBeTruthy();
     expect(
-      (within(dialog).getByRole('button', { name: 'Aplicar a 1 servicio' }) as HTMLButtonElement)
-        .disabled,
+      within(dialog)
+        .getByRole('button', { name: 'Aplicar a 1 servicio' })
+        .getAttribute('aria-disabled') === 'true',
     ).toBe(true);
   });
 
@@ -478,8 +480,9 @@ describe('ServicesPage (actualización masiva de precios)', () => {
     const dialog = await openBulk(user, ['Instalación de Windows']);
 
     expect(
-      (within(dialog).getByRole('button', { name: 'Aplicar a 1 servicio' }) as HTMLButtonElement)
-        .disabled,
+      within(dialog)
+        .getByRole('button', { name: 'Aplicar a 1 servicio' })
+        .getAttribute('aria-disabled') === 'true',
     ).toBe(true);
   });
 

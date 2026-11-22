@@ -47,6 +47,12 @@ const field = (label: string) => screen.getByLabelText(label) as HTMLInputElemen
 const saveButton = () =>
   screen.getByRole('button', { name: 'Guardar cambios' }) as HTMLButtonElement;
 
+async function confirmPassword(user: ReturnType<typeof userEvent.setup>, password: string) {
+  const dialog = await screen.findByRole('dialog', { name: 'Confirmá con tu contraseña' });
+  await user.type(within(dialog).getByLabelText('Contraseña actual'), password);
+  await user.click(within(dialog).getByRole('button', { name: 'Confirmar y guardar' }));
+}
+
 async function loaded() {
   await screen.findByDisplayValue('SCH Soluciones');
 }
@@ -212,9 +218,282 @@ describe('BusinessSettingsSection', () => {
       await user.clear(field('Número de WhatsApp'));
       await user.type(field('Número de WhatsApp'), '541122334455');
       await user.click(saveButton());
+      await confirmPassword(user, 'mi-contraseña-123');
 
       await waitFor(() => expect(putCalls(calls)).toHaveLength(1));
       expect(putCalls(calls)[0]?.body).toMatchObject({ whatsappNumber: '541122334455' });
+    });
+  });
+
+  describe('contraseña al cambiar el contacto', () => {
+    async function changeNumber(user: ReturnType<typeof userEvent.setup>) {
+      await loaded();
+      await user.clear(field('Número de WhatsApp'));
+      await user.type(field('Número de WhatsApp'), '5491199998888');
+      await user.click(saveButton());
+    }
+
+    it('pide la contraseña y la manda junto con los cambios', async () => {
+      const { user, calls } = setup();
+      await changeNumber(user);
+
+      expect(putCalls(calls)).toHaveLength(0);
+      await confirmPassword(user, 'mi-contraseña-123');
+
+      await waitFor(() => expect(putCalls(calls)).toHaveLength(1));
+      expect(putCalls(calls)[0]?.body).toMatchObject({
+        whatsappNumber: '5491199998888',
+        currentPassword: 'mi-contraseña-123',
+      });
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    });
+
+    it('al cancelar no guarda nada y conserva lo escrito', async () => {
+      const { user, calls } = setup();
+      await changeNumber(user);
+
+      const dialog = await screen.findByRole('dialog', { name: 'Confirmá con tu contraseña' });
+      await user.click(within(dialog).getByRole('button', { name: 'Cancelar' }));
+
+      expect(putCalls(calls)).toHaveLength(0);
+      expect(field('Número de WhatsApp').value).toBe('5491199998888');
+    });
+
+    it('con la contraseña incorrecta muestra el error en el diálogo, que sigue abierto', async () => {
+      const { user } = setup((call) =>
+        call.method === 'PUT'
+          ? errorResponse(400, 'INVALID_CURRENT_PASSWORD', 'La contraseña actual no es correcta', [
+              { path: ['currentPassword'], message: 'La contraseña actual no es correcta' },
+            ])
+          : undefined,
+      );
+      await changeNumber(user);
+      await confirmPassword(user, 'incorrecta');
+
+      const dialog = screen.getByRole('dialog', { name: 'Confirmá con tu contraseña' });
+      expect(await within(dialog).findByText('La contraseña actual no es correcta')).toBeTruthy();
+    });
+
+    it('con demasiados intentos (429) muestra el aviso en el diálogo, que sigue abierto', async () => {
+      const { user } = setup((call) =>
+        call.method === 'PUT'
+          ? errorResponse(429, 'TOO_MANY_REQUESTS', 'Demasiados intentos')
+          : undefined,
+      );
+      await changeNumber(user);
+      await confirmPassword(user, 'lo-que-sea');
+
+      const dialog = screen.getByRole('dialog', { name: 'Confirmá con tu contraseña' });
+      expect(
+        await within(dialog).findByText(
+          'Demasiados intentos. Esperá unos minutos y probá de nuevo.',
+        ),
+      ).toBeTruthy();
+    });
+
+    it('Enter en el campo de contraseña envía', async () => {
+      const { user, calls } = setup();
+      await changeNumber(user);
+
+      const dialog = await screen.findByRole('dialog', { name: 'Confirmá con tu contraseña' });
+      await user.type(within(dialog).getByLabelText('Contraseña actual'), 'mi-clave{Enter}');
+
+      await waitFor(() => expect(putCalls(calls)).toHaveLength(1));
+      expect(putCalls(calls)[0]?.body).toMatchObject({ currentPassword: 'mi-clave' });
+    });
+
+    it('con el campo vacío muestra "Ingresá tu contraseña" sin llamar a la API', async () => {
+      const { user, calls } = setup();
+      await changeNumber(user);
+
+      const dialog = await screen.findByRole('dialog', { name: 'Confirmá con tu contraseña' });
+      await user.click(within(dialog).getByRole('button', { name: 'Confirmar y guardar' }));
+
+      expect(await within(dialog).findByText('Ingresá tu contraseña')).toBeTruthy();
+      expect(putCalls(calls)).toHaveLength(0);
+
+      // Al escribir, el aviso desaparece.
+      await user.type(within(dialog).getByLabelText('Contraseña actual'), 'x');
+      expect(within(dialog).queryByText('Ingresá tu contraseña')).toBeNull();
+    });
+
+    it('mientras guarda, el diálogo no se cancela ni reenvía, y los campos no pierden el foco', async () => {
+      let release: (res: Response) => void = () => undefined;
+      const pending = new Promise<Response>((resolve) => {
+        release = resolve;
+      });
+      const { user } = setup();
+      // Reemplaza el fetch para demorar el PUT.
+      const original = globalThis.fetch;
+      const delayedPut = vi.fn((input: string, init?: RequestInit) =>
+        init?.method === 'PUT' ? pending : original(input, init),
+      );
+      vi.stubGlobal('fetch', delayedPut);
+      const putCount = () =>
+        delayedPut.mock.calls.filter(([, init]) => init?.method === 'PUT').length;
+      await changeNumber(user);
+      const dialog = await screen.findByRole('dialog', { name: 'Confirmá con tu contraseña' });
+      await user.type(within(dialog).getByLabelText('Contraseña actual'), 'mi-clave');
+      await user.click(within(dialog).getByRole('button', { name: 'Confirmar y guardar' }));
+
+      await waitFor(() =>
+        expect(within(dialog).getByRole('button', { name: 'Guardando…' })).toBeTruthy(),
+      );
+      // aria-disabled (no disabled): Cancelar ignora el clic sin perder el foco.
+      const cancel = within(dialog).getByRole('button', { name: 'Cancelar' });
+      expect(cancel.getAttribute('aria-disabled')).toBe('true');
+      await user.click(cancel);
+      expect(screen.getByRole('dialog', { name: 'Confirmá con tu contraseña' })).toBeTruthy();
+      // Los campos siguen habilitados; el formulario se marca como ocupado.
+      expect(field('Número de WhatsApp').matches(':disabled')).toBe(false);
+      expect(screen.getByText('Guardando…', { selector: 'p' })).toBeTruthy();
+      expect(
+        within(dialog).getByRole('button', { name: 'Guardando…' }).getAttribute('aria-disabled'),
+      ).toBe('true');
+
+      // Un segundo envío mientras guarda no dispara otro PUT.
+      await user.click(within(dialog).getByRole('button', { name: 'Guardando…' }));
+      expect(putCount()).toBe(1);
+
+      release(Response.json({ data: { ...settings, whatsappNumber: '5491199998888' } }));
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    });
+
+    it('si el contacto cambió desde otro dispositivo (403), toma el nuevo sin revertirlo', async () => {
+      // Otro dispositivo ya guardó otro número: la API lo devuelve al recargar.
+      let saved = settings;
+      const { user, calls } = setup((call) => {
+        if (call.method === 'GET' && call.path === '/api/admin/settings') {
+          return Response.json({ data: saved });
+        }
+        if (call.method === 'PUT' && call.path === '/api/admin/settings') {
+          const body = call.body as { whatsappNumber: string };
+          if (body.whatsappNumber !== saved.whatsappNumber) {
+            return errorResponse(403, 'CURRENT_PASSWORD_REQUIRED', 'Confirmá con tu contraseña');
+          }
+          return Response.json({ data: { ...saved, ...(call.body as object) } });
+        }
+        return undefined;
+      });
+      await loaded();
+      saved = { ...settings, whatsappNumber: '5491177776666' };
+      await user.type(field('Nombre del negocio'), ' Pro');
+      await user.click(saveButton());
+
+      // No pide la contraseña (eso revertiría el cambio): toma el número nuevo.
+      await waitFor(() => expect(field('Número de WhatsApp').value).toBe('5491177776666'));
+      expect(screen.queryByRole('dialog')).toBeNull();
+      expect(field('Nombre del negocio').value).toBe('SCH Soluciones Pro');
+
+      // Al guardar de nuevo, sin contraseña, manda el número nuevo y lo demás editado.
+      await user.click(saveButton());
+      await waitFor(() => expect(putCalls(calls)).toHaveLength(2));
+      expect(putCalls(calls)[1]?.body).toMatchObject({
+        whatsappNumber: '5491177776666',
+        businessName: 'SCH Soluciones Pro',
+      });
+      expect(putCalls(calls)[1]?.body).not.toHaveProperty('currentPassword');
+    });
+
+    it('después de guardar muestra lo guardado normalizado (sin marcarlo como pendiente)', async () => {
+      const { user } = setup();
+      await loaded();
+      await user.clear(field('Número de WhatsApp'));
+      // Mismo número que el guardado, con espacios y guiones: no es un cambio de contacto.
+      await user.type(field('Número de WhatsApp'), '+54 9 11 2233-4455');
+      await user.type(field('Nombre del negocio'), ' Pro');
+      await user.click(saveButton());
+
+      await waitFor(() => expect(field('Número de WhatsApp').value).toBe('5491122334455'));
+      expect(screen.getByText('Sin cambios')).toBeTruthy();
+    });
+
+    it('el error de contraseña vuelve el foco al campo (que lo describe) y se borra al escribir', async () => {
+      const { user } = setup((call) =>
+        call.method === 'PUT'
+          ? errorResponse(400, 'INVALID_CURRENT_PASSWORD', 'La contraseña actual no es correcta')
+          : undefined,
+      );
+      await changeNumber(user);
+      await confirmPassword(user, 'incorrecta');
+
+      const dialog = screen.getByRole('dialog', { name: 'Confirmá con tu contraseña' });
+      const message = await within(dialog).findByText('La contraseña actual no es correcta');
+      const input = within(dialog).getByLabelText('Contraseña actual');
+      await waitFor(() => expect(document.activeElement).toBe(input));
+      // Se anuncia una sola vez: por el foco, vía aria-describedby (sin role="alert" extra).
+      expect(input.getAttribute('aria-describedby')).toContain(message.id);
+
+      await user.type(input, 'x');
+      expect(within(dialog).queryByText('La contraseña actual no es correcta')).toBeNull();
+    });
+
+    it('lo que se escribe mientras guarda no se pierde', async () => {
+      let release: (res: Response) => void = () => undefined;
+      const pending = new Promise<Response>((resolve) => {
+        release = resolve;
+      });
+      const { user } = setup();
+      const original = globalThis.fetch;
+      vi.stubGlobal(
+        'fetch',
+        vi.fn((input: string, init?: RequestInit) =>
+          init?.method === 'PUT' ? pending : original(input, init),
+        ),
+      );
+      await loaded();
+      await user.type(field('Nombre del negocio'), ' Pro');
+      await user.click(saveButton());
+      // Mientras guarda, sigue escribiendo en otro campo.
+      await user.type(field('Título principal'), ' extra');
+
+      release(Response.json({ data: { ...settings, businessName: 'SCH Soluciones Pro' } }));
+      await waitFor(() => expect(field('Nombre del negocio').value).toBe('SCH Soluciones Pro'));
+      expect(field('Título principal').value).toMatch(/ extra$/);
+      expect(screen.getByText('Hay cambios sin guardar')).toBeTruthy();
+    });
+
+    it('cambiar solo el email también pide la contraseña', async () => {
+      const { user, calls } = setup();
+      await loaded();
+      await user.clear(field('Email (opcional)'));
+      await user.type(field('Email (opcional)'), 'nuevo@example.com');
+      await user.click(saveButton());
+
+      expect(putCalls(calls)).toHaveLength(0);
+      await confirmPassword(user, 'mi-clave');
+      await waitFor(() => expect(putCalls(calls)).toHaveLength(1));
+      expect(putCalls(calls)[0]?.body).toMatchObject({
+        email: 'nuevo@example.com',
+        currentPassword: 'mi-clave',
+      });
+    });
+
+    it('al reabrir el diálogo tras cancelar, el campo arranca vacío y sin error', async () => {
+      const { user } = setup();
+      await changeNumber(user);
+
+      let dialog = await screen.findByRole('dialog', { name: 'Confirmá con tu contraseña' });
+      await user.type(within(dialog).getByLabelText('Contraseña actual'), 'algo');
+      await user.click(within(dialog).getByRole('button', { name: 'Cancelar' }));
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+
+      await user.click(saveButton());
+      dialog = await screen.findByRole('dialog', { name: 'Confirmá con tu contraseña' });
+      expect((within(dialog).getByLabelText('Contraseña actual') as HTMLInputElement).value).toBe(
+        '',
+      );
+    });
+
+    it('cambiar otros campos no pide la contraseña', async () => {
+      const { user, calls } = setup();
+      await loaded();
+      await user.type(field('Nombre del negocio'), ' Pro');
+      await user.click(saveButton());
+
+      await waitFor(() => expect(putCalls(calls)).toHaveLength(1));
+      expect(screen.queryByRole('dialog')).toBeNull();
+      expect(putCalls(calls)[0]?.body).not.toHaveProperty('currentPassword');
     });
   });
 
