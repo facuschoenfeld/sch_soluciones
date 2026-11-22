@@ -22,6 +22,8 @@ function publish() {
  */
 export function avoidToasts(element: HTMLElement | null): (() => void) | undefined {
   if (!element) return undefined;
+  // Marca para index.css: sus hijos no se desplazan por el scroll-padding que ella misma pide.
+  element.dataset.avoidToasts = '';
   const update = () => {
     // Alto + separación del borde (bottom-4 en la barra fija, 0 en la sticky).
     const bottom = Number.parseFloat(getComputedStyle(element).bottom) || 0;

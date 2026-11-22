@@ -53,8 +53,10 @@ function Bar({ id, height, bottom }: { id: string; height: number; bottom?: stri
 
 describe('avoidToasts', () => {
   it('publica alto + separación del borde y lo quita al desmontar la barra', () => {
-    const { unmount } = render(<Bar id="a" height={40} bottom="16px" />);
+    const { unmount, getByTestId } = render(<Bar id="a" height={40} bottom="16px" />);
     expect(clearance()).toBe('56px');
+    // Marca que usa index.css para que sus hijos no hagan saltar el scroll.
+    expect(getByTestId('a').dataset.avoidToasts).toBe('');
     unmount();
     expect(clearance()).toBe('');
   });

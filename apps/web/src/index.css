@@ -124,6 +124,30 @@
  */
 :root {
   --toast-offset-bottom: calc(var(--toast-clearance, 0px) + 1rem);
+  /*
+   * Al moverse con Tab, el navegador desplaza la página para que el foco no quede debajo de
+   * la barra fija o sticky de abajo (WCAG 2.4.11). Sin barra vale 0 (sitio público incluido).
+   */
+  scroll-padding-bottom: var(--toast-clearance, 0px);
+  /*
+   * Lo mismo arriba, por el header sticky (sitio y panel, `data-sticky-header`). Los dos usan
+   * `h-(--sticky-header-height)`: cambiar el alto acá mantiene la reserva al día.
+   */
+  --sticky-header-height: 4rem;
+  --sticky-header-clearance: calc(var(--sticky-header-height) + 1rem);
+  scroll-padding-top: var(--sticky-header-clearance);
+}
+
+[data-sticky-header] * {
+  scroll-margin-top: calc(-1 * var(--sticky-header-clearance));
+}
+
+/*
+ * Lo que está dentro de esas barras cae en la zona reservada: el margen negativo la anula para
+ * que tabular por la barra (sobre todo la sticky, que sigue al scroll) no desplace la página.
+ */
+[data-avoid-toasts] * {
+  scroll-margin-bottom: calc(-1 * var(--toast-clearance, 0px));
 }
 
 /* Al aparecer o irse una barra, los toasts se desplazan en vez de saltar. */

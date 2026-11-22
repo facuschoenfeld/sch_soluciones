@@ -28,8 +28,11 @@ export function SiteHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-40 border-b bg-background/90 backdrop-blur supports-backdrop-filter:bg-background/75">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4">
+    <header
+      data-sticky-header
+      className="sticky top-0 z-40 border-b bg-background/90 backdrop-blur supports-backdrop-filter:bg-background/75"
+    >
+      <div className="mx-auto flex h-(--sticky-header-height) max-w-6xl items-center justify-between gap-4 px-4">
         <Link
           to="/"
           className="flex min-w-0 items-center gap-2 rounded-md font-semibold tracking-tight focus-ring"
