@@ -41,12 +41,12 @@ Los botones de WhatsApp abren un diálogo con el mensaje pre-cargado desde las p
 
 En http://localhost:5173/admin (redirige a `/admin/login` si no hay sesión). Se ingresa con el admin que creó `pnpm db:seed` (`ADMIN_EMAIL` / `ADMIN_PASSWORD`). La contraseña se cambia desde **Configuración**; al cambiarla se cierran las sesiones abiertas en otros dispositivos. Desde ahí también podés cerrar la sesión en todos los dispositivos (por ejemplo, si perdiste el celular).
 
-| Sección           | Qué se hace                                                                                                                                                                              |
-| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Servicios**     | Buscar y filtrar (categoría, estado, orden); editar el precio en la tabla; destacar; archivar/restaurar; borrar (solo sin trabajos); reordenar (filtrando por categoría); alta y edición |
-| **Precios**       | Seleccioná servicios → **Actualizar precios**: +/- % o monto fijo, con vista previa antes/después. El resultado se redondea al entero                                                    |
-| **Categorías**    | Crear, editar, subir/bajar, ocultar/mostrar (oculta también sus servicios) y borrar (solo sin servicios)                                                                                 |
-| **Configuración** | Datos del negocio, textos del inicio, "Sobre mí", contacto, redes y las tres plantillas de WhatsApp (con vista previa); contraseña y sesiones                                            |
+| Sección           | Qué se hace                                                                                                                                                                                      |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Servicios**     | Buscar y filtrar (categoría, estado, orden); editar el precio en la tabla; destacar; archivar/restaurar; borrar (solo sin trabajos); reordenar (filtrando por categoría); alta y edición         |
+| **Precios**       | Seleccioná servicios → **Actualizar precios**: +/- % o monto fijo, con vista previa antes/después. El resultado se redondea al entero                                                            |
+| **Categorías**    | Crear, editar, subir/bajar, ocultar/mostrar (oculta también sus servicios) y borrar (solo sin servicios)                                                                                         |
+| **Configuración** | Datos del negocio, textos del inicio, "Sobre mí", contacto, redes y las tres plantillas de WhatsApp (con vista previa); contraseña y sesiones. Cambiar el WhatsApp o el email pide tu contraseña |
 
 Los cambios se ven en el sitio al recargar: cada escritura del panel descarta la caché pública.
 
@@ -91,16 +91,16 @@ Respuestas en JSON. Las no paginadas vienen como `{ data }`, y los errores como 
 
 Panel (todo requiere sesión; las altas responden 201, los borrados y reordenamientos 204):
 
-| Endpoint                                   | Descripción                                                                                                        |
-| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------ |
-| `GET/POST /api/admin/categories`           | Lista (con cantidad de servicios) / alta.                                                                          |
-| `PATCH/DELETE /api/admin/categories/:id`   | Edición parcial / borrado (409 `CATEGORY_HAS_SERVICES` si tiene servicios).                                        |
-| `PUT /api/admin/categories/order`          | `{ ids }` con todas las categorías en el orden nuevo.                                                              |
-| `GET/POST /api/admin/services`             | Lista completa (activos y archivados, con cantidad de trabajos) / alta.                                            |
-| `GET/PATCH/DELETE /api/admin/services/:id` | Detalle / edición parcial (archivar = `{ isActive: false }`) / borrado (409 `SERVICE_HAS_JOBS` si tiene trabajos). |
-| `PUT /api/admin/services/order`            | `{ categoryId, ids }` con todos los servicios de la categoría en el orden nuevo.                                   |
-| `POST /api/admin/services/bulk-price`      | `{ serviceIds, adjustment: { kind, value } }` (`PERCENT` o `AMOUNT`). Todo o nada; omite los "a consultar".        |
-| `GET/PUT /api/admin/settings`              | Configuración del negocio (el PUT reemplaza todos los campos).                                                     |
+| Endpoint                                   | Descripción                                                                                                               |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
+| `GET/POST /api/admin/categories`           | Lista (con cantidad de servicios) / alta.                                                                                 |
+| `PATCH/DELETE /api/admin/categories/:id`   | Edición parcial / borrado (409 `CATEGORY_HAS_SERVICES` si tiene servicios).                                               |
+| `PUT /api/admin/categories/order`          | `{ ids }` con todas las categorías en el orden nuevo.                                                                     |
+| `GET/POST /api/admin/services`             | Lista completa (activos y archivados, con cantidad de trabajos) / alta.                                                   |
+| `GET/PATCH/DELETE /api/admin/services/:id` | Detalle / edición parcial (archivar = `{ isActive: false }`) / borrado (409 `SERVICE_HAS_JOBS` si tiene trabajos).        |
+| `PUT /api/admin/services/order`            | `{ categoryId, ids }` con todos los servicios de la categoría en el orden nuevo.                                          |
+| `POST /api/admin/services/bulk-price`      | `{ serviceIds, adjustment: { kind, value } }` (`PERCENT` o `AMOUNT`). Todo o nada; omite los "a consultar".               |
+| `GET/PUT /api/admin/settings`              | Configuración del negocio (el PUT reemplaza todos los campos; si cambia el WhatsApp o el email, exige `currentPassword`). |
 
 ## Variables de entorno
 
