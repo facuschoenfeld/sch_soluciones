@@ -41,7 +41,7 @@ import {
   parseFilters,
 } from '@/lib/admin-service-filters';
 import { focusMainIfLost, focusMainOnClose } from '@/lib/focus';
-import { LONG_TOAST_MS, notifyError } from '@/lib/notify';
+import { notifyError, UNDO_TOAST_MS } from '@/lib/notify';
 import { avoidToasts } from '@/lib/toast-clearance';
 import { cn } from '@/lib/utils';
 import { AdminPageHeader } from './admin-section-page';
@@ -497,11 +497,17 @@ function ServiceStatusButtons({ service }: { service: AdminServiceSummary }) {
             isActive
               ? undefined
               : {
-                  duration: LONG_TOAST_MS,
+                  duration: UNDO_TOAST_MS,
                   action: {
                     label: 'Deshacer',
-                    onClick: () =>
-                      update.mutate({ id: saved.id, patch: { isActive: true } }, { onError }),
+                    // mutateAsync y no mutate: el toast dura 30 s y para entonces la fila (y
+                    // este componente) puede no existir; los callbacks de `mutate` no correrían
+                    // y un error pasaría en silencio. La promesa se rechaza igual.
+                    onClick: () => {
+                      update
+                        .mutateAsync({ id: saved.id, patch: { isActive: true } })
+                        .catch(onError);
+                    },
                   },
                 },
           );

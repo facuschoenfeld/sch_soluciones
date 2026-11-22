@@ -1,8 +1,10 @@
 // @vitest-environment jsdom
 import type { AdminServiceSummary } from '@sch/shared';
-import { cleanup, screen, waitFor, within } from '@testing-library/react';
+import { act, cleanup, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { toast } from 'sonner';
+import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
+import { Toaster } from '@/components/admin/toaster';
 import { ADMIN_EMAIL, errorResponse, stubAdminApi, type ApiCall } from '@/test/admin-api';
 import { categoriesList, makeService, makeServiceDetail } from '@/test/admin-fixtures';
 import { renderWithProviders } from '@/test/render';
@@ -213,6 +215,64 @@ describe('ServicesPage (listado y filtros)', () => {
     await screen.findByText('Instalación de Windows');
     expect(screen.getByRole('button', { name: 'Borrar Instalación de Windows' })).toBeTruthy();
     expect(screen.queryByRole('button', { name: 'Borrar Landing page' })).toBeNull();
+  });
+});
+
+describe('ServicesPage (archivar y deshacer)', () => {
+  /** Con el filtro "activos", la fila archivada desaparece junto con su componente. */
+  function setupWithToaster(extra?: (call: ApiCall) => Response | undefined) {
+    const result = setup({ route: '/admin/servicios?estado=activos', extra });
+    render(<Toaster />);
+    return result;
+  }
+
+  const archiveButton = () =>
+    screen.queryByRole('button', { name: 'Archivar Instalación de Windows' });
+
+  // Sonner captura el puntero al tocar un toast; jsdom no lo implementa.
+  const originalSetPointerCapture = Element.prototype.setPointerCapture;
+  beforeAll(() => {
+    Element.prototype.setPointerCapture = () => {};
+  });
+
+  afterAll(() => {
+    if (originalSetPointerCapture) {
+      Element.prototype.setPointerCapture = originalSetPointerCapture;
+    } else {
+      Reflect.deleteProperty(Element.prototype, 'setPointerCapture');
+    }
+  });
+
+  afterEach(() => {
+    act(() => toast.dismiss());
+  });
+
+  it('"Deshacer" restaura el servicio aunque la fila ya no esté', async () => {
+    const { user, calls } = setupWithToaster();
+    await user.click(
+      await screen.findByRole('button', { name: 'Archivar Instalación de Windows' }),
+    );
+    await waitFor(() => expect(archiveButton()).toBeNull());
+    await user.click(await screen.findByRole('button', { name: 'Deshacer' }));
+
+    await waitFor(() => expect(callsTo(calls, 'PATCH', '/api/admin/services/1')).toHaveLength(2));
+    expect(callsTo(calls, 'PATCH', '/api/admin/services/1')[1]?.body).toEqual({ isActive: true });
+  });
+
+  it('si "Deshacer" falla con la fila ya desmontada, avisa el error', async () => {
+    let patches = 0;
+    const { user } = setupWithToaster((call) =>
+      call.method === 'PATCH' && ++patches === 2
+        ? errorResponse(409, 'CONFLICT', 'No se pudo restaurar')
+        : undefined,
+    );
+    await user.click(
+      await screen.findByRole('button', { name: 'Archivar Instalación de Windows' }),
+    );
+    await waitFor(() => expect(archiveButton()).toBeNull());
+    await user.click(await screen.findByRole('button', { name: 'Deshacer' }));
+
+    expect(await screen.findByText('No se pudo restaurar')).toBeTruthy();
   });
 });
 
