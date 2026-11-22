@@ -46,6 +46,7 @@ import {
 } from '@/lib/admin-api';
 import { ApiError, fieldErrors } from '@/lib/api-client';
 import { notifyError } from '@/lib/notify';
+import { avoidToasts } from '@/lib/toast-clearance';
 import { ConfirmDialog } from './confirm-dialog';
 import { applyFieldErrors } from './form-errors';
 import { FormField, PasswordInput } from './form-field';
@@ -424,7 +425,10 @@ function BusinessSettingsForm({ settings }: { settings: AdminSettings }) {
         />
       </Card>
 
-      <div className="sticky bottom-0 z-30 -mx-4 flex flex-wrap items-center justify-end gap-x-3 gap-y-1 border-t bg-background/95 px-4 py-2 backdrop-blur sm:mx-0 sm:rounded-xl sm:border sm:py-3">
+      <div
+        ref={avoidToasts}
+        className="sticky bottom-0 z-30 -mx-4 flex flex-wrap items-center justify-end gap-x-3 gap-y-1 border-t bg-background/95 px-4 py-2 backdrop-blur sm:mx-0 sm:rounded-xl sm:border sm:py-3"
+      >
         <p
           className="basis-full text-sm text-muted-foreground sm:mr-auto sm:basis-auto"
           aria-live="polite"

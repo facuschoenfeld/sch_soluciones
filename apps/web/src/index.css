@@ -117,6 +117,22 @@
   }
 }
 
+/*
+ * Toasts del panel, abajo a la derecha: por encima de la barra fija que haya abajo
+ * (`--toast-clearance`, ver lib/toast-clearance.ts). Sin `env(safe-area-inset-bottom)`:
+ * el viewport no usa `viewport-fit=cover`, así que valdría siempre 0.
+ */
+:root {
+  --toast-offset-bottom: calc(var(--toast-clearance, 0px) + 1rem);
+}
+
+/* Al aparecer o irse una barra, los toasts se desplazan en vez de saltar. */
+@media (prefers-reduced-motion: no-preference) {
+  [data-sonner-toaster] {
+    transition: bottom 150ms ease;
+  }
+}
+
 /* Descripción en markdown de los servicios (sin plugin de tipografía). */
 @layer components {
   .markdown {

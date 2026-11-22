@@ -42,6 +42,7 @@ import {
 } from '@/lib/admin-service-filters';
 import { focusMainIfLost, focusMainOnClose } from '@/lib/focus';
 import { LONG_TOAST_MS, notifyError } from '@/lib/notify';
+import { avoidToasts } from '@/lib/toast-clearance';
 import { cn } from '@/lib/utils';
 import { AdminPageHeader } from './admin-section-page';
 
@@ -238,6 +239,7 @@ export function ServicesPage() {
           {/* Fija abajo (zona del pulgar) y fuera del flujo: la lista no salta al seleccionar. */}
           {selectedVisible.length > 0 && (
             <div
+              ref={avoidToasts}
               className="fixed right-4 bottom-4 left-4 z-30 mx-auto flex max-w-3xl flex-wrap items-center gap-3 rounded-xl border bg-background/95 p-3 shadow-lg backdrop-blur lg:left-68"
               role="region"
               aria-label="Acciones con la selección"
