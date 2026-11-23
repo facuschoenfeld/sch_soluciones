@@ -35,8 +35,11 @@ export function FormField({
   const errorId = error ? `${id}-error` : undefined;
   const describedBy = [hintId, errorId].filter(Boolean).join(' ') || undefined;
 
+  // `content-start`: en una grilla de varias columnas la celda se estira al alto de la fila (la
+  // vecina con ayuda o error es más alta); sin esto las filas internas también se estiran y el
+  // label y el control bajan, desalineados con los de al lado.
   return (
-    <div className="grid gap-2">
+    <div className="grid content-start gap-2">
       <Label id={`${id}-label`} htmlFor={id}>
         {label}
       </Label>

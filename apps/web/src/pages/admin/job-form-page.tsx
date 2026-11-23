@@ -601,8 +601,10 @@ function JobForm({ job, services, initialClient, afterCreate, exitTo }: JobFormP
         </Button>
       )}
 
+      {/* Tres columnas solo con ancho de sobra: más angostas, los labels pasan a dos líneas y
+          el turno (fecha y hora) no entra. */}
       <Section title="Fechas">
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <FormField
             id="job-received"
             label="Ingreso"
@@ -641,7 +643,7 @@ function JobForm({ job, services, initialClient, afterCreate, exitTo }: JobFormP
       </Section>
 
       <Section title="Cobro">
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <FormField id="job-currency" label="Moneda" error={errors.currency?.message}>
             {(aria) => (
               <NativeSelect {...aria} {...form.register('currency')}>
