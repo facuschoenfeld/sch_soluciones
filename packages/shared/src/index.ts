@@ -7,6 +7,7 @@ export * from './price-adjustment.js';
 export * from './public.js';
 export * from './schemas.js';
 export * from './constraints.js';
+export * from './crm.js';
 export * from './slug.js';
 export * from './whatsapp.js';
 

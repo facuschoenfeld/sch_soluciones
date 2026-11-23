@@ -1,19 +1,31 @@
 import { z } from 'zod';
 import {
   ABOUT_TEXT_MAX_LENGTH,
+  ADDRESS_MAX_LENGTH,
   BULK_MAX_ITEMS,
   BUSINESS_NAME_MAX_LENGTH,
   CATEGORY_DESCRIPTION_MAX_LENGTH,
   CATEGORY_NAME_MAX_LENGTH,
+  CLIENT_NAME_MAX_LENGTH,
+  DEFAULT_PAGE_SIZE,
+  DEVICE_FIELD_MAX_LENGTH,
   EMAIL_MAX_LENGTH,
   ESTIMATED_TIME_MAX_LENGTH,
   HERO_SUBTITLE_MAX_LENGTH,
   HERO_TITLE_MAX_LENGTH,
   ICON_NAME_MAX_LENGTH,
+  JOB_DESCRIPTION_MAX_LENGTH,
+  JOB_TITLE_MAX_LENGTH,
+  NOTES_MAX_LENGTH,
+  PAGE_MAX,
+  PAGE_SIZE_MAX,
   PASSWORD_MAX_LENGTH,
   PASSWORD_MIN_LENGTH,
+  PHONE_MAX_DIGITS,
+  PHONE_MIN_DIGITS,
   PRICE_MAX,
   PRICE_UNIT_MAX_LENGTH,
+  REPORTED_ISSUE_MAX_LENGTH,
   SEARCH_QUERY_MAX_LENGTH,
   SERVICE_DESCRIPTION_MAX_LENGTH,
   SERVICE_NAME_MAX_LENGTH,
@@ -25,7 +37,15 @@ import {
   URL_MAX_LENGTH,
   WHATSAPP_TEMPLATE_MAX_LENGTH,
 } from './constraints.js';
-import { currencySchema, priceTypeSchema, serviceLineSchema, type PriceType } from './enums.js';
+import { isValidDateInput } from './crm.js';
+import {
+  clientSourceSchema,
+  currencySchema,
+  jobStatusSchema,
+  priceTypeSchema,
+  serviceLineSchema,
+  type PriceType,
+} from './enums.js';
 import {
   PRICE_ADJUSTMENT_PERCENT_MAX,
   PRICE_ADJUSTMENT_PERCENT_MIN,
@@ -314,3 +334,200 @@ export const settingsUpdateSchema = settingsInputSchema.extend({
 });
 export type SettingsUpdate = z.input<typeof settingsUpdateSchema>;
 export type SettingsUpdateParsed = z.output<typeof settingsUpdateSchema>;
+
+// ---------------------------------------------------------------------------
+// Panel: clientes y trabajos (mini CRM). Datos personales (Ley 25.326): solo en /api/admin.
+
+/** Query string vacío ("?estado=") = ausente. */
+const emptyAsUndefined = (value: unknown) => (value === '' ? undefined : value);
+
+const queryIdSchema = z.preprocess(
+  emptyAsUndefined,
+  z.coerce.number().int().positive().max(ID_MAX).optional(),
+);
+
+/** `?page=&pageSize=` de los listados paginados. */
+export const paginationQuerySchema = z.object({
+  page: z.preprocess(emptyAsUndefined, z.coerce.number().int().min(1).max(PAGE_MAX).default(1)),
+  pageSize: z.preprocess(
+    emptyAsUndefined,
+    z.coerce.number().int().min(1).max(PAGE_SIZE_MAX).default(DEFAULT_PAGE_SIZE),
+  ),
+});
+export type PaginationQuery = z.output<typeof paginationQuerySchema>;
+
+const searchQuerySchema = z.preprocess(
+  (value) => (typeof value === 'string' && value.trim() === '' ? undefined : value),
+  z.string().trim().max(SEARCH_QUERY_MAX_LENGTH).optional(),
+);
+
+/** Formato de exportación (`GET .../export?format=`). */
+export const exportFormatSchema = z.enum(['pdf', 'csv']);
+export type ExportFormat = z.infer<typeof exportFormatSchema>;
+
+/** Teléfono: se aceptan espacios, guiones, puntos, paréntesis y "+"; se guardan solo dígitos. */
+export const phoneSchema = z
+  .string()
+  .transform((value) => value.replace(/[\s().+-]/g, ''))
+  .pipe(
+    z
+      .string()
+      .min(1, 'Ingresá el teléfono')
+      .regex(
+        new RegExp(`^\\d{${PHONE_MIN_DIGITS},${PHONE_MAX_DIGITS}}$`),
+        `Solo números (de ${PHONE_MIN_DIGITS} a ${PHONE_MAX_DIGITS} dígitos)`,
+      ),
+  );
+
+/** `POST /api/admin/clients`. */
+export const clientInputSchema = z.object({
+  fullName: requiredText(CLIENT_NAME_MAX_LENGTH, 'Ingresá el nombre'),
+  phone: phoneSchema,
+  email: optionalEmail,
+  address: optionalText(ADDRESS_MAX_LENGTH),
+  source: clientSourceSchema,
+  notes: optionalText(NOTES_MAX_LENGTH),
+});
+export type ClientInput = z.input<typeof clientInputSchema>;
+export type ClientInputParsed = z.output<typeof clientInputSchema>;
+
+/** `PATCH /api/admin/clients/:id`. */
+export const clientUpdateSchema = clientInputSchema.partial();
+export type ClientUpdate = z.input<typeof clientUpdateSchema>;
+export type ClientUpdateParsed = z.output<typeof clientUpdateSchema>;
+
+/** Filtros del listado de clientes: búsqueda por nombre, teléfono o email. */
+export const clientsFilterSchema = z.object({ q: searchQuerySchema });
+export type ClientsFilter = z.output<typeof clientsFilterSchema>;
+
+/** `GET /api/admin/clients`. */
+export const clientsQuerySchema = clientsFilterSchema.extend(paginationQuerySchema.shape);
+export type ClientsQuery = z.output<typeof clientsQuerySchema>;
+
+/** `GET /api/admin/clients/export`. */
+export const clientsExportQuerySchema = clientsFilterSchema.extend({ format: exportFormatSchema });
+
+const deviceFieldSchema = optionalText(DEVICE_FIELD_MAX_LENGTH);
+
+/** Datos del equipo (servicio técnico). Si todos están vacíos se guarda null. */
+export const deviceInfoSchema = z
+  .object({
+    brand: deviceFieldSchema,
+    model: deviceFieldSchema,
+    serialNumber: deviceFieldSchema,
+    reportedIssue: optionalText(REPORTED_ISSUE_MAX_LENGTH),
+  })
+  .nullable()
+  .transform((value) =>
+    value && Object.values(value).some((field) => field !== null) ? value : null,
+  );
+export type DeviceInfoParsed = z.output<typeof deviceInfoSchema>;
+
+const DATE_MIN = Date.UTC(2000, 0, 1);
+const DATE_MAX = Date.UTC(2100, 0, 1);
+
+/** Fecha y hora ISO con zona (ej. "2026-11-23T18:30:00.000Z"), entre 2000 y 2100. */
+const dateTimeSchema = z.iso
+  .datetime({ offset: true, error: 'Ingresá una fecha válida' })
+  .refine((value) => {
+    const time = Date.parse(value);
+    return time >= DATE_MIN && time < DATE_MAX;
+  }, 'Ingresá una fecha válida')
+  .transform((value) => new Date(value));
+
+const jobAmountSchema = z
+  .number({ error: 'Ingresá un monto válido' })
+  .min(0, 'El monto no puede ser negativo')
+  .max(PRICE_MAX, 'El monto es demasiado grande')
+  .refine(hasAtMostTwoDecimals, 'Hasta 2 decimales');
+
+/** Lo pagado no puede superar el total (en centavos, sin errores de punto flotante). */
+export function jobAmountsIssue(amountCharged: number, amountPaid: number): string | null {
+  return Math.round(amountPaid * 100) > Math.round(amountCharged * 100)
+    ? 'Lo pagado no puede superar el total'
+    : null;
+}
+
+const jobFieldsSchema = z.object({
+  clientId: z
+    .number({ error: 'Elegí un cliente' })
+    .int()
+    .positive('Elegí un cliente')
+    .max(ID_MAX, 'Elegí un cliente'),
+  /** Servicio del catálogo (opcional). Al asignarlo, la API guarda el snapshot de nombre y precio. */
+  serviceId: idSchema.nullable(),
+  title: requiredText(JOB_TITLE_MAX_LENGTH, 'Ingresá un título'),
+  description: optionalText(JOB_DESCRIPTION_MAX_LENGTH),
+  deviceInfo: deviceInfoSchema,
+  status: jobStatusSchema,
+  amountCharged: jobAmountSchema,
+  currency: currencySchema,
+  amountPaid: jobAmountSchema,
+  /** Fecha de ingreso (o de pedido, en desarrollo): ordena el listado y filtra por fechas. */
+  receivedAt: dateTimeSchema,
+  /** Turno. */
+  scheduledAt: dateTimeSchema.nullable(),
+  completedAt: dateTimeSchema.nullable(),
+  internalNotes: optionalText(NOTES_MAX_LENGTH),
+});
+
+/** `POST /api/admin/jobs`. */
+export const jobInputSchema = jobFieldsSchema.superRefine((value, ctx) => {
+  const issue = jobAmountsIssue(value.amountCharged, value.amountPaid);
+  if (issue) ctx.addIssue({ code: 'custom', path: ['amountPaid'], message: issue });
+});
+export type JobInput = z.input<typeof jobInputSchema>;
+export type JobInputParsed = z.output<typeof jobInputSchema>;
+
+/**
+ * `PATCH /api/admin/jobs/:id`: cualquier subconjunto. Los montos y el cambio de estado se
+ * validan en la API contra el trabajo ya combinado con los cambios.
+ */
+export const jobUpdateSchema = jobFieldsSchema.partial();
+export type JobUpdate = z.input<typeof jobUpdateSchema>;
+export type JobUpdateParsed = z.output<typeof jobUpdateSchema>;
+
+/** Día de un filtro ("2026-11-23"), en el mismo rango de años que las fechas de los trabajos. */
+const dateInputSchema = z.string().refine((value) => {
+  const year = Number(value.slice(0, 4));
+  return isValidDateInput(value) && year >= 2000 && year < 2100;
+}, 'Fecha inválida');
+
+const jobsFilterObject = z.object({
+  status: z.preprocess(emptyAsUndefined, jobStatusSchema.optional()),
+  clientId: queryIdSchema,
+  serviceId: queryIdSchema,
+  /** Fecha de ingreso desde / hasta (inclusive), como días en hora argentina ("2026-11-23"). */
+  from: z.preprocess(emptyAsUndefined, dateInputSchema.optional()),
+  to: z.preprocess(emptyAsUndefined, dateInputSchema.optional()),
+  /** Solo terminados o entregados con saldo a cobrar. */
+  balanceDue: z.preprocess(
+    emptyAsUndefined,
+    z
+      .enum(['true', 'false'])
+      .optional()
+      .transform((value) => value === 'true'),
+  ),
+});
+
+const isDateRangeInOrder = (value: { from?: string; to?: string }) =>
+  !value.from || !value.to || value.from <= value.to;
+const dateRangeMessage = () => ({
+  path: ['to'],
+  message: 'La fecha "hasta" es anterior a "desde"',
+});
+
+/** Filtros del listado de trabajos. */
+export const jobsFilterSchema = jobsFilterObject.refine(isDateRangeInOrder, dateRangeMessage());
+export type JobsFilter = z.output<typeof jobsFilterSchema>;
+
+/** `GET /api/admin/jobs`. */
+export const jobsQuerySchema = jobsFilterObject
+  .extend(paginationQuerySchema.shape)
+  .refine(isDateRangeInOrder, dateRangeMessage());
+export type JobsQuery = z.output<typeof jobsQuerySchema>;
+
+/** `GET /api/admin/jobs/export`. */
+export const jobsExportQuerySchema = jobsFilterObject
+  .extend({ format: exportFormatSchema })
+  .refine(isDateRangeInOrder, dateRangeMessage());
