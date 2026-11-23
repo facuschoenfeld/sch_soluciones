@@ -133,6 +133,7 @@ model Job {
   serviceNameSnapshot      String?    @map("service_name_snapshot")
   servicePriceSnapshot     Decimal?   @map("service_price_snapshot") @db.Decimal(12, 2)
   servicePriceTypeSnapshot PriceType? @map("service_price_type_snapshot")
+  serviceCurrencySnapshot  Currency?  @map("service_currency_snapshot")
   title                    String
   description              String?
   // { brand, model, serialNumber, reportedIssue, ... } validado con Zod en la API.
@@ -141,7 +142,8 @@ model Job {
   amountCharged            Decimal    @default(0) @map("amount_charged") @db.Decimal(12, 2)
   currency                 Currency   @default(ARS)
   amountPaid               Decimal    @default(0) @map("amount_paid") @db.Decimal(12, 2)
-  receivedAt               DateTime?  @map("received_at")
+  // Fecha de ingreso (o de pedido): ordena el listado y es la que usan los filtros por fecha.
+  receivedAt               DateTime   @default(now()) @map("received_at")
   scheduledAt              DateTime?  @map("scheduled_at")
   completedAt              DateTime?  @map("completed_at")
   internalNotes            String?    @map("internal_notes")
@@ -151,6 +153,7 @@ model Job {
   @@index([clientId])
   @@index([status])
   @@index([serviceId])
+  @@index([receivedAt])
   @@map("jobs")
 }
 
