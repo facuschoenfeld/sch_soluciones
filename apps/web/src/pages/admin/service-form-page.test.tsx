@@ -150,6 +150,20 @@ describe('ServiceFormPage (alta)', () => {
     expect(screen.getByText('Desde $ 25.000', { selector: 'strong', exact: false })).toBeTruthy();
   });
 
+  it('entre dos tipos con precio, un monto vaciado a propósito queda vacío', async () => {
+    const { user } = setup();
+    await fillBasics(user);
+    await user.type(input('Monto'), '25000');
+    // Pasa por "A consultar" para que haya un monto guardado que se podría recuperar.
+    await user.selectOptions(screen.getByLabelText('Tipo de precio'), 'QUOTE');
+    await user.selectOptions(screen.getByLabelText('Tipo de precio'), 'FIXED');
+
+    await user.clear(input('Monto'));
+    await user.selectOptions(screen.getByLabelText('Tipo de precio'), 'FROM');
+
+    expect(input('Monto').value).toBe('');
+  });
+
   it('la vista previa del precio se actualiza mientras se escribe', async () => {
     const { user } = setup();
     await screen.findByLabelText('Monto');

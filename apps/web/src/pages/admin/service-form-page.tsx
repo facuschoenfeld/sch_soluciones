@@ -20,6 +20,7 @@ import { useState, type ReactNode } from 'react';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import { Link, useNavigate, useParams } from 'react-router';
 import { toast } from 'sonner';
+import { AmountField } from '@/components/admin/amount-field';
 import { applyFieldErrors } from '@/components/admin/form-errors';
 import { FormField } from '@/components/admin/form-field';
 import { MarkdownEditor } from '@/components/admin/markdown-editor';
@@ -39,7 +40,6 @@ import {
   useSaveService,
 } from '@/lib/admin-api';
 import { ApiError } from '@/lib/api-client';
-import { formatAmountInput, parseAmountInput } from '@/lib/amount-input';
 import { useSettings } from '@/lib/public-api';
 import { notifyError } from '@/lib/notify';
 import { AdminPageHeader } from './admin-section-page';
@@ -241,7 +241,9 @@ function ServiceForm({
         const current = form.getValues('priceAmount');
         if (typeof current === 'number' && Number.isFinite(current)) setLastAmount(current);
         form.setValue('priceAmount', null);
-      } else if (form.getValues('priceAmount') === null) {
+      } else if (isQuote && form.getValues('priceAmount') === null) {
+        // Solo al volver de "a consultar" (`isQuote` es el tipo del último render, el anterior):
+        // entre dos tipos con monto, un monto vaciado a propósito queda vacío.
         form.setValue('priceAmount', lastAmount);
       }
     },
@@ -380,7 +382,7 @@ function ServiceForm({
                   control={form.control}
                   name="priceAmount"
                   render={({ field }) => (
-                    <AmountInput
+                    <AmountField
                       {...aria}
                       currency={currency}
                       value={field.value ?? null}
@@ -512,44 +514,5 @@ function ServiceForm({
       </div>
       {guard.dialog}
     </form>
-  );
-}
-
-interface AmountInputProps {
-  id: string;
-  'aria-invalid': boolean;
-  'aria-describedby': string | undefined;
-  currency: string;
-  value: number | null;
-  onChange: (value: number | null) => void;
-  onBlur: () => void;
-  inputRef: (element: HTMLInputElement | null) => void;
-}
-
-/**
- * Monto en formato argentino. Se guarda el texto tal cual se escribe (para no reformatear
- * mientras se tipea) y al formulario se le pasa el número (NaN si no es válido).
- */
-function AmountInput({ currency, value, onChange, onBlur, inputRef, ...aria }: AmountInputProps) {
-  const [text, setText] = useState(() => formatAmountInput(value));
-  return (
-    <div className="flex items-center gap-2">
-      <span className="text-sm text-muted-foreground" aria-hidden="true">
-        {currency === 'USD' ? 'US$' : '$'}
-      </span>
-      <Input
-        {...aria}
-        ref={inputRef}
-        value={text}
-        onChange={(event) => {
-          setText(event.target.value);
-          onChange(parseAmountInput(event.target.value));
-        }}
-        onBlur={onBlur}
-        inputMode="decimal"
-        autoComplete="off"
-        className="h-11 tabular-nums"
-      />
-    </div>
   );
 }
