@@ -1,5 +1,9 @@
 import type {
   AdminCategory,
+  AdminClientDetail,
+  AdminClientSummary,
+  AdminDashboard,
+  AdminJob,
   AdminServiceDetail,
   AdminServiceSummary,
   AdminSettings,
@@ -7,12 +11,23 @@ import type {
   BulkPriceResult,
   CategoryInput,
   CategoryUpdate,
+  ClientInput,
   DataResponse,
+  JobInput,
+  JobUpdate,
+  Paginated,
   ServiceInput,
   ServiceUpdate,
   SettingsUpdate,
 } from '@sch/shared';
-import { useMutation, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query';
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+  type QueryClient,
+  type QueryKey,
+} from '@tanstack/react-query';
 import { ApiError, apiGet, apiSend } from '@/lib/api-client';
 
 // Hooks de la API del panel. Las claves empiezan con 'admin': al cerrar sesión se borran
@@ -24,6 +39,13 @@ export const adminQueryKeys = {
   services: ['admin', 'services'] as const,
   service: (id: number) => ['admin', 'services', id] as const,
   settings: ['admin', 'settings'] as const,
+  clients: ['admin', 'clients'] as const,
+  clientList: (query: string) => ['admin', 'clients', 'list', query] as const,
+  client: (id: number) => ['admin', 'clients', 'detail', id] as const,
+  jobs: ['admin', 'jobs'] as const,
+  jobList: (query: string) => ['admin', 'jobs', 'list', query] as const,
+  job: (id: number) => ['admin', 'jobs', 'detail', id] as const,
+  dashboard: ['admin', 'dashboard'] as const,
 };
 
 async function getData<T>(path: string): Promise<T> {
@@ -263,5 +285,124 @@ export function useSaveSettings() {
       // El nombre del negocio y las plantillas también se usan en el panel y en el sitio.
       return queryClient.invalidateQueries({ queryKey: ['public'] });
     },
+  });
+}
+
+// --- Clientes y trabajos (mini CRM) ----------------------------------------
+
+/**
+ * Después de escribir un cliente o un trabajo: se refrescan listados, fichas y métricas. Los
+ * trabajos cambian los totales del cliente y si un servicio se puede borrar (sus trabajos).
+ * `skip`: la ficha recién guardada (ya está en la caché con la respuesta) o recién borrada (si
+ * se recargara, la página mostraría "no existe" antes de salir).
+ */
+function invalidateCrm(
+  queryClient: QueryClient,
+  { skip, services = false }: { skip?: QueryKey; services?: boolean } = {},
+): Promise<void> {
+  const notSkipped = ({ queryKey }: { queryKey: QueryKey }) =>
+    !skip || JSON.stringify(queryKey) !== JSON.stringify(skip);
+  return Promise.all([
+    queryClient.invalidateQueries({ queryKey: adminQueryKeys.clients, predicate: notSkipped }),
+    queryClient.invalidateQueries({ queryKey: adminQueryKeys.jobs, predicate: notSkipped }),
+    queryClient.invalidateQueries({ queryKey: adminQueryKeys.dashboard }),
+    // Solo los trabajos cambian algo del catálogo (cuántos tiene cada servicio).
+    services && queryClient.invalidateQueries({ queryKey: adminQueryKeys.services }),
+  ]).then(() => undefined);
+}
+
+/** `query` es el query string ya armado (sin "?"): también es la clave de la caché. */
+export function useAdminClients(query: string) {
+  return useQuery({
+    queryKey: adminQueryKeys.clientList(query),
+    queryFn: () => apiGet<Paginated<AdminClientSummary>>(`/admin/clients?${query}`),
+    // Al cambiar de página o de búsqueda se sigue viendo la lista anterior hasta que llega la nueva.
+    placeholderData: keepPreviousData,
+  });
+}
+
+export function useAdminClient(id: number | undefined) {
+  return useQuery({
+    queryKey: adminQueryKeys.client(id ?? 0),
+    queryFn: () => getData<AdminClientDetail>(`/admin/clients/${id}`),
+    enabled: id !== undefined,
+  });
+}
+
+export function useSaveClient() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, input }: { id?: number; input: ClientInput }) =>
+      id === undefined
+        ? sendData<AdminClientDetail>('POST', '/admin/clients', input)
+        : sendData<AdminClientDetail>('PATCH', `/admin/clients/${id}`, input),
+    onSuccess: (client) => {
+      queryClient.setQueryData(adminQueryKeys.client(client.id), client);
+      return invalidateCrm(queryClient, { skip: adminQueryKeys.client(client.id) });
+    },
+  });
+}
+
+export function useDeleteClient() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => apiSend('DELETE', `/admin/clients/${id}`),
+    onSuccess: (_data, id) => {
+      queryClient.removeQueries({ queryKey: adminQueryKeys.client(id) });
+      return invalidateCrm(queryClient, { skip: adminQueryKeys.client(id) });
+    },
+  });
+}
+
+export function useAdminJobs(query: string, options: { enabled?: boolean } = {}) {
+  return useQuery({
+    queryKey: adminQueryKeys.jobList(query),
+    queryFn: () => apiGet<Paginated<AdminJob>>(`/admin/jobs?${query}`),
+    placeholderData: keepPreviousData,
+    enabled: options.enabled ?? true,
+  });
+}
+
+export function useAdminJob(id: number | undefined) {
+  return useQuery({
+    queryKey: adminQueryKeys.job(id ?? 0),
+    queryFn: () => getData<AdminJob>(`/admin/jobs/${id}`),
+    enabled: id !== undefined,
+    // El formulario siempre parte de lo guardado.
+    staleTime: 0,
+  });
+}
+
+/** Alta, edición del formulario (solo los campos cambiados) y cambios de estado. */
+export function useSaveJob() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, input }: { id?: number; input: JobInput | JobUpdate }) =>
+      id === undefined
+        ? sendData<AdminJob>('POST', '/admin/jobs', input)
+        : sendData<AdminJob>('PATCH', `/admin/jobs/${id}`, input),
+    onSuccess: (job) => {
+      queryClient.setQueryData(adminQueryKeys.job(job.id), job);
+      return invalidateCrm(queryClient, { skip: adminQueryKeys.job(job.id), services: true });
+    },
+  });
+}
+
+export function useDeleteJob() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => apiSend('DELETE', `/admin/jobs/${id}`),
+    onSuccess: (_data, id) => {
+      queryClient.removeQueries({ queryKey: adminQueryKeys.job(id) });
+      return invalidateCrm(queryClient, { skip: adminQueryKeys.job(id), services: true });
+    },
+  });
+}
+
+export function useAdminDashboard() {
+  return useQuery({
+    queryKey: adminQueryKeys.dashboard,
+    queryFn: () => getData<AdminDashboard>('/admin/dashboard'),
+    staleTime: 0,
   });
 }

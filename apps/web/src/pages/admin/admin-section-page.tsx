@@ -1,6 +1,4 @@
-import type { LucideIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
-import { EmptyState } from '@/components/feedback/empty-state';
 import { usePageTitle } from '@/lib/hooks';
 
 interface AdminPageHeaderProps {
@@ -19,21 +17,5 @@ export function AdminPageHeader({ title, description, actions }: AdminPageHeader
       </div>
       {actions}
     </header>
-  );
-}
-
-interface UpcomingSectionPageProps {
-  title: string;
-  icon: LucideIcon;
-  description: string;
-}
-
-/** Sección del panel que todavía no tiene contenido (se completa en las próximas etapas). */
-export function UpcomingSectionPage({ title, icon, description }: UpcomingSectionPageProps) {
-  return (
-    <div className="mx-auto max-w-5xl space-y-8 px-4 py-8 sm:px-6">
-      <AdminPageHeader title={title} />
-      <EmptyState icon={icon} title="Próximamente" description={description} />
-    </div>
   );
 }

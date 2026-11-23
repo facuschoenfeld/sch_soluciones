@@ -1,13 +1,16 @@
-import { ClipboardList, Users } from 'lucide-react';
 import { useEffect } from 'react';
 import { Navigate, Route, Routes } from 'react-router';
 import { AdminLayout } from '@/components/admin/admin-layout';
 import { RequireAuth } from '@/components/admin/require-auth';
 import { Toaster } from '@/components/admin/toaster';
 import { SlowLoadingNotice } from '@/components/feedback/slow-loading-notice';
-import { UpcomingSectionPage } from '@/pages/admin/admin-section-page';
 import { CategoriesPage } from '@/pages/admin/categories-page';
+import { ClientDetailPage } from '@/pages/admin/client-detail-page';
+import { ClientFormPage } from '@/pages/admin/client-form-page';
+import { ClientsPage } from '@/pages/admin/clients-page';
 import { DashboardPage } from '@/pages/admin/dashboard-page';
+import { JobFormPage } from '@/pages/admin/job-form-page';
+import { JobsPage } from '@/pages/admin/jobs-page';
 import { LoginPage } from '@/pages/admin/login-page';
 import { ServiceFormPage } from '@/pages/admin/service-form-page';
 import { ServicesPage } from '@/pages/admin/services-page';
@@ -42,26 +45,13 @@ export default function AdminApp() {
             <Route path="servicios/nuevo" element={<ServiceFormPage />} />
             <Route path="servicios/:id" element={<ServiceFormPage />} />
             <Route path="categorias" element={<CategoriesPage />} />
-            <Route
-              path="clientes"
-              element={
-                <UpcomingSectionPage
-                  title="Clientes"
-                  icon={Users}
-                  description="Desde acá vas a ver tus clientes, sus datos de contacto y su historial de trabajos."
-                />
-              }
-            />
-            <Route
-              path="trabajos"
-              element={
-                <UpcomingSectionPage
-                  title="Trabajos"
-                  icon={ClipboardList}
-                  description="Desde acá vas a registrar cada trabajo, su estado y los cobros."
-                />
-              }
-            />
+            <Route path="clientes" element={<ClientsPage />} />
+            <Route path="clientes/nuevo" element={<ClientFormPage />} />
+            <Route path="clientes/:id" element={<ClientDetailPage />} />
+            <Route path="clientes/:id/editar" element={<ClientFormPage />} />
+            <Route path="trabajos" element={<JobsPage />} />
+            <Route path="trabajos/nuevo" element={<JobFormPage />} />
+            <Route path="trabajos/:id" element={<JobFormPage />} />
             <Route path="configuracion" element={<SettingsPage />} />
             <Route path="*" element={<Navigate to="/admin" replace />} />
           </Route>

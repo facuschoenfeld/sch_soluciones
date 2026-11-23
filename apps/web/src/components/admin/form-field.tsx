@@ -1,4 +1,4 @@
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, TriangleExclamationPoint } from 'lucide-react';
 import { useState, type ComponentProps, type ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,6 +10,8 @@ interface FormFieldProps {
   label: string;
   error?: string;
   hint?: string;
+  /** "warning": la pista es un aviso (no bloquea, pero hay que verla). */
+  hintTone?: 'muted' | 'warning';
   children: (aria: {
     id: string;
     'aria-invalid': boolean;
@@ -17,18 +19,41 @@ interface FormFieldProps {
   }) => ReactNode;
 }
 
-/** Label + control + ayuda + error, con los atributos aria conectados. */
-export function FormField({ id, label, error, hint, children }: FormFieldProps) {
+/**
+ * Label + control + ayuda + error, con los atributos aria conectados. El label tiene id
+ * `<id>-label`, para controles compuestos que lo usan con `aria-labelledby`.
+ */
+export function FormField({
+  id,
+  label,
+  error,
+  hint,
+  hintTone = 'muted',
+  children,
+}: FormFieldProps) {
   const hintId = hint ? `${id}-hint` : undefined;
   const errorId = error ? `${id}-error` : undefined;
   const describedBy = [hintId, errorId].filter(Boolean).join(' ') || undefined;
 
   return (
     <div className="grid gap-2">
-      <Label htmlFor={id}>{label}</Label>
+      <Label id={`${id}-label`} htmlFor={id}>
+        {label}
+      </Label>
       {children({ id, 'aria-invalid': Boolean(error), 'aria-describedby': describedBy })}
       {hint && (
-        <p id={hintId} className="text-sm text-muted-foreground">
+        <p
+          id={hintId}
+          className={cn(
+            'text-sm',
+            hintTone === 'warning'
+              ? 'flex gap-1.5 font-medium text-destructive-text'
+              : 'text-muted-foreground',
+          )}
+        >
+          {hintTone === 'warning' && (
+            <TriangleExclamationPoint className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+          )}
           {hint}
         </p>
       )}

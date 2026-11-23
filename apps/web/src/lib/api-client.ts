@@ -81,3 +81,36 @@ export function apiSend<T = void>(
     body: body === undefined ? undefined : JSON.stringify(body),
   });
 }
+
+/** Nombre del archivo de `Content-Disposition: attachment; filename="x.pdf"`. */
+function attachmentName(header: string | null, fallback: string): string {
+  const match = header ? /filename="([^"]+)"/.exec(header) : null;
+  return match?.[1] ?? fallback;
+}
+
+/**
+ * Descarga un archivo de la API (exportaciones). Se pide con fetch y no con un link directo:
+ * así un error (ej. demasiados registros) se muestra como aviso en vez de abrir una página con
+ * el JSON del error.
+ */
+export async function apiDownload(path: string, fallbackName: string): Promise<string> {
+  const response = await fetch(`/api${path}`, { credentials: 'same-origin' });
+  if (!response.ok) {
+    const body: unknown = await response.json().catch(() => null);
+    if (isApiErrorBody(body)) {
+      throw new ApiError(response.status, body.error.code, body.error.message, body.error.details);
+    }
+    throw new ApiError(response.status, 'UNKNOWN', 'No se pudo descargar el archivo');
+  }
+  const url = URL.createObjectURL(await response.blob());
+  const name = attachmentName(response.headers.get('Content-Disposition'), fallbackName);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = name;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  // Después de que el navegador tomó el archivo.
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  return name;
+}
