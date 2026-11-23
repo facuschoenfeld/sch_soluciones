@@ -47,8 +47,13 @@ En http://localhost:5173/admin (redirige a `/admin/login` si no hay sesión). Se
 | **Precios**       | Seleccioná servicios → **Actualizar precios**: +/- % o monto fijo, con vista previa antes/después. El resultado se redondea al entero                                                            |
 | **Categorías**    | Crear, editar, subir/bajar, ocultar/mostrar (oculta también sus servicios) y borrar (solo sin servicios)                                                                                         |
 | **Configuración** | Datos del negocio, textos del inicio, "Sobre mí", contacto, redes y las tres plantillas de WhatsApp (con vista previa); contraseña y sesiones. Cambiar el WhatsApp o el email pide tu contraseña |
+| **Inicio**        | Ingresos del mes por moneda (trabajos terminados o entregados en el mes), saldo a cobrar, trabajos por estado, próximos turnos y últimos clientes                                                |
+| **Clientes**      | Buscar (nombre, teléfono o email) y paginar; ficha con contacto, notas, total facturado y cobrado, historial de trabajos y "Escribir por WhatsApp"; borrar (solo sin trabajos); exportar PDF/CSV |
+| **Trabajos**      | Filtrar (estado, cliente, servicio, fechas de ingreso, saldo a cobrar); alta desde el listado o la ficha; el servicio precarga título y total; estados, cobros, equipo y notas; exportar PDF/CSV |
 
 Los cambios se ven en el sitio al recargar: cada escritura del panel descarta la caché pública.
+
+Los datos de clientes son personales (Ley 25.326): solo se exponen en `/api/admin` y nunca se registran en los logs. Al registrar un trabajo con un servicio del catálogo se guarda una copia de su nombre y precio: cambiar o borrar el servicio después no altera el historial. El estado avanza libremente (se pueden saltear pasos); volver a un estado anterior pide confirmación y un trabajo entregado no se puede cancelar. Al terminar un trabajo se registra la fecha de terminado (la de ese día); si se reabre, se borra. Las exportaciones respetan los filtros del listado; el CSV usa `;` como separador (Excel en español).
 
 La sesión es una cookie httpOnly (`SameSite=Strict`; en producción `Secure` con prefijo `__Host-`) que dura 12 h y se renueva sola con el uso, hasta un máximo de 7 días desde el login. Los intentos fallidos de login (y de contraseña actual) se limitan: 10 por hora por IP y 50 por hora en total. El límite total no se aplica a los navegadores donde ya iniciaste sesión, que reciben una cookie de dispositivo de confianza (con su propio límite de 10 por hora): un ataque distribuido no te deja afuera desde tu PC o tu celular. Cambiar `JWT_SECRET` cierra todas las sesiones.
 
@@ -101,6 +106,13 @@ Panel (todo requiere sesión; las altas responden 201, los borrados y reordenami
 | `PUT /api/admin/services/order`            | `{ categoryId, ids }` con todos los servicios de la categoría en el orden nuevo.                                          |
 | `POST /api/admin/services/bulk-price`      | `{ serviceIds, adjustment: { kind, value } }` (`PERCENT` o `AMOUNT`). Todo o nada; omite los "a consultar".               |
 | `GET/PUT /api/admin/settings`              | Configuración del negocio (el PUT reemplaza todos los campos; si cambia el WhatsApp o el email, exige `currentPassword`). |
+| `GET/POST /api/admin/clients`              | Lista paginada (`?q=&page=&pageSize=`, por nombre, email o dígitos del teléfono) / alta.                                  |
+| `GET/PATCH/DELETE /api/admin/clients/:id`  | Ficha (con totales por moneda) / edición parcial / borrado (409 `CLIENT_HAS_JOBS` si tiene trabajos).                     |
+| `GET /api/admin/clients/export`            | `?format=pdf\|csv&q=`: descarga el listado filtrado.                                                                      |
+| `GET/POST /api/admin/jobs`                 | Lista paginada (`?status=&clientId=&serviceId=&from=&to=&balanceDue=true`; fechas `AAAA-MM-DD` en hora argentina) / alta. |
+| `GET/PATCH/DELETE /api/admin/jobs/:id`     | Detalle / edición parcial (409 `JOB_CHANGED` si otra petición lo modificó en el medio) / borrado.                         |
+| `GET /api/admin/jobs/export`               | `?format=pdf\|csv` y los mismos filtros del listado.                                                                      |
+| `GET /api/admin/dashboard`                 | Métricas del inicio del panel.                                                                                            |
 
 ## Variables de entorno
 
