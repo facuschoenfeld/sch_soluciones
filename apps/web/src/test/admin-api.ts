@@ -4,6 +4,8 @@ import { settingsFixture } from '@/test/fixtures';
 export interface ApiCall {
   method: string;
   path: string;
+  /** Query string con el "?" (vacío si no hay). */
+  search: string;
   body: unknown;
 }
 
@@ -47,6 +49,7 @@ export function stubAdminApi({ session = null, meStatus, handler }: AdminApiOpti
     const call: ApiCall = {
       method,
       path: url.pathname,
+      search: url.search,
       body: raw === undefined ? undefined : (JSON.parse(raw) as unknown),
     };
     calls.push(call);
