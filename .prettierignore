@@ -7,3 +7,7 @@ apps/api/prisma/migrations
 SCHSOLUCIONES_PROMPT_CC.md
 # Contiene secciones mantenidas a mano por el usuario: no reformatear.
 CLAUDE.md
+# Skills y agentes de Claude Code (archivos de terceros): no reformatear.
+.claude
+# Caché local del hook de Impeccable (no versionada).
+**/.impeccable/hook.cache.json

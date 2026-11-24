@@ -6,7 +6,8 @@ import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
   {
-    ignores: ['**/node_modules', '**/dist', '**/coverage', 'apps/api/src/generated'],
+    // `.claude/`: skills y agentes de Claude Code (scripts de terceros, minificados).
+    ignores: ['**/node_modules', '**/dist', '**/coverage', 'apps/api/src/generated', '.claude'],
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,
