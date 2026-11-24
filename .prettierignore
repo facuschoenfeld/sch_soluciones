@@ -11,3 +11,5 @@ CLAUDE.md
 .claude
 # Caché local del hook de Impeccable (no versionada).
 **/.impeccable/hook.cache.json
+# Archivos que escribe el modo live de Impeccable (config y estado de sesión).
+**/.impeccable/live
