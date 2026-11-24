@@ -25,10 +25,10 @@ colors:
 typography:
   display:
     fontFamily: "'Inter Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
-    fontSize: '3rem'
+    fontSize: 'clamp(2.25rem, 1.75rem + 2.5vw, 4rem)'
     fontWeight: 700
-    lineHeight: 1
-    letterSpacing: '-0.025em'
+    lineHeight: 1.05
+    letterSpacing: '-0.03em'
   headline:
     fontFamily: "'Inter Variable', ui-sans-serif, system-ui, sans-serif"
     fontSize: '1.875rem'
@@ -55,6 +55,13 @@ typography:
     fontSize: '0.875rem'
     fontWeight: 500
     lineHeight: 1
+  price:
+    fontFamily: "'Inter Variable', ui-sans-serif, system-ui, sans-serif"
+    fontSize: '1.25rem'
+    fontWeight: 700
+    lineHeight: 1.4
+    letterSpacing: '-0.025em'
+    fontFeature: "'tnum'"
   badge:
     fontFamily: "'Inter Variable', ui-sans-serif, system-ui, sans-serif"
     fontSize: '0.75rem'
@@ -225,10 +232,11 @@ Neutros pizarra con un único azul de acción y un verde que solo significa "esc
 
 ### Hierarchy
 
-- **Display** (700; 2.25 rem en celular y 3 rem desde 640 px; interlineado ≈1.1 en celular y 1 desde 640 px; `-0.025em`): solo el título del hero. Con `text-balance`.
+- **Display** (700; fluido `clamp(2.25rem, 1.75rem + 2.5vw, 4rem)`: ≈38 px en celular, ≈60 px a 1280 px y 64 px desde 1440 px; interlineado 1.05; `-0.03em`): solo el título del hero. Con `text-balance`. La parte en `vw` se mantiene chica frente a la de rem porque no crece con el zoom (WCAG 1.4.4). Como el título se edita desde el panel, corta palabras largas (`overflow-wrap: break-word` y guiones) para no generar scroll horizontal a 320 px.
 - **Headline** (700; 1.5 rem en celular y 1.875 rem desde 640 px; ≈1.2; `-0.025em`): títulos de sección ("¿Qué necesitás?", "Servicios destacados") y encabezados de página del panel.
 - **Title** (600; 1.125 a 1.25 rem; 1.375): nombre del servicio en la tarjeta, títulos de las tarjetas de línea y de las secciones de formularios.
-- **Body** (400; 1 rem; 1.5): texto corrido. El subtítulo del hero sube a 1.125-1.25 rem en Lápiz Pizarra. Las descripciones en markdown usan interlineado amplio (`leading-relaxed`).
+- **Price** (700; 1.25 rem; `-0.025em`; cifras tabulares): el monto del servicio, un paso por encima del nombre. La unidad ("por equipo") lo sigue en Body small con Lápiz Pizarra, en línea (no flex, que descarta el espacio) y sin cortes internos, para que se lea de corrido y baje entera si no entra.
+- **Body** (400; 1 rem; 1.5): texto corrido. El subtítulo del hero sube a 1.125-1.25 rem en Lápiz Pizarra, con interlineado amplio (1.625) y hasta 672 px de ancho. Las descripciones en markdown usan interlineado amplio (`leading-relaxed`).
 - **Body small** (400; 0.875 rem; ≈1.43): descripciones de tarjetas, ayudas de campos y metadatos.
 - **Label** (500; 0.875 rem; interlineado 1): labels de formularios, botones y navegación.
 - **Badge** (500; 0.75 rem): badges de categoría y de estado.
@@ -237,7 +245,7 @@ Neutros pizarra con un único azul de acción y un verde que solo significa "esc
 
 **La Regla de Una Sola Familia.** Inter para todo. La jerarquía se arma con peso (400, 500, 600 y 700) y tamaño, nunca con una segunda fuente decorativa.
 
-**La Regla del Precio con Peso.** El precio de un servicio va en Title (600, 1.125 rem) en el color del texto principal, nunca apagado ni en letra chica.
+**La Regla del Precio con Peso.** El monto de un servicio va en Price (700, 1.25 rem, cifras tabulares), un paso más grande que el nombre y en el color del texto principal; nunca apagado ni en letra chica. Solo la unidad baja a texto secundario.
 
 ## Layout
 
@@ -342,7 +350,7 @@ De arriba abajo:
 1. Badges (la categoría en Bruma Pizarra y "Destacado" con borde).
 2. Nombre en Title.
 3. Descripción corta en Body small.
-4. Precio en Title de peso 600 y, si hay, tiempo estimado con ícono de reloj.
+4. Monto en Price con la unidad en chico al lado y, si hay, tiempo estimado con ícono de reloj.
 5. Dos botones del mismo ancho: "Consultar" (WhatsApp) y "Ver detalle" (outline).
 
 El bloque de precio se empuja al fondo para que las tarjetas de una fila alineen precios y botones.
@@ -353,7 +361,7 @@ El bloque de precio se empuja al fondo para que las tarjetas de una fila alineen
 
 - **Do** usar Azul Señal como único acento de marca: acción principal, navegación activa y logo.
 - **Do** reservar Verde WhatsApp para lo que abre WhatsApp (botón flotante, "Consultar" y el botón del hero), con hover más oscuro (`whatsapp-green-deep`).
-- **Do** mostrar el precio en Title (600, 1.125 rem) en el color del texto principal, siempre visible en la tarjeta sin entrar al detalle.
+- **Do** mostrar el monto en Price (700, 1.25 rem, cifras tabulares) en el color del texto principal, con la unidad en texto secundario, siempre visible en la tarjeta sin entrar al detalle.
 - **Do** dar 44 px de alto mínimo a todo lo que se toca (salvo el nav de escritorio), y foco visible (borde Azul Foco con aro de 3 px, o contorno de 2 px desplazado 2 px).
 - **Do** acompañar cada estado de color con texto e ícono de lucide.
 - **Do** separar superficies con borde Línea Fina y bandas de Bruma Pizarra al 40 % antes que con sombras.

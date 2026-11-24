@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-24T00:24:48.601Z",
+  "generatedAt": "2026-11-24T00:40:09.600Z",
   "title": "Design System: SCH Soluciones",
   "extensions": {
     "colorMeta": {
@@ -308,7 +308,7 @@
     "typographyMeta": {
       "display": {
         "displayName": "Display",
-        "purpose": "Solo el título del hero (2.25 rem en celular, 3 rem desde 640 px)."
+        "purpose": "Solo el título del hero; fluido clamp(2.25rem, 1.75rem + 2.5vw, 4rem): ≈38 px en celular, ≈60 px a 1280 px."
       },
       "headline": {
         "displayName": "Headline",
@@ -316,7 +316,11 @@
       },
       "title": {
         "displayName": "Title",
-        "purpose": "Nombre del servicio, títulos de tarjeta y precio."
+        "purpose": "Nombre del servicio y títulos de tarjeta."
+      },
+      "price": {
+        "displayName": "Price",
+        "purpose": "Monto del servicio, un paso sobre el nombre, con cifras tabulares; la unidad va en Body small."
       },
       "body": {
         "displayName": "Body",
@@ -443,8 +447,8 @@
       "kind": "card",
       "refersTo": "card",
       "description": "Categoría, nombre, descripción, precio con peso y dos acciones del mismo ancho.",
-      "html": "<article class=\"ds-card\"><span class=\"ds-badge\">Mantenimiento de PC</span><h3 class=\"ds-card-title\"><a href=\"#\">Limpieza y mantenimiento</a></h3><p class=\"ds-card-text\">Limpieza interna, cambio de pasta térmica y revisión general.</p><div class=\"ds-card-price\"><p class=\"ds-price\">$ 25.000</p><p class=\"ds-meta\"><svg class=\"ds-icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"10\"/><polyline points=\"12 6 12 12 16 14\"/></svg> 24 a 48 h</p></div><div class=\"ds-card-actions\"><button class=\"ds-card-wa\"><svg class=\"ds-icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M7.9 20A9 9 0 1 0 4 16.1L2 22Z\"/></svg> Consultar</button><button class=\"ds-card-more\">Ver detalle <svg class=\"ds-icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/></svg></button></div></article>",
-      "css": ".ds-icon { width: 16px; height: 16px; flex-shrink: 0; } .ds-card { font-family: 'Inter Variable', ui-sans-serif, system-ui, sans-serif; display: flex; flex-direction: column; gap: 16px; max-width: 360px; padding: 20px; border: 1px solid var(--border); border-radius: 14px; background: var(--card); color: var(--card-foreground); box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1); transition: box-shadow 150ms ease; } .ds-card:hover { box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); } .ds-badge { align-self: flex-start; padding: 2px 8px; border-radius: 9999px; background: var(--secondary); color: var(--secondary-foreground); font-size: 0.75rem; font-weight: 500; } .ds-card-title { margin: 0; font-size: 1.125rem; font-weight: 600; line-height: 1.375; } .ds-card-title a { color: inherit; text-decoration: none; border-radius: 6px; } .ds-card-title a:hover { color: var(--primary); } .ds-card-title a:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; } .ds-card-text { margin: 0; font-size: 0.875rem; color: var(--muted-foreground); } .ds-card-price { display: grid; gap: 4px; } .ds-price { margin: 0; font-size: 1.125rem; font-weight: 600; color: var(--foreground); } .ds-meta { margin: 0; display: flex; align-items: center; gap: 6px; font-size: 0.875rem; color: var(--muted-foreground); } .ds-card-actions { display: flex; gap: 8px; } .ds-card-wa, .ds-card-more { font-family: 'Inter Variable', ui-sans-serif, system-ui, sans-serif; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 8px 16px; border-radius: 8px; font-size: 0.875rem; font-weight: 500; white-space: nowrap; cursor: pointer; transition: background-color 150ms ease, box-shadow 150ms ease; flex: 1; } .ds-card-wa { border: 1px solid transparent; background: var(--whatsapp); color: var(--whatsapp-foreground); } .ds-card-wa:hover { background: var(--whatsapp-hover); } .ds-card-more { border: 1px solid var(--border); background: var(--background); color: var(--foreground); box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); } .ds-card-more:hover { background: var(--accent); } .ds-card-wa:focus-visible, .ds-card-more:focus-visible { outline: none; border-color: var(--ring); box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 50%, transparent); }"
+      "html": "<article class=\"ds-card\"><span class=\"ds-badge\">Mantenimiento de PC</span><h3 class=\"ds-card-title\"><a href=\"#\">Limpieza y mantenimiento</a></h3><p class=\"ds-card-text\">Limpieza interna, cambio de pasta térmica y revisión general.</p><div class=\"ds-card-price\"><p class=\"ds-price\"><span class=\"ds-price-amount\">$ 25.000</span> <span class=\"ds-price-unit\">por equipo</span></p><p class=\"ds-meta\"><svg class=\"ds-icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"10\"/><polyline points=\"12 6 12 12 16 14\"/></svg> 24 a 48 h</p></div><div class=\"ds-card-actions\"><button class=\"ds-card-wa\"><svg class=\"ds-icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M7.9 20A9 9 0 1 0 4 16.1L2 22Z\"/></svg> Consultar</button><button class=\"ds-card-more\">Ver detalle <svg class=\"ds-icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/></svg></button></div></article>",
+      "css": ".ds-icon { width: 16px; height: 16px; flex-shrink: 0; } .ds-card { font-family: 'Inter Variable', ui-sans-serif, system-ui, sans-serif; display: flex; flex-direction: column; gap: 16px; max-width: 360px; padding: 20px; border: 1px solid var(--border); border-radius: 14px; background: var(--card); color: var(--card-foreground); box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1); transition: box-shadow 150ms ease; } .ds-card:hover { box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); } .ds-badge { align-self: flex-start; padding: 2px 8px; border-radius: 9999px; background: var(--secondary); color: var(--secondary-foreground); font-size: 0.75rem; font-weight: 500; } .ds-card-title { margin: 0; font-size: 1.125rem; font-weight: 600; line-height: 1.375; } .ds-card-title a { color: inherit; text-decoration: none; border-radius: 6px; } .ds-card-title a:hover { color: var(--primary); } .ds-card-title a:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; } .ds-card-text { margin: 0; font-size: 0.875rem; color: var(--muted-foreground); } .ds-card-price { display: grid; gap: 4px; } .ds-price { margin: 0; color: var(--foreground); } .ds-price-amount { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.025em; font-variant-numeric: tabular-nums; } .ds-price-unit { font-size: 0.875rem; white-space: nowrap; color: var(--muted-foreground); } .ds-meta { margin: 0; display: flex; align-items: center; gap: 6px; font-size: 0.875rem; color: var(--muted-foreground); } .ds-card-actions { display: flex; gap: 8px; } .ds-card-wa, .ds-card-more { font-family: 'Inter Variable', ui-sans-serif, system-ui, sans-serif; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 8px 16px; border-radius: 8px; font-size: 0.875rem; font-weight: 500; white-space: nowrap; cursor: pointer; transition: background-color 150ms ease, box-shadow 150ms ease; flex: 1; } .ds-card-wa { border: 1px solid transparent; background: var(--whatsapp); color: var(--whatsapp-foreground); } .ds-card-wa:hover { background: var(--whatsapp-hover); } .ds-card-more { border: 1px solid var(--border); background: var(--background); color: var(--foreground); box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); } .ds-card-more:hover { background: var(--accent); } .ds-card-wa:focus-visible, .ds-card-more:focus-visible { outline: none; border-color: var(--ring); box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 50%, transparent); }"
     },
     {
       "name": "Header del sitio",
@@ -498,7 +502,7 @@
       },
       {
         "name": "La Regla del Precio con Peso",
-        "body": "El precio de un servicio va en Title (600, 1.125 rem) en el color del texto principal, nunca apagado ni en letra chica.",
+        "body": "El monto de un servicio va en Price (700, 1.25 rem, cifras tabulares), un paso más grande que el nombre y en el color del texto principal; nunca apagado ni en letra chica. Solo la unidad baja a texto secundario.",
         "section": "typography"
       },
       {
@@ -510,7 +514,7 @@
     "dos": [
       "Do usar Azul Señal como único acento de marca: acción principal, navegación activa y logo.",
       "Do reservar Verde WhatsApp para lo que abre WhatsApp (botón flotante, \"Consultar\" y el botón del hero), con hover más oscuro (whatsapp-green-deep).",
-      "Do mostrar el precio en Title (600, 1.125 rem) en el color del texto principal, siempre visible en la tarjeta sin entrar al detalle.",
+      "Do mostrar el monto en Price (700, 1.25 rem, cifras tabulares) en el color del texto principal, con la unidad en texto secundario, siempre visible en la tarjeta sin entrar al detalle.",
       "Do dar 44 px de alto mínimo a todo lo que se toca (salvo el nav de escritorio), y foco visible (borde Azul Foco con aro de 3 px, o contorno de 2 px desplazado 2 px).",
       "Do acompañar cada estado de color con texto e ícono de lucide.",
       "Do separar superficies con borde Línea Fina y bandas de Bruma Pizarra al 40 % antes que con sombras.",
