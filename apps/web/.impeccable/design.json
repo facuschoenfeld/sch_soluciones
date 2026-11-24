@@ -1,0 +1,529 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-24T00:24:48.601Z",
+  "title": "Design System: SCH Soluciones",
+  "extensions": {
+    "colorMeta": {
+      "signal-blue": {
+        "role": "primary",
+        "displayName": "Azul Señal",
+        "canonical": "oklch(0.488 0.243 264.376)",
+        "tonalRamp": [
+          "oklch(0.15 0.085 264.376)",
+          "oklch(0.25 0.146 264.376)",
+          "oklch(0.35 0.207 264.376)",
+          "oklch(0.45 0.243 264.376)",
+          "oklch(0.55 0.243 264.376)",
+          "oklch(0.68 0.194 264.376)",
+          "oklch(0.82 0.109 264.376)",
+          "oklch(0.95 0.029 264.376)"
+        ]
+      },
+      "signal-blue-dark": {
+        "role": "primary",
+        "displayName": "Azul Señal (modo oscuro)",
+        "canonical": "oklch(0.707 0.165 254.624)",
+        "tonalRamp": [
+          "oklch(0.15 0.058 254.624)",
+          "oklch(0.25 0.099 254.624)",
+          "oklch(0.35 0.14 254.624)",
+          "oklch(0.45 0.165 254.624)",
+          "oklch(0.55 0.165 254.624)",
+          "oklch(0.68 0.132 254.624)",
+          "oklch(0.82 0.074 254.624)",
+          "oklch(0.95 0.02 254.624)"
+        ]
+      },
+      "focus-blue": {
+        "role": "primary",
+        "displayName": "Azul Foco",
+        "canonical": "oklch(0.546 0.245 262.881)",
+        "tonalRamp": [
+          "oklch(0.15 0.086 262.881)",
+          "oklch(0.25 0.147 262.881)",
+          "oklch(0.35 0.208 262.881)",
+          "oklch(0.45 0.245 262.881)",
+          "oklch(0.55 0.245 262.881)",
+          "oklch(0.68 0.196 262.881)",
+          "oklch(0.82 0.11 262.881)",
+          "oklch(0.95 0.029 262.881)"
+        ]
+      },
+      "blue-wash": {
+        "role": "primary",
+        "displayName": "Lavado Azul",
+        "canonical": "oklch(0.932 0.032 255.585)",
+        "tonalRamp": [
+          "oklch(0.15 0.042 255.585)",
+          "oklch(0.25 0.072 255.585)",
+          "oklch(0.35 0.102 255.585)",
+          "oklch(0.45 0.12 255.585)",
+          "oklch(0.55 0.12 255.585)",
+          "oklch(0.68 0.096 255.585)",
+          "oklch(0.82 0.054 255.585)",
+          "oklch(0.95 0.014 255.585)"
+        ]
+      },
+      "whatsapp-green": {
+        "role": "secondary",
+        "displayName": "Verde WhatsApp",
+        "canonical": "oklch(0.527 0.154 150.069)",
+        "tonalRamp": [
+          "oklch(0.15 0.054 150.069)",
+          "oklch(0.25 0.092 150.069)",
+          "oklch(0.35 0.131 150.069)",
+          "oklch(0.45 0.154 150.069)",
+          "oklch(0.55 0.154 150.069)",
+          "oklch(0.68 0.123 150.069)",
+          "oklch(0.82 0.069 150.069)",
+          "oklch(0.95 0.018 150.069)"
+        ]
+      },
+      "whatsapp-green-deep": {
+        "role": "secondary",
+        "displayName": "Verde WhatsApp profundo",
+        "canonical": "oklch(0.448 0.119 151.328)",
+        "tonalRamp": [
+          "oklch(0.15 0.042 151.328)",
+          "oklch(0.25 0.071 151.328)",
+          "oklch(0.35 0.101 151.328)",
+          "oklch(0.45 0.119 151.328)",
+          "oklch(0.55 0.119 151.328)",
+          "oklch(0.68 0.095 151.328)",
+          "oklch(0.82 0.054 151.328)",
+          "oklch(0.95 0.014 151.328)"
+        ]
+      },
+      "error-red": {
+        "role": "tertiary",
+        "displayName": "Rojo Error",
+        "canonical": "oklch(0.577 0.245 27.325)",
+        "tonalRamp": [
+          "oklch(0.15 0.086 27.325)",
+          "oklch(0.25 0.147 27.325)",
+          "oklch(0.35 0.208 27.325)",
+          "oklch(0.45 0.245 27.325)",
+          "oklch(0.55 0.245 27.325)",
+          "oklch(0.68 0.196 27.325)",
+          "oklch(0.82 0.11 27.325)",
+          "oklch(0.95 0.029 27.325)"
+        ]
+      },
+      "error-red-text": {
+        "role": "tertiary",
+        "displayName": "Rojo Error (texto)",
+        "canonical": "oklch(0.505 0.213 27.518)",
+        "tonalRamp": [
+          "oklch(0.15 0.075 27.518)",
+          "oklch(0.25 0.128 27.518)",
+          "oklch(0.35 0.181 27.518)",
+          "oklch(0.45 0.213 27.518)",
+          "oklch(0.55 0.213 27.518)",
+          "oklch(0.68 0.17 27.518)",
+          "oklch(0.82 0.096 27.518)",
+          "oklch(0.95 0.026 27.518)"
+        ]
+      },
+      "error-red-dark": {
+        "role": "tertiary",
+        "displayName": "Rojo Error (modo oscuro)",
+        "canonical": "oklch(0.704 0.191 22.216)",
+        "tonalRamp": [
+          "oklch(0.15 0.077 22.216)",
+          "oklch(0.25 0.132 22.216)",
+          "oklch(0.35 0.187 22.216)",
+          "oklch(0.45 0.22 22.216)",
+          "oklch(0.55 0.22 22.216)",
+          "oklch(0.68 0.176 22.216)",
+          "oklch(0.82 0.099 22.216)",
+          "oklch(0.95 0.026 22.216)"
+        ]
+      },
+      "paper-white": {
+        "role": "neutral",
+        "displayName": "Papel",
+        "canonical": "oklch(1 0 0)",
+        "tonalRamp": [
+          "oklch(0.15 0.003 255)",
+          "oklch(0.25 0.006 255)",
+          "oklch(0.35 0.009 255)",
+          "oklch(0.45 0.01 255)",
+          "oklch(0.55 0.01 255)",
+          "oklch(0.68 0.008 255)",
+          "oklch(0.82 0.005 255)",
+          "oklch(0.95 0.001 255)"
+        ]
+      },
+      "slate-ink": {
+        "role": "neutral",
+        "displayName": "Tinta Pizarra",
+        "canonical": "oklch(0.208 0.042 265.755)",
+        "tonalRamp": [
+          "oklch(0.15 0.016 265.755)",
+          "oklch(0.25 0.027 265.755)",
+          "oklch(0.35 0.038 265.755)",
+          "oklch(0.45 0.045 265.755)",
+          "oklch(0.55 0.045 265.755)",
+          "oklch(0.68 0.036 265.755)",
+          "oklch(0.82 0.02 265.755)",
+          "oklch(0.95 0.005 265.755)"
+        ]
+      },
+      "slate-mist": {
+        "role": "neutral",
+        "displayName": "Bruma Pizarra",
+        "canonical": "oklch(0.968 0.007 247.896)",
+        "tonalRamp": [
+          "oklch(0.15 0.016 247.896)",
+          "oklch(0.25 0.027 247.896)",
+          "oklch(0.35 0.038 247.896)",
+          "oklch(0.45 0.045 247.896)",
+          "oklch(0.55 0.045 247.896)",
+          "oklch(0.68 0.036 247.896)",
+          "oklch(0.82 0.02 247.896)",
+          "oklch(0.95 0.005 247.896)"
+        ]
+      },
+      "slate-pencil": {
+        "role": "neutral",
+        "displayName": "Lápiz Pizarra",
+        "canonical": "oklch(0.446 0.043 257.281)",
+        "tonalRamp": [
+          "oklch(0.15 0.016 257.281)",
+          "oklch(0.25 0.027 257.281)",
+          "oklch(0.35 0.038 257.281)",
+          "oklch(0.45 0.045 257.281)",
+          "oklch(0.55 0.045 257.281)",
+          "oklch(0.68 0.036 257.281)",
+          "oklch(0.82 0.02 257.281)",
+          "oklch(0.95 0.005 257.281)"
+        ]
+      },
+      "hairline": {
+        "role": "neutral",
+        "displayName": "Línea Fina",
+        "canonical": "oklch(0.929 0.013 255.508)",
+        "tonalRamp": [
+          "oklch(0.15 0.016 255.508)",
+          "oklch(0.25 0.027 255.508)",
+          "oklch(0.35 0.038 255.508)",
+          "oklch(0.45 0.045 255.508)",
+          "oklch(0.55 0.045 255.508)",
+          "oklch(0.68 0.036 255.508)",
+          "oklch(0.82 0.02 255.508)",
+          "oklch(0.95 0.005 255.508)"
+        ]
+      },
+      "field-edge": {
+        "role": "neutral",
+        "displayName": "Canto de Campo",
+        "canonical": "oklch(0.554 0.046 257.417)",
+        "tonalRamp": [
+          "oklch(0.15 0.016 257.417)",
+          "oklch(0.25 0.028 257.417)",
+          "oklch(0.35 0.039 257.417)",
+          "oklch(0.45 0.046 257.417)",
+          "oklch(0.55 0.046 257.417)",
+          "oklch(0.68 0.037 257.417)",
+          "oklch(0.82 0.021 257.417)",
+          "oklch(0.95 0.006 257.417)"
+        ]
+      },
+      "night-slate": {
+        "role": "neutral",
+        "displayName": "Pizarra Noche",
+        "canonical": "oklch(0.129 0.042 264.695)",
+        "tonalRamp": [
+          "oklch(0.15 0.016 264.695)",
+          "oklch(0.25 0.027 264.695)",
+          "oklch(0.35 0.038 264.695)",
+          "oklch(0.45 0.045 264.695)",
+          "oklch(0.55 0.045 264.695)",
+          "oklch(0.68 0.036 264.695)",
+          "oklch(0.82 0.02 264.695)",
+          "oklch(0.95 0.005 264.695)"
+        ]
+      },
+      "night-raise": {
+        "role": "neutral",
+        "displayName": "Relieve Noche",
+        "canonical": "oklch(0.279 0.041 260.031)",
+        "tonalRamp": [
+          "oklch(0.15 0.016 260.031)",
+          "oklch(0.25 0.027 260.031)",
+          "oklch(0.35 0.038 260.031)",
+          "oklch(0.45 0.045 260.031)",
+          "oklch(0.55 0.045 260.031)",
+          "oklch(0.68 0.036 260.031)",
+          "oklch(0.82 0.02 260.031)",
+          "oklch(0.95 0.005 260.031)"
+        ]
+      },
+      "night-chalk": {
+        "role": "neutral",
+        "displayName": "Tiza",
+        "canonical": "oklch(0.984 0.003 247.858)",
+        "tonalRamp": [
+          "oklch(0.15 0.016 247.858)",
+          "oklch(0.25 0.027 247.858)",
+          "oklch(0.35 0.038 247.858)",
+          "oklch(0.45 0.045 247.858)",
+          "oklch(0.55 0.045 247.858)",
+          "oklch(0.68 0.036 247.858)",
+          "oklch(0.82 0.02 247.858)",
+          "oklch(0.95 0.005 247.858)"
+        ]
+      },
+      "night-pencil": {
+        "role": "neutral",
+        "displayName": "Lápiz Noche",
+        "canonical": "oklch(0.704 0.04 256.788)",
+        "tonalRamp": [
+          "oklch(0.15 0.016 256.788)",
+          "oklch(0.25 0.027 256.788)",
+          "oklch(0.35 0.038 256.788)",
+          "oklch(0.45 0.045 256.788)",
+          "oklch(0.55 0.045 256.788)",
+          "oklch(0.68 0.036 256.788)",
+          "oklch(0.82 0.02 256.788)",
+          "oklch(0.95 0.005 256.788)"
+        ]
+      },
+      "night-hairline": {
+        "role": "neutral",
+        "displayName": "Línea Noche",
+        "canonical": "oklch(1 0 0 / 10%)",
+        "tonalRamp": [
+          "oklch(0.15 0.003 255)",
+          "oklch(0.25 0.006 255)",
+          "oklch(0.35 0.009 255)",
+          "oklch(0.45 0.01 255)",
+          "oklch(0.55 0.01 255)",
+          "oklch(0.68 0.008 255)",
+          "oklch(0.82 0.005 255)",
+          "oklch(0.95 0.001 255)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Solo el título del hero (2.25 rem en celular, 3 rem desde 640 px)."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Títulos de sección y encabezados de página (1.5 rem en celular, 1.875 rem desde 640 px)."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Nombre del servicio, títulos de tarjeta y precio."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Texto corrido."
+      },
+      "body-small": {
+        "displayName": "Body small",
+        "purpose": "Descripciones de tarjetas, ayudas y metadatos."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Labels de formulario, botones y navegación."
+      },
+      "badge": {
+        "displayName": "Badge",
+        "purpose": "Badges de categoría y de estado."
+      }
+    },
+    "shadows": [
+      {
+        "name": "control-rest",
+        "value": "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+        "purpose": "Inputs, selects y botones con borde."
+      },
+      {
+        "name": "card-rest",
+        "value": "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
+        "purpose": "Tarjetas y secciones en reposo."
+      },
+      {
+        "name": "card-hover",
+        "value": "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
+        "purpose": "Solo tarjetas clickeables al pasar el mouse."
+      },
+      {
+        "name": "floating",
+        "value": "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
+        "purpose": "Diálogos, hojas laterales, botón flotante de WhatsApp, aviso de carga lenta y barras fijas."
+      }
+    ],
+    "motion": [
+      {
+        "name": "state-change",
+        "value": "150ms ease",
+        "purpose": "Cambios de color, sombra y desplazamiento de toasts (con prefers-reduced-motion: no-preference)."
+      },
+      {
+        "name": "dialog",
+        "value": "200ms (fade + zoom 95 %)",
+        "purpose": "Apertura y cierre de diálogos."
+      },
+      {
+        "name": "sheet",
+        "value": "500ms al abrir / 300ms al cerrar, ease-in-out",
+        "purpose": "Hoja lateral del menú móvil."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Botón principal",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Acción principal no-WhatsApp: \"Ver servicios\", \"Guardar cambios\".",
+      "html": "<button class=\"ds-btn-primary\">Ver servicios <svg class=\"ds-icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/></svg></button>",
+      "css": ".ds-icon { width: 16px; height: 16px; flex-shrink: 0; } .ds-btn-primary { font-family: 'Inter Variable', ui-sans-serif, system-ui, sans-serif; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 8px 16px; border-radius: 8px; font-size: 0.875rem; font-weight: 500; white-space: nowrap; cursor: pointer; transition: background-color 150ms ease, box-shadow 150ms ease; border: 1px solid transparent; background: var(--primary); color: var(--primary-foreground); } .ds-btn-primary:hover { background: color-mix(in oklab, var(--primary) 90%, transparent); } .ds-btn-primary:focus-visible { outline: none; border-color: var(--ring); box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 50%, transparent); }"
+    },
+    {
+      "name": "Botón de WhatsApp",
+      "kind": "button",
+      "refersTo": "button-whatsapp",
+      "description": "Único uso del verde: abre el diálogo con el mensaje de WhatsApp editable.",
+      "html": "<button class=\"ds-btn-whatsapp\"><svg class=\"ds-icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M7.9 20A9 9 0 1 0 4 16.1L2 22Z\"/></svg> Escribime por WhatsApp</button>",
+      "css": ".ds-icon { width: 16px; height: 16px; flex-shrink: 0; } .ds-btn-whatsapp { font-family: 'Inter Variable', ui-sans-serif, system-ui, sans-serif; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 8px 16px; border-radius: 8px; font-size: 0.875rem; font-weight: 500; white-space: nowrap; cursor: pointer; transition: background-color 150ms ease, box-shadow 150ms ease; border: 1px solid transparent; background: var(--whatsapp); color: var(--whatsapp-foreground); } .ds-btn-whatsapp:hover { background: var(--whatsapp-hover); } .ds-btn-whatsapp:focus-visible { outline: none; border-color: var(--ring); box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 50%, transparent); }"
+    },
+    {
+      "name": "Botón outline",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "Acción secundaria: \"Ver detalle\", \"Cancelar\".",
+      "html": "<button class=\"ds-btn-outline\">Ver detalle <svg class=\"ds-icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/></svg></button>",
+      "css": ".ds-icon { width: 16px; height: 16px; flex-shrink: 0; } .ds-btn-outline { font-family: 'Inter Variable', ui-sans-serif, system-ui, sans-serif; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 8px 16px; border-radius: 8px; font-size: 0.875rem; font-weight: 500; white-space: nowrap; cursor: pointer; transition: background-color 150ms ease, box-shadow 150ms ease; border: 1px solid var(--border); background: var(--background); color: var(--foreground); box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); } .ds-btn-outline:hover { background: var(--accent); color: var(--accent-foreground); } .ds-btn-outline:focus-visible { outline: none; border-color: var(--ring); box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 50%, transparent); }"
+    },
+    {
+      "name": "Campo de texto",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Label arriba, control de 44 px, ayuda debajo en texto secundario.",
+      "html": "<label class=\"ds-field\"><span class=\"ds-label\">Nombre y apellido</span><input class=\"ds-input\" placeholder=\"Ej.: Juan Pérez\" /><span class=\"ds-hint\">Como figura en la ficha del cliente.</span></label>",
+      "css": ".ds-field { font-family: 'Inter Variable', ui-sans-serif, system-ui, sans-serif; display: grid; align-content: start; gap: 8px; max-width: 320px; } .ds-label { font-size: 0.875rem; font-weight: 500; line-height: 1; color: var(--foreground); } .ds-input { font-family: 'Inter Variable', ui-sans-serif, system-ui, sans-serif; height: 44px; padding: 4px 12px; border: 1px solid var(--input); border-radius: 8px; background: transparent; color: var(--foreground); font-size: 1rem; box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); transition: border-color 150ms ease, box-shadow 150ms ease; } .ds-input::placeholder { color: var(--muted-foreground); } .ds-input:focus-visible { outline: none; border-color: var(--ring); box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 50%, transparent); } .ds-hint { font-size: 0.875rem; color: var(--muted-foreground); }"
+    },
+    {
+      "name": "Campo de monto",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Monto en formato es-AR con el símbolo dentro del campo, alineado con los vecinos.",
+      "html": "<div class=\"ds-amount\"><span class=\"ds-amount-prefix\" aria-hidden=\"true\">$</span><input class=\"ds-amount-input\" inputmode=\"decimal\" value=\"25.000\" aria-label=\"Total\" /></div>",
+      "css": ".ds-amount { font-family: 'Inter Variable', ui-sans-serif, system-ui, sans-serif; position: relative; max-width: 220px; } .ds-amount-prefix { position: absolute; top: 0; bottom: 0; left: 12px; display: flex; align-items: center; pointer-events: none; font-size: 1rem; color: var(--muted-foreground); } .ds-amount-input { font-family: 'Inter Variable', ui-sans-serif, system-ui, sans-serif; width: 100%; height: 44px; padding: 4px 12px 4px 32px; border: 1px solid var(--input); border-radius: 8px; background: transparent; color: var(--foreground); font-size: 1rem; font-variant-numeric: tabular-nums; box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); } .ds-amount-input:focus-visible { outline: none; border-color: var(--ring); box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 50%, transparent); }"
+    },
+    {
+      "name": "Chips de filtro",
+      "kind": "chip",
+      "refersTo": "chip-filter",
+      "description": "Filtros del listado de servicios (línea y categoría), con aria-pressed.",
+      "html": "<div class=\"ds-chips\"><button class=\"ds-chip\" aria-pressed=\"true\">Todas</button><button class=\"ds-chip\" aria-pressed=\"false\">Desarrollo</button><button class=\"ds-chip\" aria-pressed=\"false\">Servicio técnico</button></div>",
+      "css": ".ds-chips { display: flex; flex-wrap: wrap; gap: 8px; } .ds-chip { font-family: 'Inter Variable', ui-sans-serif, system-ui, sans-serif; min-height: 44px; padding: 0 16px; border-radius: 9999px; border: 1px solid var(--input); background: var(--background); color: var(--foreground); font-size: 0.875rem; font-weight: 500; cursor: pointer; transition: background-color 150ms ease; } .ds-chip:hover { background: var(--muted); } .ds-chip[aria-pressed=\"true\"] { border-color: var(--primary); background: var(--primary); color: var(--primary-foreground); } .ds-chip:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }"
+    },
+    {
+      "name": "Tarjeta de servicio",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Categoría, nombre, descripción, precio con peso y dos acciones del mismo ancho.",
+      "html": "<article class=\"ds-card\"><span class=\"ds-badge\">Mantenimiento de PC</span><h3 class=\"ds-card-title\"><a href=\"#\">Limpieza y mantenimiento</a></h3><p class=\"ds-card-text\">Limpieza interna, cambio de pasta térmica y revisión general.</p><div class=\"ds-card-price\"><p class=\"ds-price\">$ 25.000</p><p class=\"ds-meta\"><svg class=\"ds-icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"10\"/><polyline points=\"12 6 12 12 16 14\"/></svg> 24 a 48 h</p></div><div class=\"ds-card-actions\"><button class=\"ds-card-wa\"><svg class=\"ds-icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M7.9 20A9 9 0 1 0 4 16.1L2 22Z\"/></svg> Consultar</button><button class=\"ds-card-more\">Ver detalle <svg class=\"ds-icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/></svg></button></div></article>",
+      "css": ".ds-icon { width: 16px; height: 16px; flex-shrink: 0; } .ds-card { font-family: 'Inter Variable', ui-sans-serif, system-ui, sans-serif; display: flex; flex-direction: column; gap: 16px; max-width: 360px; padding: 20px; border: 1px solid var(--border); border-radius: 14px; background: var(--card); color: var(--card-foreground); box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1); transition: box-shadow 150ms ease; } .ds-card:hover { box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); } .ds-badge { align-self: flex-start; padding: 2px 8px; border-radius: 9999px; background: var(--secondary); color: var(--secondary-foreground); font-size: 0.75rem; font-weight: 500; } .ds-card-title { margin: 0; font-size: 1.125rem; font-weight: 600; line-height: 1.375; } .ds-card-title a { color: inherit; text-decoration: none; border-radius: 6px; } .ds-card-title a:hover { color: var(--primary); } .ds-card-title a:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; } .ds-card-text { margin: 0; font-size: 0.875rem; color: var(--muted-foreground); } .ds-card-price { display: grid; gap: 4px; } .ds-price { margin: 0; font-size: 1.125rem; font-weight: 600; color: var(--foreground); } .ds-meta { margin: 0; display: flex; align-items: center; gap: 6px; font-size: 0.875rem; color: var(--muted-foreground); } .ds-card-actions { display: flex; gap: 8px; } .ds-card-wa, .ds-card-more { font-family: 'Inter Variable', ui-sans-serif, system-ui, sans-serif; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 8px 16px; border-radius: 8px; font-size: 0.875rem; font-weight: 500; white-space: nowrap; cursor: pointer; transition: background-color 150ms ease, box-shadow 150ms ease; flex: 1; } .ds-card-wa { border: 1px solid transparent; background: var(--whatsapp); color: var(--whatsapp-foreground); } .ds-card-wa:hover { background: var(--whatsapp-hover); } .ds-card-more { border: 1px solid var(--border); background: var(--background); color: var(--foreground); box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); } .ds-card-more:hover { background: var(--accent); } .ds-card-wa:focus-visible, .ds-card-more:focus-visible { outline: none; border-color: var(--ring); box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 50%, transparent); }"
+    },
+    {
+      "name": "Header del sitio",
+      "kind": "nav",
+      "refersTo": "navigation",
+      "description": "Header sticky de 64 px, translúcido, con logo en cuadrado azul y links con estado activo en azul.",
+      "html": "<header class=\"ds-header\"><a class=\"ds-brand\" href=\"#\"><span class=\"ds-logo\"><svg class=\"ds-icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z\"/></svg></span>SCH Soluciones</a><nav aria-label=\"Principal\"><ul class=\"ds-nav\"><li><a class=\"ds-nav-link\" href=\"#\">Inicio</a></li><li><a class=\"ds-nav-link\" aria-current=\"page\" href=\"#\">Servicios</a></li><li><a class=\"ds-nav-link\" href=\"#\">Contacto</a></li></ul></nav></header>",
+      "css": ".ds-icon { width: 16px; height: 16px; flex-shrink: 0; } .ds-header { font-family: 'Inter Variable', ui-sans-serif, system-ui, sans-serif; display: flex; align-items: center; justify-content: space-between; gap: 16px; height: 64px; padding: 0 16px; border-bottom: 1px solid var(--border); background: color-mix(in oklab, var(--background) 75%, transparent); backdrop-filter: blur(8px); } .ds-brand { display: flex; align-items: center; gap: 8px; font-weight: 600; letter-spacing: -0.025em; color: var(--foreground); text-decoration: none; border-radius: 8px; } .ds-logo { display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 8px; background: var(--primary); color: var(--primary-foreground); } .ds-nav { display: flex; gap: 4px; margin: 0; padding: 0; list-style: none; } .ds-nav-link { display: block; padding: 8px 12px; border-radius: 8px; font-size: 0.875rem; font-weight: 500; color: var(--muted-foreground); text-decoration: none; transition: background-color 150ms ease, color 150ms ease; } .ds-nav-link:hover { background: var(--muted); color: var(--foreground); } .ds-nav-link[aria-current=\"page\"] { color: var(--primary); } .ds-brand:focus-visible, .ds-nav-link:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }"
+    },
+    {
+      "name": "Botón flotante de WhatsApp",
+      "kind": "custom",
+      "refersTo": "whatsapp-fab",
+      "description": "Círculo verde de 56 px fijo abajo a la derecha en todas las páginas públicas.",
+      "html": "<button class=\"ds-fab\" aria-label=\"Escribir por WhatsApp\"><svg class=\"ds-icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M7.9 20A9 9 0 1 0 4 16.1L2 22Z\"/></svg></button>",
+      "css": ".ds-fab { display: inline-flex; align-items: center; justify-content: center; width: 56px; height: 56px; border: none; border-radius: 9999px; background: var(--whatsapp); color: var(--whatsapp-foreground); box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); cursor: pointer; transition: background-color 150ms ease; } .ds-fab .ds-icon { width: 28px; height: 28px; } .ds-fab:hover { background: var(--whatsapp-hover); } .ds-fab:focus-visible { outline: none; border-color: var(--ring); box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 50%, transparent); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "La mesa de trabajo",
+    "overview": "El sistema se parece a un banco de taller prolijo: cada herramienta en su lugar, nada que no sirva y todo al alcance de la mano. Sobre una base gris pizarra casi neutra, un único azul marca dónde actuar y un verde reservado abre WhatsApp. El sitio se siente prolijo, técnico y directo: confianza por precisión, no por adorno.\n\nLa densidad es media y regular. Las superficies son blancas (o pizarra profunda en modo oscuro), separadas por bordes finos y sombras casi imperceptibles. La tipografía es una sola familia, Inter, y la jerarquía sale del peso y del tamaño, no de cambios de fuente. El precio y la acción siguiente siempre son visibles: el diseño los pone adelante y se corre del medio.\n\nEl sistema rechaza tres cosas, confirmadas por el dueño: la plantilla genérica (gradientes llamativos, ilustraciones 3D y frases vacías de landing), la estética gamer/RGB (neón, negros con brillos, tipografías agresivas) y lo corporativo frío (fotos de stock y tono institucional).",
+    "keyCharacteristics": [
+      "Un solo acento de marca (Azul Señal) sobre neutros pizarra.",
+      "Verde exclusivo para WhatsApp.",
+      "Superficies casi planas: borde fino, sombra mínima, que sube solo al pasar el mouse o en lo que flota.",
+      "Inter en todos los niveles; títulos en negrita con interletra apenas cerrada.",
+      "Esquinas suaves y consistentes (8 px en controles, 14 px en tarjetas).",
+      "Objetivos táctiles de 44 px y foco visible en todo.",
+      "Modo claro y oscuro con los mismos roles."
+    ],
+    "rules": [
+      {
+        "name": "La Regla del Verde Reservado",
+        "body": "El verde significa WhatsApp y nada más. No se usa para éxito, \"pagado\", confirmaciones ni decoración. Si un botón verde no abre WhatsApp, está mal.",
+        "section": "colors"
+      },
+      {
+        "name": "La Regla de la Señal Única",
+        "body": "El azul es el único acento de marca. No se agregan segundos acentos ni paletas por categoría. Las categorías se distinguen por ícono y nombre, no por color.",
+        "section": "colors"
+      },
+      {
+        "name": "La Regla del Estado Legible",
+        "body": "El color nunca es la única pista. Cada estado (de trabajo, de pago o de error) lleva texto e ícono además del tono.",
+        "section": "colors"
+      },
+      {
+        "name": "La Regla de Una Sola Familia",
+        "body": "Inter para todo. La jerarquía se arma con peso (400, 500, 600 y 700) y tamaño, nunca con una segunda fuente decorativa.",
+        "section": "typography"
+      },
+      {
+        "name": "La Regla del Precio con Peso",
+        "body": "El precio de un servicio va en Title (600, 1.125 rem) en el color del texto principal, nunca apagado ni en letra chica.",
+        "section": "typography"
+      },
+      {
+        "name": "La Regla del Plano por Defecto",
+        "body": "En reposo, las superficies son planas. Una sombra más fuerte que shadow-sm solo aparece por estado (hover) o porque el elemento flota de verdad (diálogo, botón flotante, barra fija).",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do usar Azul Señal como único acento de marca: acción principal, navegación activa y logo.",
+      "Do reservar Verde WhatsApp para lo que abre WhatsApp (botón flotante, \"Consultar\" y el botón del hero), con hover más oscuro (whatsapp-green-deep).",
+      "Do mostrar el precio en Title (600, 1.125 rem) en el color del texto principal, siempre visible en la tarjeta sin entrar al detalle.",
+      "Do dar 44 px de alto mínimo a todo lo que se toca (salvo el nav de escritorio), y foco visible (borde Azul Foco con aro de 3 px, o contorno de 2 px desplazado 2 px).",
+      "Do acompañar cada estado de color con texto e ícono de lucide.",
+      "Do separar superficies con borde Línea Fina y bandas de Bruma Pizarra al 40 % antes que con sombras.",
+      "Do definir todo color nuevo como token en src/index.css, con su par de modo oscuro, y verificar AA (4.5:1 en texto, 3:1 en bordes de controles y foco)."
+    ],
+    "donts": [
+      "Don't parecer una plantilla genérica: nada de gradientes llamativos, ilustraciones 3D ni frases vacías de landing. El único degradado permitido es el lavado tenue del hero (Lavado Azul al 60 % hacia el fondo).",
+      "Don't caer en estética gamer/RGB: ni neón, ni brillos sobre negro, ni tipografías agresivas. El modo oscuro es pizarra azulada, no negro puro.",
+      "Don't usar fotos de stock ni tono corporativo frío. Solo fotos y proyectos reales del dueño, cuando estén.",
+      "Don't usar el verde para éxito, \"pagado\" o confirmaciones; esos estados van en azul o pizarra con ícono.",
+      "Don't usar sombras por encima de shadow-sm en reposo; shadow-lg es solo para lo que flota.",
+      "Don't agregar una segunda familia tipográfica ni pesos por debajo de 400.",
+      "Don't usar colores de Tailwind sueltos (text-amber-700, bg-green-500) en lugar de los tokens del sistema."
+    ]
+  }
+}
