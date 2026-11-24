@@ -28,8 +28,8 @@ pnpm-debug.log*
 .DS_Store
 Thumbs.db
 
-# Configuración local de Claude Code
-.claude/settings.local.json
+# Configuración local de Claude Code (agentes, skills y settings)
+.claude/
 
 # Brief del proyecto (uso local)
 SCHSOLUCIONES_PROMPT_CC.md
