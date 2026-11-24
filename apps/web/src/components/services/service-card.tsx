@@ -10,16 +10,22 @@ interface ServiceCardProps {
   service: PublicServiceSummary;
   /** Nivel del título según la sección donde se usa (h2 en listados, h3 dentro de secciones). */
   headingLevel?: 'h2' | 'h3';
+  /** `false` donde la sección ya dice que son destacados (inicio). */
+  showFeaturedBadge?: boolean;
 }
 
-export function ServiceCard({ service, headingLevel: Heading = 'h3' }: ServiceCardProps) {
+export function ServiceCard({
+  service,
+  headingLevel: Heading = 'h3',
+  showFeaturedBadge = true,
+}: ServiceCardProps) {
   const detailPath = `/servicios/${service.slug}`;
 
   return (
     <article className="flex h-full flex-col gap-4 rounded-xl border bg-card p-5 text-card-foreground shadow-sm transition-shadow hover:shadow-md">
       <div className="flex flex-wrap items-center gap-2">
         <Badge variant="secondary">{service.category.name}</Badge>
-        {service.isFeatured && <Badge variant="outline">Destacado</Badge>}
+        {showFeaturedBadge && service.isFeatured && <Badge variant="outline">Destacado</Badge>}
       </div>
 
       <div className="space-y-2">

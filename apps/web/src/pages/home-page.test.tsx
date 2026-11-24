@@ -72,6 +72,8 @@ describe('HomePage', () => {
     expect(section).not.toBeNull();
     expect(await within(section as HTMLElement).findByText('Instalación de Windows')).toBeTruthy();
     expect(within(section as HTMLElement).queryByText('Landing page')).toBeNull();
+    // La sección ya dice que son destacados: el badge no se repite en cada tarjeta.
+    expect(within(section as HTMLElement).queryByText('Destacado')).toBeNull();
   });
 
   it('muestra el estado vacío si ningún servicio es destacado', async () => {

@@ -53,6 +53,8 @@ describe('ServicesPage', () => {
     const price = screen.getByText('$ 30.000');
     expect(price.parentElement?.textContent?.replace(/\s+/g, ' ')).toBe('$ 30.000 por equipo');
     expect(screen.getByText('Desde $ 150.000')).toBeTruthy();
+    // En el listado, los destacados sí llevan el badge (en el inicio se omite).
+    expect(screen.getAllByText('Destacado').length).toBeGreaterThan(0);
   });
 
   it('filtra por línea desde la URL y con los chips', async () => {

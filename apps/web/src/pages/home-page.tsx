@@ -20,11 +20,15 @@ import { getCategoryIcon } from '@/lib/category-icons';
 import { usePageTitle } from '@/lib/hooks';
 import { useCategories, useServices, useSettings } from '@/lib/public-api';
 import { LINE_LABELS, filterCategoriesByLine, lineParamFor } from '@/lib/service-filters';
+import { cn } from '@/lib/utils';
 
 // Textos de respaldo si la configuración no carga: el inicio sigue siendo útil.
 const FALLBACK_HERO_TITLE = 'Soluciones en desarrollo y servicio técnico';
 const FALLBACK_HERO_SUBTITLE =
   'Páginas web, aplicaciones de escritorio y mantenimiento de PC para tu casa o negocio.';
+
+/** Tamaño del título del hero; lo comparte el skeleton para ocupar el mismo alto. */
+const HERO_TITLE_SIZE = 'text-[clamp(2.25rem,1.75rem+2.5vw,4rem)]';
 
 const LINES: { line: ServiceLine; icon: LucideIcon; description: string }[] = [
   {
@@ -78,10 +82,20 @@ function Hero() {
     <section className="border-b bg-linear-to-b from-accent/60 to-background">
       <div className="mx-auto max-w-6xl px-4 py-16 sm:py-24">
         {settings.isPending ? (
-          <div className="max-w-3xl space-y-4" role="status" aria-label="Cargando">
-            <Skeleton className="h-12 w-full" />
-            <Skeleton className="h-12 w-2/3" />
-            <Skeleton className="h-6 w-full max-w-xl" />
+          // Mismas medidas que el contenido (en `em` de cada tamaño, con su interlineado): 3 líneas
+          // de título y de subtítulo en el celular, 2 desde 640 px, como el texto de respaldo. Un
+          // título propio más largo o más corto puede mover los botones una línea.
+          <div className="max-w-3xl space-y-5" role="status" aria-label="Cargando">
+            <div className={cn(HERO_TITLE_SIZE, 'space-y-[0.05em] py-[0.025em]')}>
+              <Skeleton className="h-[1em] w-full" />
+              <Skeleton className="h-[1em] w-2/3" />
+              <Skeleton className="h-[1em] w-1/2 sm:hidden" />
+            </div>
+            <div className="max-w-2xl space-y-[0.625em] py-[0.3125em] text-lg sm:text-xl">
+              <Skeleton className="h-[1em] w-full" />
+              <Skeleton className="h-[1em] w-5/6" />
+              <Skeleton className="h-[1em] w-1/2 sm:hidden" />
+            </div>
           </div>
         ) : (
           <div className="max-w-3xl space-y-5">
@@ -89,7 +103,12 @@ function Hero() {
                 crece con el zoom, así que se mantiene chica frente a la parte en rem (WCAG 1.4.4).
                 El título se edita desde el panel: una palabra larga se corta en vez de generar
                 scroll horizontal a 320 px (WCAG 1.4.10). */}
-            <h1 className="text-[clamp(2.25rem,1.75rem+2.5vw,4rem)] leading-[1.05] font-bold tracking-[-0.03em] text-balance wrap-break-word hyphens-auto">
+            <h1
+              className={cn(
+                HERO_TITLE_SIZE,
+                'leading-[1.05] font-bold tracking-[-0.03em] text-balance wrap-break-word hyphens-auto',
+              )}
+            >
               {settings.data?.heroTitle || FALLBACK_HERO_TITLE}
             </h1>
             <p className="max-w-2xl text-lg leading-relaxed text-pretty text-muted-foreground sm:text-xl">
@@ -196,7 +215,9 @@ function FeaturedServices() {
           >
             Servicios destacados
           </h2>
-          <Button asChild variant="link" className="min-h-11 px-0">
+          {/* `has-[>svg]:px-0`: el tamaño por defecto del botón agrega relleno cuando hay ícono, y
+              el link quedaba corrido del borde de la grilla. */}
+          <Button asChild variant="link" className="min-h-11 px-0 has-[>svg]:px-0">
             <Link to="/servicios">
               Ver todos los servicios
               <ArrowRight aria-hidden="true" />
@@ -219,7 +240,8 @@ function FeaturedServices() {
             <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {featured.map((service) => (
                 <li key={service.slug}>
-                  <ServiceCard service={service} />
+                  {/* En "Servicios destacados" el badge "Destacado" se repetiría en cada tarjeta. */}
+                  <ServiceCard service={service} showFeaturedBadge={false} />
                 </li>
               ))}
             </ul>
@@ -239,7 +261,9 @@ function HowItWorks() {
       >
         Cómo funciona
       </h2>
-      <ol className="mt-8 grid gap-6 md:grid-cols-3">
+      {/* Tres columnas recién desde 1024 px: en tablet quedaban de ~200 px y los títulos y
+          descripciones se partían en muchas líneas. */}
+      <ol className="mt-8 grid gap-6 lg:grid-cols-3">
         {STEPS.map(({ icon: Icon, title, description }, index) => (
           <li key={title} className="flex gap-4">
             <span className="flex size-11 shrink-0 items-center justify-center rounded-full border-2 border-primary text-primary">

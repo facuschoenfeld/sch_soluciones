@@ -24,7 +24,7 @@ export function SiteFooter() {
               <li key={link.to}>
                 <Link
                   to={link.to}
-                  className="inline-flex min-h-10 items-center rounded-sm text-sm text-muted-foreground underline-offset-4 focus-ring hover:text-foreground hover:underline"
+                  className="inline-flex min-h-11 items-center rounded-sm text-sm text-muted-foreground underline-offset-4 focus-ring hover:text-foreground hover:underline"
                 >
                   {link.label}
                 </Link>
