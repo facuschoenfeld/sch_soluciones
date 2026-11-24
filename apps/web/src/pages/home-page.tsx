@@ -77,6 +77,7 @@ export function HomePage() {
 
 function Hero() {
   const settings = useSettings();
+  const heroTitle = settings.data?.heroTitle?.trim() || FALLBACK_HERO_TITLE;
 
   return (
     <section className="border-b bg-linear-to-b from-accent/60 to-background">
@@ -108,8 +109,23 @@ function Hero() {
                 HERO_TITLE_SIZE,
                 'leading-[1.05] font-bold tracking-[-0.03em] text-balance wrap-break-word hyphens-auto',
               )}
+              // El nombre va entero en el h1: algunos lectores (VoiceOver en iOS) leen cada
+              // `span` inline-block por separado al navegar con gestos.
+              aria-label={heroTitle}
             >
-              {settings.data?.heroTitle || FALLBACK_HERO_TITLE}
+              {/* Entrada palabra por palabra (`.hero-word` en index.css): una ola corta, con demora
+                  tope de 8 pasos; con "reducir movimiento" queda en un fundido. */}
+              {heroTitle.split(/\s+/).flatMap((word, i) => [
+                i > 0 ? ' ' : '',
+                <span
+                  key={i}
+                  aria-hidden="true"
+                  className="hero-word"
+                  style={{ animationDelay: `${Math.min(i, 8) * 45}ms` }}
+                >
+                  {word}
+                </span>,
+              ])}
             </h1>
             <p className="max-w-2xl text-lg leading-relaxed text-pretty text-muted-foreground sm:text-xl">
               {/* `||`: un texto vacío guardado desde el panel también cae al siguiente. */}
@@ -143,7 +159,10 @@ function ServiceLines() {
 
   return (
     <section aria-labelledby="lineas-titulo" className="mx-auto max-w-6xl px-4 py-16">
-      <h2 id="lineas-titulo" className="text-2xl font-bold tracking-tight text-balance sm:text-3xl">
+      <h2
+        id="lineas-titulo"
+        className="reveal text-2xl font-bold tracking-tight text-balance sm:text-3xl"
+      >
         ¿Qué necesitás?
       </h2>
       <div className="mt-8 grid gap-4 md:grid-cols-2">
@@ -152,7 +171,7 @@ function ServiceLines() {
           // pseudo-elemento cubre toda la tarjeta.
           <article
             key={line}
-            className="group relative flex flex-col gap-4 rounded-xl border bg-card p-6 text-card-foreground shadow-sm transition-shadow hover:shadow-md has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-ring"
+            className="reveal group relative flex flex-col gap-4 rounded-xl border bg-card p-6 text-card-foreground shadow-sm transition-shadow hover:shadow-md has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-ring"
           >
             <span className="flex size-12 items-center justify-center rounded-lg bg-primary text-primary-foreground">
               <Icon className="size-6" aria-hidden="true" />
@@ -215,7 +234,7 @@ function FeaturedServices() {
         <div className="flex flex-wrap items-end justify-between gap-4">
           <h2
             id="destacados-titulo"
-            className="text-2xl font-bold tracking-tight text-balance sm:text-3xl"
+            className="reveal text-2xl font-bold tracking-tight text-balance sm:text-3xl"
           >
             Servicios destacados
           </h2>
@@ -243,7 +262,7 @@ function FeaturedServices() {
           {featured.length > 0 && (
             <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {featured.map((service) => (
-                <li key={service.slug}>
+                <li key={service.slug} className="reveal">
                   {/* En "Servicios destacados" el badge "Destacado" se repetiría en cada tarjeta. */}
                   <ServiceCard service={service} showFeaturedBadge={false} />
                 </li>
@@ -261,7 +280,7 @@ function HowItWorks() {
     <section aria-labelledby="como-funciona-titulo" className="mx-auto max-w-6xl px-4 py-16">
       <h2
         id="como-funciona-titulo"
-        className="text-2xl font-bold tracking-tight text-balance sm:text-3xl"
+        className="reveal text-2xl font-bold tracking-tight text-balance sm:text-3xl"
       >
         Cómo funciona
       </h2>
@@ -269,7 +288,7 @@ function HowItWorks() {
           descripciones se partían en muchas líneas. */}
       <ol className="mt-8 grid gap-6 lg:grid-cols-3">
         {STEPS.map(({ icon: Icon, title, description }, index) => (
-          <li key={title} className="flex gap-4">
+          <li key={title} className="reveal flex gap-4">
             <span className="flex size-11 shrink-0 items-center justify-center rounded-full border-2 border-primary text-primary">
               <Icon className="size-5" aria-hidden="true" />
             </span>
@@ -290,7 +309,7 @@ function HowItWorks() {
 function FinalCta() {
   return (
     <section className="mx-auto max-w-6xl px-4 pb-16">
-      <div className="flex flex-col items-start gap-4 rounded-2xl bg-primary px-6 py-10 text-primary-foreground sm:flex-row sm:items-center sm:justify-between sm:px-10">
+      <div className="reveal flex flex-col items-start gap-4 rounded-2xl bg-primary px-6 py-10 text-primary-foreground sm:flex-row sm:items-center sm:justify-between sm:px-10">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold tracking-tight text-balance">
             ¿No encontrás lo que buscás?

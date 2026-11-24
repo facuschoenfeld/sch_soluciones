@@ -2,12 +2,14 @@ import { MessageCircle } from 'lucide-react';
 import { Outlet, ScrollRestoration } from 'react-router';
 import { SlowLoadingNotice } from '@/components/feedback/slow-loading-notice';
 import { WhatsappButton } from '@/components/whatsapp/whatsapp-button';
+import { useRevealOnScroll } from '@/lib/reveal-on-scroll';
 import { useFocusMainOnNavigation } from '@/lib/use-focus-main';
 import { SiteFooter } from './site-footer';
 import { SiteHeader } from './site-header';
 
 export function RootLayout() {
   const mainRef = useFocusMainOnNavigation();
+  useRevealOnScroll();
 
   return (
     <div className="flex min-h-dvh flex-col">

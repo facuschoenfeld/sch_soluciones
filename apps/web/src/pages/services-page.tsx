@@ -244,7 +244,7 @@ export function ServicesPage() {
             )}
           >
             {visibleServices.map((service) => (
-              <li key={service.slug}>
+              <li key={service.slug} className="reveal">
                 <ServiceCard service={service} headingLevel="h2" />
               </li>
             ))}

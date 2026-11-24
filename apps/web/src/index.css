@@ -197,3 +197,77 @@
     @apply border-l-4 pl-4 text-muted-foreground italic;
   }
 }
+
+/*
+ * Entrada del título del hero, palabra por palabra (cada `.hero-word` trae su demora inline).
+ * Arranca legible (opacidad 0.5: el texto grande no baja de 3:1), no invisible; con "reducir movimiento", solo un fundido.
+ */
+@keyframes hero-word-in {
+  from {
+    opacity: 0.5;
+    transform: translateY(0.25em);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes hero-word-fade {
+  from {
+    opacity: 0.4;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@layer components {
+  .hero-word {
+    display: inline-block;
+    max-width: 100%;
+    animation: hero-word-in 600ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-word {
+      animation: hero-word-fade 200ms ease-out both;
+      animation-delay: 0ms !important;
+    }
+  }
+}
+
+/*
+ * Aparición al scrollear (`.reveal`, ver lib/reveal-on-scroll.ts): cada elemento sube y aparece
+ * una sola vez al entrar en pantalla; los que entran juntos se escalonan (`--reveal-delay`).
+ * Solo se ocultan con `html.reveal-ready` (el script corrió) y sin "reducir movimiento": si el
+ * script falla o el visitante pide menos movimiento, todo se ve fijo. Con el foco de teclado
+ * adentro, el elemento se muestra aunque todavía no haya entrado.
+ */
+/* Animación (no `transition`): así no pisa las transiciones de hover de cada elemento. */
+@keyframes reveal-in {
+  from {
+    opacity: 0;
+    translate: 0 1.5rem;
+  }
+  to {
+    opacity: 1;
+    translate: none;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .reveal-ready .reveal:not(.is-revealed, :has(:focus-visible)) {
+    opacity: 0;
+    translate: 0 1.5rem;
+  }
+  .reveal-ready .reveal.is-revealed {
+    animation: reveal-in 700ms cubic-bezier(0.16, 1, 0.3, 1) var(--reveal-delay, 0ms) backwards;
+  }
+  /* Si ya se mostraba por el foco de teclado, no vuelve a arrancar desde 0 al revelarse. */
+  .reveal-ready .reveal.is-revealed:has(:focus-visible) {
+    animation: none;
+  }
+}
+@media print {
+  .reveal-ready .reveal {
+    opacity: 1 !important;
+    translate: none !important;
+  }
+}
