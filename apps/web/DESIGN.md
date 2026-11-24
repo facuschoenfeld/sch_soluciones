@@ -266,6 +266,12 @@ Neutros pizarra con un único azul de acción y un verde que solo significa "esc
 - **Header**: sticky, de 64 px (`--sticky-header-height`), translúcido con desenfoque. La reserva de scroll (`scroll-padding-top`) se calcula de esa misma variable.
 - **Mobile-first**: todo se diseña primero a 360-390 px. Botones y links interactivos de al menos 44 px de alto. Única excepción: los links del nav de escritorio (≈36 px, desde 768 px, donde se usa mouse).
 
+- **Movimiento** (decidido con el usuario, noviembre de 2026): el movimiento acompaña estados, no decora.
+  - **Entrada del hero**: el título aparece palabra por palabra (600 ms, demora de 45 ms por palabra con tope de 8 pasos). Es el único momento focal de la portada.
+  - **Aparición al scrollear** (`.reveal`, `lib/reveal-on-scroll.ts`): títulos de sección, tarjetas, pasos y la banda final suben 1.5 rem y aparecen (700 ms) una sola vez al entrar en pantalla; los que entran juntos se escalonan 80 ms (tope de 4 pasos). Se ocultan solo si el script corrió (`html.reveal-ready`) y sin "reducir movimiento". El hero no la lleva. Un elemento con el foco de teclado adentro se muestra aunque no haya entrado. (Se probó antes una versión ligada al scroll con `animation-timeline`: se descartó porque, al terminar en el borde inferior de la pantalla, no se notaba.)
+  - **Respuestas**: la tarjeta de servicio tiñe el borde de azul y avanza su flecha al apuntar o enfocar, sin moverse. El botón principal del hero avanza la flecha y cede al 98 % al presionar. Los chips de filtro se rellenan de azul desde el centro.
+  - Easing `cubic-bezier(0.16, 1, 0.3, 1)` para respuestas y entradas. Con "reducir movimiento" no hay desplazamientos; quedan solo fundidos o cambios de color.
+
 ## Elevation & Depth
 
 Casi plano. Las superficies descansan con un borde fino (Línea Fina) y una sombra mínima; la profundidad la dan los bordes y los cambios de tono, no las sombras. La sombra sube solo como respuesta: al pasar el mouse sobre una tarjeta clickeable, o en lo que realmente flota sobre el contenido.

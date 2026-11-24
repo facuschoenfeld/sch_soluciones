@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-24T00:40:09.600Z",
+  "generatedAt": "2026-11-24T02:09:36.791Z",
   "title": "Design System: SCH Soluciones",
   "extensions": {
     "colorMeta": {
@@ -371,6 +371,26 @@
         "name": "dialog",
         "value": "200ms (fade + zoom 95 %)",
         "purpose": "Apertura y cierre de diálogos."
+      },
+      {
+        "name": "hero-word",
+        "value": "600ms cubic-bezier(0.16, 1, 0.3, 1), demora 45ms por palabra (tope 8)",
+        "purpose": "Entrada del título del hero, palabra por palabra; único momento focal."
+      },
+      {
+        "name": "reveal",
+        "value": "700ms cubic-bezier(0.16, 1, 0.3, 1), escalonado 80ms (tope 4); opacidad 0→1, translate 1.5rem→0; IntersectionObserver, una sola vez",
+        "purpose": "Aparición al entrar en pantalla de títulos de sección, tarjetas, pasos y banda final. Oculto solo si corrió el script y sin reducir movimiento."
+      },
+      {
+        "name": "card-focus",
+        "value": "200ms cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Tarjeta de servicio al apuntar o enfocar: borde primario al 50 %, sombra media, flecha +3px. La tarjeta no se mueve."
+      },
+      {
+        "name": "chip-fill",
+        "value": "280ms cubic-bezier(0.16, 1, 0.3, 1), clip-path circle 0%→75%",
+        "purpose": "Relleno azul desde el centro al elegir un chip de filtro."
       },
       {
         "name": "sheet",
