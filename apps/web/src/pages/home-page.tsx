@@ -1,21 +1,18 @@
+import { ArrowRightIcon } from '@animateicons/react/lucide/arrow-right-icon';
+import { CodeIcon } from '@animateicons/react/lucide/code-icon';
+import { WrenchIcon } from '@animateicons/react/lucide/wrench-icon';
 import type { PublicCategory, ServiceLine } from '@sch/shared';
-import {
-  ArrowRight,
-  Code,
-  Handshake,
-  MessageCircle,
-  MousePointerClick,
-  PackageOpen,
-  Wrench,
-  type LucideIcon,
-} from 'lucide-react';
+import { Handshake, MousePointerClick, PackageOpen } from 'lucide-react';
+import type { ComponentType, SVGProps } from 'react';
 import { Link } from 'react-router';
 import { EmptyState } from '@/components/feedback/empty-state';
 import { QueryError } from '@/components/feedback/query-error';
+import { AnimatedIcon, type AnimateIcon } from '@/components/icons/animated-icon';
 import { ServiceCard, ServiceGridSkeleton } from '@/components/services/service-card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { WhatsappButton } from '@/components/whatsapp/whatsapp-button';
+import { WhatsappIcon } from '@/components/whatsapp/whatsapp-icon';
 import { getCategoryIcon } from '@/lib/category-icons';
 import { usePageTitle } from '@/lib/hooks';
 import { useCategories, useServices, useSettings } from '@/lib/public-api';
@@ -30,27 +27,31 @@ const FALLBACK_HERO_SUBTITLE =
 /** Tamaño del título del hero; lo comparte el skeleton para ocupar el mismo alto. */
 const HERO_TITLE_SIZE = 'text-[clamp(2.25rem,1.75rem+2.5vw,4rem)]';
 
-const LINES: { line: ServiceLine; icon: LucideIcon; description: string }[] = [
+const LINES: { line: ServiceLine; icon: AnimateIcon; description: string }[] = [
   {
     line: 'DEVELOPMENT',
-    icon: Code,
+    icon: CodeIcon,
     description: 'Páginas web y aplicaciones de escritorio a medida para tu negocio.',
   },
   {
     line: 'TECH_SUPPORT',
-    icon: Wrench,
+    icon: WrenchIcon,
     description: 'Mantenimiento, reparación, diagnóstico e instalación de Windows.',
   },
 ];
 
-const STEPS: { icon: LucideIcon; title: string; description: string }[] = [
+const STEPS: {
+  icon: ComponentType<SVGProps<SVGSVGElement>>;
+  title: string;
+  description: string;
+}[] = [
   {
     icon: MousePointerClick,
     title: 'Elegí el servicio',
     description: 'Mirá los servicios, precios y tiempos estimados.',
   },
   {
-    icon: MessageCircle,
+    icon: WhatsappIcon,
     title: 'Escribime por WhatsApp',
     description: 'El mensaje ya viene armado; podés editarlo antes de enviarlo.',
   },
@@ -134,18 +135,15 @@ function Hero() {
           </div>
         )}
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-          {/* Respuesta: la flecha avanza al apuntar o enfocar y el botón cede apenas al presionar. */}
-          <Button asChild size="lg" className="group/cta min-h-11 motion-safe:active:scale-[0.98]">
+          {/* Respuesta: la flecha se anima al apuntar o enfocar y el botón cede apenas al presionar. */}
+          <Button asChild size="lg" className="min-h-11 motion-safe:active:scale-[0.98]">
             <Link to="/servicios">
               Ver servicios
-              <ArrowRight
-                aria-hidden="true"
-                className="transition-[translate] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] motion-safe:group-hover/cta:translate-x-1 motion-safe:group-focus-visible/cta:translate-x-1"
-              />
+              <AnimatedIcon icon={ArrowRightIcon} />
             </Link>
           </Button>
           <WhatsappButton variant="whatsapp" size="lg" className="min-h-11">
-            <MessageCircle aria-hidden="true" />
+            <WhatsappIcon aria-hidden="true" />
             Escribime por WhatsApp
           </WhatsappButton>
         </div>
@@ -171,10 +169,11 @@ function ServiceLines() {
           // pseudo-elemento cubre toda la tarjeta.
           <article
             key={line}
+            data-icon-trigger
             className="reveal group relative flex flex-col gap-4 rounded-xl border bg-card p-6 text-card-foreground shadow-sm transition-shadow hover:shadow-md has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-ring"
           >
             <span className="flex size-12 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-              <Icon className="size-6" aria-hidden="true" />
+              <AnimatedIcon icon={Icon} size={24} />
             </span>
             <div className="space-y-2">
               <h3 className="text-xl font-semibold">
@@ -195,7 +194,7 @@ function ServiceLines() {
               aria-hidden="true"
             >
               Ver servicios
-              <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
+              <AnimatedIcon icon={ArrowRightIcon} />
             </span>
           </article>
         ))}
@@ -238,12 +237,16 @@ function FeaturedServices() {
           >
             Servicios destacados
           </h2>
-          {/* `has-[>svg]:px-0`: el tamaño por defecto del botón agrega relleno cuando hay ícono, y
+          {/* `has-[>svg,>[data-animated-icon]]:px-0`: el tamaño por defecto del botón agrega relleno cuando hay ícono, y
               el link quedaba corrido del borde de la grilla. */}
-          <Button asChild variant="link" className="min-h-11 px-0 has-[>svg]:px-0">
+          <Button
+            asChild
+            variant="link"
+            className="min-h-11 px-0 has-[>svg,>[data-animated-icon]]:px-0"
+          >
             <Link to="/servicios">
               Ver todos los servicios
-              <ArrowRight aria-hidden="true" />
+              <AnimatedIcon icon={ArrowRightIcon} />
             </Link>
           </Button>
         </div>
@@ -319,7 +322,7 @@ function FinalCta() {
           </p>
         </div>
         <WhatsappButton variant="secondary" size="lg" className="min-h-11 shrink-0">
-          <MessageCircle aria-hidden="true" />
+          <WhatsappIcon aria-hidden="true" />
           Escribime por WhatsApp
         </WhatsappButton>
       </div>

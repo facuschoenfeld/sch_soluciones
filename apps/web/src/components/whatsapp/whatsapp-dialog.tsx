@@ -1,12 +1,14 @@
+import { CalendarCheckIcon } from '@animateicons/react/lucide/calendar-check-icon';
+import { MessagesSquareIcon } from '@animateicons/react/lucide/messages-square-icon';
 import {
   buildWhatsappUrl,
   isValidWhatsappNumber,
   type PublicServiceSummary,
   type PublicSettings,
 } from '@sch/shared';
-import { CalendarCheck, MessageCircle, MessagesSquare, type LucideIcon } from 'lucide-react';
 import { useId, useRef, useState } from 'react';
 import { QueryError } from '@/components/feedback/query-error';
+import { AnimatedIcon, type AnimateIcon } from '@/components/icons/animated-icon';
 import { Button } from '@/components/ui/button';
 import {
   DialogClose,
@@ -19,12 +21,13 @@ import {
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Textarea } from '@/components/ui/textarea';
+import { WhatsappIcon } from '@/components/whatsapp/whatsapp-icon';
 import { useSettings } from '@/lib/public-api';
 import { WHATSAPP_INTENT_LABELS, buildInitialMessage, type WhatsappIntent } from '@/lib/whatsapp';
 
-const INTENT_ICONS: Record<WhatsappIntent, LucideIcon> = {
-  booking: CalendarCheck,
-  inquiry: MessagesSquare,
+const INTENT_ICONS: Record<WhatsappIntent, AnimateIcon> = {
+  booking: CalendarCheckIcon,
+  inquiry: MessagesSquareIcon,
 };
 
 interface WhatsappDialogContentProps {
@@ -144,7 +147,7 @@ function WhatsappMessageForm({
                     onChange={() => changeIntent(option)}
                     className="sr-only"
                   />
-                  <Icon className="size-4" aria-hidden="true" />
+                  <AnimatedIcon icon={Icon} />
                   {WHATSAPP_INTENT_LABELS[option]}
                 </label>
               );
@@ -205,14 +208,14 @@ function WhatsappMessageForm({
         {href ? (
           <Button asChild variant="whatsapp" className="min-h-11">
             <a href={href} target="_blank" rel="noopener noreferrer" onClick={onSent}>
-              <MessageCircle aria-hidden="true" />
+              <WhatsappIcon aria-hidden="true" />
               Abrir WhatsApp
               <span className="sr-only"> (se abre en una pestaña nueva)</span>
             </a>
           </Button>
         ) : (
           <Button variant="whatsapp" className="min-h-11" disabled aria-describedby={`${id}-hint`}>
-            <MessageCircle aria-hidden="true" />
+            <WhatsappIcon aria-hidden="true" />
             Abrir WhatsApp
           </Button>
         )}

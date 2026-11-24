@@ -269,7 +269,8 @@ Neutros pizarra con un único azul de acción y un verde que solo significa "esc
 - **Movimiento** (decidido con el usuario, noviembre de 2026): el movimiento acompaña estados, no decora.
   - **Entrada del hero**: el título aparece palabra por palabra (600 ms, demora de 45 ms por palabra con tope de 8 pasos). Es el único momento focal de la portada.
   - **Aparición al scrollear** (`.reveal`, `lib/reveal-on-scroll.ts`): títulos de sección, tarjetas, pasos y la banda final suben 1.5 rem y aparecen (700 ms) una sola vez al entrar en pantalla; los que entran juntos se escalonan 80 ms (tope de 4 pasos). Se ocultan solo si el script corrió (`html.reveal-ready`) y sin "reducir movimiento". El hero no la lleva. Un elemento con el foco de teclado adentro se muestra aunque no haya entrado. (Se probó antes una versión ligada al scroll con `animation-timeline`: se descartó porque, al terminar en el borde inferior de la pantalla, no se notaba.)
-  - **Respuestas**: la tarjeta de servicio tiñe el borde de azul y avanza su flecha al apuntar o enfocar, sin moverse. El botón principal del hero avanza la flecha y cede al 98 % al presionar. Los chips de filtro se rellenan de azul desde el centro.
+  - **Respuestas**: la tarjeta de servicio tiñe el borde de azul sin moverse. El botón principal del hero cede al 98 % al presionar. Los chips de filtro se rellenan de azul desde el centro.
+  - **Íconos animados** (sitio público, noviembre de 2026): los íconos dentro de links, botones y labels son de `@animateicons/react` (`AnimatedIcon`, `components/icons/animated-icon.tsx`) y hacen un gesto corto (la flecha avanza, la de reintentar gira), con la curva y duración propias de la librería (excepción al easing de abajo), al apuntar o enfocar con teclado el elemento entero, no solo el ícono. Las tarjetas de línea animan los suyos con toda la tarjeta (`data-icon-trigger`). Los íconos que no están en algo interactivo (reloj, ubicación, pasos, estados vacíos) quedan estáticos de lucide; el panel también. Con "reducir movimiento" o en táctil no se animan.
   - Easing `cubic-bezier(0.16, 1, 0.3, 1)` para respuestas y entradas. Con "reducir movimiento" no hay desplazamientos; quedan solo fundidos o cambios de color.
 
 ## Elevation & Depth
@@ -296,7 +297,7 @@ Esquinas suaves y consistentes, derivadas de un radio base de 10 px:
 - **Diálogos**: 10 px.
 - **Píldoras**: badges, chips de categoría, botón flotante de WhatsApp y número de paso.
 
-Los íconos son de lucide, de trazo de 2 px y puntas redondeadas, a 16 px en botones y 20-24 px en encabezados de tarjeta. Van solos o dentro de un cuadrado de 8-10 px de radio con fondo Azul Señal. El logo provisorio (llave inglesa sobre cuadrado azul) sigue esa misma forma.
+Los íconos son de lucide (o su versión animada, con el mismo trazo; ver Movimiento), de trazo de 2 px y puntas redondeadas, a 16 px en botones y 20-24 px en encabezados de tarjeta. Van solos o dentro de un cuadrado de 8-10 px de radio con fondo Azul Señal. El logo provisorio (llave inglesa sobre cuadrado azul) sigue esa misma forma.
 
 ## Components
 
@@ -306,7 +307,7 @@ Firmes y sobrios: se ven sólidos, responden claro y no llaman la atención sin 
 
 - **Shape:** esquinas suaves (8 px). En la práctica, todos los botones del sitio y del panel llevan alto mínimo de 44 px (`min-h-11`).
 - **Primary:** fondo Azul Señal con texto blanco, Label (500, 0.875 rem), 16 px de relleno lateral e ícono de 16 px a 8 px del texto. El hover baja la opacidad del fondo al 90 %.
-- **WhatsApp:** fondo Verde WhatsApp con texto blanco y el ícono de burbuja de chat. El hover pasa a `whatsapp-green-deep` (más oscuro). Es la acción principal de cada tarjeta y del hero.
+- **WhatsApp:** fondo Verde WhatsApp con texto blanco y el logo de WhatsApp (`WhatsappIcon`, en `currentColor`; estático). El hover pasa a `whatsapp-green-deep` (más oscuro). Es la acción principal de cada tarjeta y del hero.
 - **Outline:** fondo del lienzo, borde fino y sombra de control. El hover pasa a Lavado Azul. Es la acción secundaria ("Ver detalle", "Cancelar").
 - **Ghost / Link:** ghost para botones de ícono (tema, menú); link en Azul Señal con subrayado en hover ("Ver todos los servicios", "Volver").
 - **Focus:** borde Azul Foco con un aro de 3 px al 50 %. Deshabilitado: 50 % de opacidad. Los botones que guardan en línea usan `aria-disabled` en lugar de `disabled`, para no perder el foco.
@@ -347,7 +348,7 @@ Firmes y sobrios: se ven sólidos, responden claro y no llaman la atención sin 
 
 ### Botón flotante de WhatsApp
 
-El elemento más reconocible del sitio: un círculo Verde WhatsApp de 56 px con el ícono de burbuja de chat y sombra flotante, fijo abajo a la derecha (16 px, respetando el área segura). Está en todas las páginas públicas y abre el mismo diálogo de mensaje editable que los demás botones verdes.
+El elemento más reconocible del sitio: un círculo Verde WhatsApp de 56 px con el logo de WhatsApp en blanco y sombra flotante, fijo abajo a la derecha (16 px, respetando el área segura). Está en todas las páginas públicas y abre el mismo diálogo de mensaje editable que los demás botones verdes.
 
 ### Tarjeta de servicio
 

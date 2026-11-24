@@ -1,6 +1,8 @@
-import { Menu, Wrench } from 'lucide-react';
+import { MenuIcon } from '@animateicons/react/lucide/menu-icon';
+import { WrenchIcon } from '@animateicons/react/lucide/wrench-icon';
 import { useState } from 'react';
 import { Link, NavLink } from 'react-router';
+import { AnimatedIcon } from '@/components/icons/animated-icon';
 import { Button } from '@/components/ui/button';
 import {
   Sheet,
@@ -38,7 +40,7 @@ export function SiteHeader() {
           className="flex min-w-0 items-center gap-2 rounded-md font-semibold tracking-tight focus-ring"
         >
           <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-primary text-primary-foreground">
-            <Wrench className="size-4" aria-hidden="true" />
+            <AnimatedIcon icon={WrenchIcon} />
           </span>
           <span className="truncate">{businessName}</span>
         </Link>
@@ -66,7 +68,7 @@ export function SiteHeader() {
                 className="size-11 md:hidden"
                 aria-label="Abrir menú"
               >
-                <Menu aria-hidden="true" />
+                <AnimatedIcon icon={MenuIcon} />
               </Button>
             </SheetTrigger>
             <SheetContent side="right" onCloseAutoFocus={keepFocusInMain}>

@@ -1,5 +1,7 @@
-import { Moon, Sun } from 'lucide-react';
+import { MoonIcon } from '@animateicons/react/lucide/moon-icon';
+import { SunIcon } from '@animateicons/react/lucide/sun-icon';
 import { useEffect, useState } from 'react';
+import { AnimatedIcon } from '@/components/icons/animated-icon';
 import { Button } from '@/components/ui/button';
 import { applyTheme, getCurrentTheme, getStoredTheme, saveTheme, type Theme } from '@/lib/theme';
 
@@ -37,7 +39,7 @@ export function ThemeToggle() {
       aria-label={label}
       title={label}
     >
-      {theme === 'dark' ? <Sun aria-hidden="true" /> : <Moon aria-hidden="true" />}
+      <AnimatedIcon icon={theme === 'dark' ? SunIcon : MoonIcon} />
     </Button>
   );
 }

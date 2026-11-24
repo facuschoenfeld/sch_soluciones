@@ -1,10 +1,13 @@
+import { ArrowRightIcon } from '@animateicons/react/lucide/arrow-right-icon';
 import { formatPrice, type PublicServiceSummary } from '@sch/shared';
-import { ArrowRight, Clock, MessageCircle } from 'lucide-react';
+import { Clock } from 'lucide-react';
 import { Link } from 'react-router';
+import { AnimatedIcon } from '@/components/icons/animated-icon';
 import { WhatsappButton } from '@/components/whatsapp/whatsapp-button';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { WhatsappIcon } from '@/components/whatsapp/whatsapp-icon';
 
 interface ServiceCardProps {
   service: PublicServiceSummary;
@@ -63,16 +66,13 @@ export function ServiceCard({
           className="min-h-11 flex-1"
           aria-label={`Consultar por WhatsApp sobre ${service.name}`}
         >
-          <MessageCircle aria-hidden="true" />
+          <WhatsappIcon aria-hidden="true" />
           Consultar
         </WhatsappButton>
-        <Button asChild variant="outline" className="group/detail min-h-11 flex-1">
+        <Button asChild variant="outline" className="min-h-11 flex-1">
           <Link to={detailPath} aria-label={`Ver detalle de ${service.name}`}>
             Ver detalle
-            <ArrowRight
-              aria-hidden="true"
-              className="transition-[translate] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] motion-safe:group-hover:translate-x-[3px] motion-safe:group-focus-visible/detail:translate-x-[3px]"
-            />
+            <AnimatedIcon icon={ArrowRightIcon} />
           </Link>
         </Button>
       </div>

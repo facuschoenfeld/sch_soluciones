@@ -1,4 +1,6 @@
-import { RotateCw, TriangleExclamationPoint } from 'lucide-react';
+import { RotateCwIcon } from '@animateicons/react/lucide/rotate-cw-icon';
+import { TriangleExclamationPoint } from 'lucide-react';
+import { AnimatedIcon } from '@/components/icons/animated-icon';
 import { Button } from '@/components/ui/button';
 import { ApiError } from '@/lib/api-client';
 import { cn } from '@/lib/utils';
@@ -41,7 +43,7 @@ export function QueryError({
       </div>
       {onRetry && (
         <Button variant="outline" className="min-h-11" onClick={onRetry}>
-          <RotateCw aria-hidden="true" />
+          <AnimatedIcon icon={RotateCwIcon} />
           Reintentar
         </Button>
       )}

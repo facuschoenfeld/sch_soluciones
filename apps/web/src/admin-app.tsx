@@ -4,6 +4,7 @@ import { AdminLayout } from '@/components/admin/admin-layout';
 import { RequireAuth } from '@/components/admin/require-auth';
 import { Toaster } from '@/components/admin/toaster';
 import { SlowLoadingNotice } from '@/components/feedback/slow-loading-notice';
+import { IconAnimationContext } from '@/components/icons/icon-animation-context';
 import { CategoriesPage } from '@/pages/admin/categories-page';
 import { ClientDetailPage } from '@/pages/admin/client-detail-page';
 import { ClientFormPage } from '@/pages/admin/client-form-page';
@@ -35,7 +36,8 @@ export default function AdminApp() {
   useNoIndex();
 
   return (
-    <>
+    // Íconos estáticos en el panel (los animados son solo del sitio público).
+    <IconAnimationContext value={false}>
       <Routes>
         <Route path="login" element={<LoginPage />} />
         <Route element={<RequireAuth />}>
@@ -59,6 +61,6 @@ export default function AdminApp() {
       </Routes>
       <SlowLoadingNotice />
       <Toaster />
-    </>
+    </IconAnimationContext>
   );
 }

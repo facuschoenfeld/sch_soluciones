@@ -1,5 +1,7 @@
-import { ArrowLeft, SearchX } from 'lucide-react';
+import { ArrowLeftIcon } from '@animateicons/react/lucide/arrow-left-icon';
+import { SearchX } from 'lucide-react';
 import { Link } from 'react-router';
+import { AnimatedIcon } from '@/components/icons/animated-icon';
 import { Button } from '@/components/ui/button';
 import { usePageTitle } from '@/lib/hooks';
 
@@ -17,7 +19,7 @@ export function NotFoundPage() {
       <div className="mt-2 flex flex-col gap-3 sm:flex-row">
         <Button asChild size="lg" className="min-h-11">
           <Link to="/">
-            <ArrowLeft aria-hidden="true" />
+            <AnimatedIcon icon={ArrowLeftIcon} />
             Volver al inicio
           </Link>
         </Button>

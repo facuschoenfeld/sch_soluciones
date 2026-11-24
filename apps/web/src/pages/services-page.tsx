@@ -1,13 +1,16 @@
+import { RotateCwIcon } from '@animateicons/react/lucide/rotate-cw-icon';
 import { SEARCH_QUERY_MAX_LENGTH, isValidSlug, type ServiceLine } from '@sch/shared';
-import { MessageCircle, PackageOpen, RotateCw, Search, SearchX } from 'lucide-react';
+import { PackageOpen, Search, SearchX } from 'lucide-react';
 import { useSearchParams } from 'react-router';
 import { EmptyState } from '@/components/feedback/empty-state';
 import { QueryError } from '@/components/feedback/query-error';
+import { AnimatedIcon } from '@/components/icons/animated-icon';
 import { ServiceCard, ServiceGridSkeleton } from '@/components/services/service-card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { WhatsappButton } from '@/components/whatsapp/whatsapp-button';
+import { WhatsappIcon } from '@/components/whatsapp/whatsapp-icon';
 import { useDebouncedValue, usePageTitle } from '@/lib/hooks';
 import { useCategories, useServices } from '@/lib/public-api';
 import {
@@ -182,17 +185,17 @@ export function ServicesPage() {
         )}
 
         {categories.isError && !categories.data && (
-          <p className="flex flex-wrap items-center gap-x-2 text-sm text-muted-foreground">
+          <div className="flex flex-wrap items-center gap-x-2 text-sm text-muted-foreground">
             No se pudieron cargar las categorías.
             <Button
               variant="link"
               className="h-auto min-h-10 px-0"
               onClick={() => void categories.refetch()}
             >
-              <RotateCw aria-hidden="true" />
+              <AnimatedIcon icon={RotateCwIcon} />
               Reintentar
             </Button>
-          </p>
+          </div>
         )}
       </div>
 
@@ -230,7 +233,7 @@ export function ServicesPage() {
             description="Mientras tanto, escribime y te cuento en qué te puedo ayudar."
             action={
               <WhatsappButton variant="whatsapp" className="min-h-11">
-                <MessageCircle aria-hidden="true" />
+                <WhatsappIcon aria-hidden="true" />
                 Escribime por WhatsApp
               </WhatsappButton>
             }

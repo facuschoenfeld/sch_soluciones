@@ -1,16 +1,13 @@
+import { ArrowLeftIcon } from '@animateicons/react/lucide/arrow-left-icon';
+import { CalendarCheckIcon } from '@animateicons/react/lucide/calendar-check-icon';
+import { MessagesSquareIcon } from '@animateicons/react/lucide/messages-square-icon';
 import { formatPrice } from '@sch/shared';
-import {
-  ArrowLeft,
-  CalendarCheck,
-  ChevronRight,
-  Clock,
-  MessagesSquare,
-  SearchX,
-} from 'lucide-react';
+import { ChevronRight, Clock, SearchX } from 'lucide-react';
 import { Suspense, lazy } from 'react';
 import { Link, useParams } from 'react-router';
 import { EmptyState } from '@/components/feedback/empty-state';
 import { QueryError } from '@/components/feedback/query-error';
+import { AnimatedIcon } from '@/components/icons/animated-icon';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -74,7 +71,7 @@ export function ServiceDetailPage() {
           action={
             <Button asChild variant="outline" className="min-h-11">
               <Link to="/servicios">
-                <ArrowLeft aria-hidden="true" />
+                <AnimatedIcon icon={ArrowLeftIcon} />
                 Ver todos los servicios
               </Link>
             </Button>
@@ -126,7 +123,7 @@ export function ServiceDetailPage() {
                 size="lg"
                 className="min-h-11"
               >
-                <CalendarCheck aria-hidden="true" />
+                <AnimatedIcon icon={CalendarCheckIcon} />
                 Reservar turno
               </WhatsappButton>
               <WhatsappButton
@@ -136,7 +133,7 @@ export function ServiceDetailPage() {
                 size="lg"
                 className="min-h-11"
               >
-                <MessagesSquare aria-hidden="true" />
+                <AnimatedIcon icon={MessagesSquareIcon} />
                 Hacer una consulta
               </WhatsappButton>
             </div>

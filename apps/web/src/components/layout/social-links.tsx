@@ -1,5 +1,7 @@
+import { ExternalLinkIcon } from '@animateicons/react/lucide/external-link-icon';
+import { MailIcon } from '@animateicons/react/lucide/mail-icon';
 import type { PublicSettings } from '@sch/shared';
-import { ExternalLink, Mail } from 'lucide-react';
+import { AnimatedIcon } from '@/components/icons/animated-icon';
 import { getContactLinks } from '@/lib/contact-links';
 import { cn } from '@/lib/utils';
 
@@ -25,9 +27,9 @@ export function SocialLinks({
             className="inline-flex min-h-10 items-center gap-2 rounded-sm text-sm text-muted-foreground underline-offset-4 focus-ring hover:text-foreground hover:underline"
           >
             {link.external ? (
-              <ExternalLink className="size-4" aria-hidden="true" />
+              <AnimatedIcon icon={ExternalLinkIcon} />
             ) : (
-              <Mail className="size-4" aria-hidden="true" />
+              <AnimatedIcon icon={MailIcon} />
             )}
             {link.label}
             {link.external && <span className="sr-only"> (se abre en una pestaña nueva)</span>}
