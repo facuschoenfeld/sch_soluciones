@@ -4,10 +4,11 @@ import {
   type WhatsappTemplateValues,
   type WhatsappTemplateVariable,
 } from '@sch/shared';
-import { MessageCircle, Plus } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { WhatsappIcon } from '@/components/whatsapp/whatsapp-icon';
 import { FormField } from './form-field';
 
 interface TemplateFieldProps {
@@ -99,7 +100,7 @@ export function TemplateField({
 
       <figure className="space-y-1.5">
         <figcaption className="flex items-center gap-1.5 text-sm text-muted-foreground">
-          <MessageCircle className="size-4" aria-hidden="true" />
+          <WhatsappIcon className="size-4" aria-hidden="true" />
           Vista previa{isEmpty && ` (vacía: se usa ${fallbackLabel})`}
         </figcaption>
         <p

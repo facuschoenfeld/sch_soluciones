@@ -1,9 +1,10 @@
 import type { LucideIcon } from 'lucide-react';
-import { Clock, MapPin, MessageCircle } from 'lucide-react';
+import { Clock, MapPin } from 'lucide-react';
 import { QueryError } from '@/components/feedback/query-error';
 import { SocialLinks } from '@/components/layout/social-links';
 import { Skeleton } from '@/components/ui/skeleton';
 import { WhatsappButton } from '@/components/whatsapp/whatsapp-button';
+import { WhatsappIcon } from '@/components/whatsapp/whatsapp-icon';
 import { aboutParagraphs } from '@/lib/about-text';
 import { usePageTitle } from '@/lib/hooks';
 import { useSettings } from '@/lib/public-api';
@@ -74,7 +75,7 @@ export function ContactPage() {
               )}
               <SocialLinks settings={settings.data} />
               <WhatsappButton variant="whatsapp" size="lg" className="min-h-11 w-full">
-                <MessageCircle aria-hidden="true" />
+                <WhatsappIcon aria-hidden="true" />
                 Escribime por WhatsApp
               </WhatsappButton>
             </section>

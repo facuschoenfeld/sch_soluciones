@@ -5,7 +5,7 @@ import {
   formatDate,
   type AdminClientDetail,
 } from '@sch/shared';
-import { ArrowLeft, ClipboardList, MessageCircle, Pencil, Plus, Trash2, Users } from 'lucide-react';
+import { ArrowLeft, ClipboardList, Pencil, Plus, Trash2, Users } from 'lucide-react';
 import { useState, type ReactNode } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import { toast } from 'sonner';
@@ -16,6 +16,7 @@ import { EmptyState } from '@/components/feedback/empty-state';
 import { QueryError } from '@/components/feedback/query-error';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { WhatsappIcon } from '@/components/whatsapp/whatsapp-icon';
 import {
   mutationErrorMessage,
   useAdminClient,
@@ -112,7 +113,7 @@ function ClientDetail({ client }: { client: AdminClientDetail }) {
             {whatsappUrl && (
               <Button asChild variant="whatsapp" className="min-h-11">
                 <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
-                  <MessageCircle aria-hidden="true" />
+                  <WhatsappIcon aria-hidden="true" />
                   Escribir por WhatsApp
                   <span className="sr-only"> (se abre en una pestaña nueva)</span>
                 </a>

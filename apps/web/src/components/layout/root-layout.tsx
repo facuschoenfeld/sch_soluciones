@@ -1,7 +1,7 @@
-import { MessageCircle } from 'lucide-react';
 import { Outlet, ScrollRestoration } from 'react-router';
 import { SlowLoadingNotice } from '@/components/feedback/slow-loading-notice';
 import { WhatsappButton } from '@/components/whatsapp/whatsapp-button';
+import { WhatsappIcon } from '@/components/whatsapp/whatsapp-icon';
 import { useRevealOnScroll } from '@/lib/reveal-on-scroll';
 import { useFocusMainOnNavigation } from '@/lib/use-focus-main';
 import { SiteFooter } from './site-footer';
@@ -32,7 +32,7 @@ export function RootLayout() {
         aria-label="Escribir por WhatsApp"
         title="Escribir por WhatsApp"
       >
-        <MessageCircle className="size-7" aria-hidden="true" />
+        <WhatsappIcon className="size-7" aria-hidden="true" />
       </WhatsappButton>
 
       <SlowLoadingNotice />
