@@ -84,11 +84,15 @@ function Hero() {
             <Skeleton className="h-6 w-full max-w-xl" />
           </div>
         ) : (
-          <div className="max-w-3xl space-y-4">
-            <h1 className="text-4xl font-bold tracking-tight text-balance sm:text-5xl">
+          <div className="max-w-3xl space-y-5">
+            {/* Display fluido: ~38 px en el celular, ~60 px en escritorio. La parte en `vw` no
+                crece con el zoom, así que se mantiene chica frente a la parte en rem (WCAG 1.4.4).
+                El título se edita desde el panel: una palabra larga se corta en vez de generar
+                scroll horizontal a 320 px (WCAG 1.4.10). */}
+            <h1 className="text-[clamp(2.25rem,1.75rem+2.5vw,4rem)] leading-[1.05] font-bold tracking-[-0.03em] text-balance wrap-break-word hyphens-auto">
               {settings.data?.heroTitle || FALLBACK_HERO_TITLE}
             </h1>
-            <p className="text-lg text-pretty text-muted-foreground sm:text-xl">
+            <p className="max-w-2xl text-lg leading-relaxed text-pretty text-muted-foreground sm:text-xl">
               {/* `||`: un texto vacío guardado desde el panel también cae al siguiente. */}
               {settings.data?.heroSubtitle || settings.data?.tagline || FALLBACK_HERO_SUBTITLE}
             </p>
@@ -116,7 +120,7 @@ function ServiceLines() {
 
   return (
     <section aria-labelledby="lineas-titulo" className="mx-auto max-w-6xl px-4 py-16">
-      <h2 id="lineas-titulo" className="text-2xl font-bold tracking-tight sm:text-3xl">
+      <h2 id="lineas-titulo" className="text-2xl font-bold tracking-tight text-balance sm:text-3xl">
         ¿Qué necesitás?
       </h2>
       <div className="mt-8 grid gap-4 md:grid-cols-2">
@@ -186,7 +190,10 @@ function FeaturedServices() {
     <section aria-labelledby="destacados-titulo" className="border-y bg-muted/40">
       <div className="mx-auto max-w-6xl px-4 py-16">
         <div className="flex flex-wrap items-end justify-between gap-4">
-          <h2 id="destacados-titulo" className="text-2xl font-bold tracking-tight sm:text-3xl">
+          <h2
+            id="destacados-titulo"
+            className="text-2xl font-bold tracking-tight text-balance sm:text-3xl"
+          >
             Servicios destacados
           </h2>
           <Button asChild variant="link" className="min-h-11 px-0">
@@ -226,7 +233,10 @@ function FeaturedServices() {
 function HowItWorks() {
   return (
     <section aria-labelledby="como-funciona-titulo" className="mx-auto max-w-6xl px-4 py-16">
-      <h2 id="como-funciona-titulo" className="text-2xl font-bold tracking-tight sm:text-3xl">
+      <h2
+        id="como-funciona-titulo"
+        className="text-2xl font-bold tracking-tight text-balance sm:text-3xl"
+      >
         Cómo funciona
       </h2>
       <ol className="mt-8 grid gap-6 md:grid-cols-3">
@@ -254,7 +264,9 @@ function FinalCta() {
     <section className="mx-auto max-w-6xl px-4 pb-16">
       <div className="flex flex-col items-start gap-4 rounded-2xl bg-primary px-6 py-10 text-primary-foreground sm:flex-row sm:items-center sm:justify-between sm:px-10">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold tracking-tight">¿No encontrás lo que buscás?</h2>
+          <h2 className="text-2xl font-bold tracking-tight text-balance">
+            ¿No encontrás lo que buscás?
+          </h2>
           <p className="text-primary-foreground/90">
             Contame qué necesitás y te respondo a la brevedad.
           </p>

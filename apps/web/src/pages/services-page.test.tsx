@@ -49,7 +49,9 @@ describe('ServicesPage', () => {
     expect(await screen.findByText('Instalación de Windows')).toBeTruthy();
     expect(serviceTitles()).toEqual(['Landing page', 'Instalación de Windows']);
     // getByText normaliza los espacios: el U+00A0 de Intl se compara como espacio común.
-    expect(screen.getByText('$ 30.000 por equipo')).toBeTruthy();
+    // El monto y la unidad van en elementos separados, pero el párrafo se lee de corrido.
+    const price = screen.getByText('$ 30.000');
+    expect(price.parentElement?.textContent?.replace(/\s+/g, ' ')).toBe('$ 30.000 por equipo');
     expect(screen.getByText('Desde $ 150.000')).toBeTruthy();
   });
 

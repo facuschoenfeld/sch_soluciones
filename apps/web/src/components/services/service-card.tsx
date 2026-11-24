@@ -32,7 +32,7 @@ export function ServiceCard({ service, headingLevel: Heading = 'h3' }: ServiceCa
       </div>
 
       <div className="mt-auto space-y-1">
-        <p className="text-lg font-semibold text-foreground">{formatPrice(service)}</p>
+        <ServicePrice service={service} />
         {service.estimatedTime && (
           <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
             <Clock className="size-4" aria-hidden="true" />
@@ -63,6 +63,35 @@ export function ServiceCard({ service, headingLevel: Heading = 'h3' }: ServiceCa
         </Button>
       </div>
     </article>
+  );
+}
+
+/**
+ * El monto manda (un paso más grande que el nombre, cifras tabulares para comparar entre
+ * tarjetas) y la unidad ("por equipo") lo acompaña en chico. Se lee igual de corrido.
+ */
+function ServicePrice({ service }: { service: PublicServiceSummary }) {
+  // Mismo criterio que `formatPrice`: sin monto válido es "A consultar" y no lleva unidad.
+  const hasAmount =
+    service.priceType !== 'QUOTE' &&
+    service.priceAmount !== null &&
+    Number.isFinite(service.priceAmount);
+  const unit = hasAmount ? service.priceUnit?.trim() : undefined;
+  return (
+    // Inline, no flex: en flex el espacio entre los dos spans no se renderiza y al copiar o con
+    // lector se leería "$ 30.000por equipo". Los inline se alinean por línea base solos.
+    <p className="text-foreground">
+      <span className="text-xl font-bold tracking-tight tabular-nums">
+        {formatPrice({ ...service, priceUnit: null })}
+      </span>
+      {unit && (
+        <>
+          {' '}
+          {/* Sin cortes internos: si no entra, la unidad baja entera a la línea siguiente. */}
+          <span className="text-sm whitespace-nowrap text-muted-foreground">{unit}</span>
+        </>
+      )}
+    </p>
   );
 }
 

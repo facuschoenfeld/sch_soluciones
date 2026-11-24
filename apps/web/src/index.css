@@ -115,6 +115,16 @@
   body {
     @apply bg-background font-sans text-foreground antialiased;
   }
+  /* Selección de texto con el azul de marca en vez del celeste del sistema. */
+  ::selection {
+    background-color: color-mix(in oklab, var(--primary) 30%, transparent);
+  }
+  /* Sobre superficies azules (banda final, botones, badges) el tinte azul no se vería: se invierte. */
+  .bg-primary::selection,
+  .bg-primary *::selection {
+    background-color: var(--primary-foreground);
+    color: var(--primary);
+  }
 }
 
 /*
