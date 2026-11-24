@@ -118,10 +118,14 @@ function Hero() {
           </div>
         )}
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-          <Button asChild size="lg" className="min-h-11">
+          {/* Respuesta: la flecha avanza al apuntar o enfocar y el botón cede apenas al presionar. */}
+          <Button asChild size="lg" className="group/cta min-h-11 motion-safe:active:scale-[0.98]">
             <Link to="/servicios">
               Ver servicios
-              <ArrowRight aria-hidden="true" />
+              <ArrowRight
+                aria-hidden="true"
+                className="transition-[translate] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] motion-safe:group-hover/cta:translate-x-1 motion-safe:group-focus-visible/cta:translate-x-1"
+              />
             </Link>
           </Button>
           <WhatsappButton variant="whatsapp" size="lg" className="min-h-11">

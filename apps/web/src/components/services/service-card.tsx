@@ -22,7 +22,9 @@ export function ServiceCard({
   const detailPath = `/servicios/${service.slug}`;
 
   return (
-    <article className="flex h-full flex-col gap-4 rounded-xl border bg-card p-5 text-card-foreground shadow-sm transition-shadow hover:shadow-md">
+    // Foco (hover o teclado dentro de la tarjeta): la tarjeta no se mueve; el borde toma el azul,
+    // el nombre se pinta y la flecha de "Ver detalle" avanza. Sin movimiento con "reducir movimiento".
+    <article className="group flex h-full flex-col gap-4 rounded-xl border bg-card p-5 text-card-foreground shadow-sm transition-[border-color,box-shadow] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] hover:border-primary/50 hover:shadow-md has-focus-visible:border-primary/50 has-focus-visible:shadow-md">
       <div className="flex flex-wrap items-center gap-2">
         <Badge variant="secondary">{service.category.name}</Badge>
         {showFeaturedBadge && service.isFeatured && <Badge variant="outline">Destacado</Badge>}
@@ -30,7 +32,10 @@ export function ServiceCard({
 
       <div className="space-y-2">
         <Heading className="text-lg leading-snug font-semibold">
-          <Link to={detailPath} className="rounded-sm focus-ring hover:text-primary">
+          <Link
+            to={detailPath}
+            className="rounded-sm focus-ring transition-colors duration-150 group-hover:text-primary"
+          >
             {service.name}
           </Link>
         </Heading>
@@ -61,10 +66,13 @@ export function ServiceCard({
           <MessageCircle aria-hidden="true" />
           Consultar
         </WhatsappButton>
-        <Button asChild variant="outline" className="min-h-11 flex-1">
+        <Button asChild variant="outline" className="group/detail min-h-11 flex-1">
           <Link to={detailPath} aria-label={`Ver detalle de ${service.name}`}>
             Ver detalle
-            <ArrowRight aria-hidden="true" />
+            <ArrowRight
+              aria-hidden="true"
+              className="transition-[translate] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] motion-safe:group-hover:translate-x-[3px] motion-safe:group-focus-visible/detail:translate-x-[3px]"
+            />
           </Link>
         </Button>
       </div>

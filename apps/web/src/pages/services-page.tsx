@@ -21,12 +21,19 @@ import { cn } from '@/lib/utils';
 
 const SEARCH_DEBOUNCE_MS = 300;
 
+/**
+ * Chip de filtro. Al elegirlo, el azul se expande desde el centro (un `::before` con
+ * `clip-path`) y se retrae al soltarlo; con "reducir movimiento" el cambio es inmediato.
+ * El color del texto sigue al relleno: cambia rápido al elegir (el azul cubre el centro enseguida)
+ * y con demora al soltar (el centro es lo último que se descubre), para no cruzar contrastes.
+ */
 function chipClass(active: boolean) {
   return cn(
-    'min-h-11 rounded-full border px-4 text-sm font-medium transition-colors focus-ring',
+    'relative isolate min-h-11 overflow-hidden rounded-full border bg-background px-4 text-sm font-medium transition-[border-color,color,background-color] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] focus-ring',
+    'before:absolute before:inset-0 before:-z-10 before:bg-primary before:transition-[clip-path] before:duration-[280ms] before:ease-[cubic-bezier(0.16,1,0.3,1)] before:[clip-path:circle(0%_at_50%_50%)] motion-reduce:before:transition-none',
     active
-      ? 'border-primary bg-primary text-primary-foreground'
-      : 'border-input bg-background text-foreground hover:bg-muted',
+      ? 'border-primary text-primary-foreground duration-100 before:[clip-path:circle(75%_at_50%_50%)] forced-colors:border-2 forced-colors:border-[Highlight]'
+      : 'border-input text-foreground delay-150 hover:bg-muted hover:delay-0',
   );
 }
 
