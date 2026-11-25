@@ -38,7 +38,7 @@ export function QueryError({
     >
       <TriangleExclamationPoint className="size-8 text-destructive" aria-hidden="true" />
       <div className="space-y-1">
-        <p className="font-semibold">{title}</p>
+        <p className="font-heading font-semibold">{title}</p>
         <p className="text-sm text-muted-foreground">{messageFor(error)}</p>
       </div>
       {onRetry && (

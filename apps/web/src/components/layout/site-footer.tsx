@@ -13,7 +13,7 @@ export function SiteFooter() {
     <footer className="border-t bg-muted/40 pb-20 md:pb-0">
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:grid-cols-2 lg:grid-cols-3">
         <div className="space-y-2">
-          <p className="font-semibold">{businessName}</p>
+          <p className="font-heading font-semibold">{businessName}</p>
           {settings?.tagline && <p className="text-sm text-muted-foreground">{settings.tagline}</p>}
         </div>
 

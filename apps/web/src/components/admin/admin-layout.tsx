@@ -44,7 +44,7 @@ function AdminNavList({ onNavigate }: { onNavigate?: () => void }) {
 function Brand() {
   const businessName = useBusinessName();
   return (
-    <span className="flex min-w-0 items-center gap-2 font-semibold tracking-tight">
+    <span className="flex min-w-0 items-center gap-2 font-heading font-semibold tracking-tight">
       <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-primary text-primary-foreground">
         <Wrench className="size-4" aria-hidden="true" />
       </span>

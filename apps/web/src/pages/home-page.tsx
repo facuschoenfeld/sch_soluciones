@@ -108,7 +108,7 @@ function Hero() {
             <h1
               className={cn(
                 HERO_TITLE_SIZE,
-                'leading-[1.05] font-bold tracking-[-0.03em] text-balance wrap-break-word hyphens-auto',
+                'leading-[1.05] font-bold tracking-[-0.02em] text-balance wrap-break-word hyphens-auto',
               )}
               // El nombre va entero en el h1: algunos lectores (VoiceOver en iOS) leen cada
               // `span` inline-block por separado al navegar con gestos.
@@ -296,7 +296,7 @@ function HowItWorks() {
               <Icon className="size-5" aria-hidden="true" />
             </span>
             <div className="space-y-1">
-              <p className="font-semibold">
+              <p className="font-heading font-semibold">
                 <span className="sr-only">Paso {index + 1}: </span>
                 {title}
               </p>

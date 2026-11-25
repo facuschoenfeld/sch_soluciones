@@ -24,46 +24,46 @@ colors:
   night-hairline: 'oklch(1 0 0 / 10%)'
 typography:
   display:
-    fontFamily: "'Inter Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
+    fontFamily: "'Sora Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
     fontSize: 'clamp(2.25rem, 1.75rem + 2.5vw, 4rem)'
     fontWeight: 700
     lineHeight: 1.05
-    letterSpacing: '-0.03em'
+    letterSpacing: '-0.02em'
   headline:
-    fontFamily: "'Inter Variable', ui-sans-serif, system-ui, sans-serif"
+    fontFamily: "'Sora Variable', ui-sans-serif, system-ui, sans-serif"
     fontSize: '1.875rem'
     fontWeight: 700
     lineHeight: 1.2
     letterSpacing: '-0.025em'
   title:
-    fontFamily: "'Inter Variable', ui-sans-serif, system-ui, sans-serif"
+    fontFamily: "'Sora Variable', ui-sans-serif, system-ui, sans-serif"
     fontSize: '1.125rem'
     fontWeight: 600
     lineHeight: 1.375
   body:
-    fontFamily: "'Inter Variable', ui-sans-serif, system-ui, sans-serif"
+    fontFamily: "'Geist Variable', ui-sans-serif, system-ui, sans-serif"
     fontSize: '1rem'
     fontWeight: 400
     lineHeight: 1.5
   body-small:
-    fontFamily: "'Inter Variable', ui-sans-serif, system-ui, sans-serif"
+    fontFamily: "'Geist Variable', ui-sans-serif, system-ui, sans-serif"
     fontSize: '0.875rem'
     fontWeight: 400
     lineHeight: 1.43
   label:
-    fontFamily: "'Inter Variable', ui-sans-serif, system-ui, sans-serif"
+    fontFamily: "'Geist Variable', ui-sans-serif, system-ui, sans-serif"
     fontSize: '0.875rem'
     fontWeight: 500
     lineHeight: 1
   price:
-    fontFamily: "'Inter Variable', ui-sans-serif, system-ui, sans-serif"
+    fontFamily: "'Geist Variable', ui-sans-serif, system-ui, sans-serif"
     fontSize: '1.25rem'
     fontWeight: 700
     lineHeight: 1.4
     letterSpacing: '-0.025em'
     fontFeature: "'tnum'"
   badge:
-    fontFamily: "'Inter Variable', ui-sans-serif, system-ui, sans-serif"
+    fontFamily: "'Geist Variable', ui-sans-serif, system-ui, sans-serif"
     fontSize: '0.75rem'
     fontWeight: 500
     lineHeight: 1.33
@@ -163,7 +163,7 @@ components:
 
 El sistema se parece a un banco de taller prolijo: cada herramienta en su lugar, nada que no sirva y todo al alcance de la mano. Sobre una base gris pizarra casi neutra, un único azul marca dónde actuar y un verde reservado abre WhatsApp. El sitio se siente **prolijo, técnico y directo**: confianza por precisión, no por adorno.
 
-La densidad es media y regular. Las superficies son blancas (o pizarra profunda en modo oscuro), separadas por bordes finos y sombras casi imperceptibles. La tipografía es una sola familia, Inter, y la jerarquía sale del peso y del tamaño, no de cambios de fuente. El precio y la acción siguiente siempre son visibles: el diseño los pone adelante y se corre del medio.
+La densidad es media y regular. Las superficies son blancas (o pizarra profunda en modo oscuro), separadas por bordes finos y sombras casi imperceptibles. La tipografía combina dos familias: Sora en los títulos, geométrica y algo ancha, le da presencia a la marca; Geist en el resto, neutra y técnica, mantiene la lectura limpia. Dentro de cada una, la jerarquía sale del peso y del tamaño. El precio y la acción siguiente siempre son visibles: el diseño los pone adelante y se corre del medio.
 
 El sistema rechaza tres cosas, confirmadas por el dueño:
 
@@ -176,7 +176,7 @@ El sistema rechaza tres cosas, confirmadas por el dueño:
 - Un solo acento de marca (Azul Señal) sobre neutros pizarra.
 - Verde exclusivo para WhatsApp.
 - Superficies casi planas: borde fino, sombra mínima, que sube solo al pasar el mouse o en lo que flota.
-- Inter en todos los niveles; títulos en negrita con interletra apenas cerrada.
+- Sora en títulos y logo, Geist en el resto; títulos en negrita con interletra apenas cerrada.
 - Esquinas suaves y consistentes (8 px en controles, 14 px en tarjetas).
 - Objetivos táctiles de 44 px y foco visible en todo.
 - Modo claro y oscuro con los mismos roles.
@@ -225,14 +225,14 @@ Neutros pizarra con un único azul de acción y un verde que solo significa "esc
 
 ## Typography
 
-**Display Font:** Inter Variable (con `ui-sans-serif`, `system-ui`, `-apple-system`, Segoe UI y Roboto)
-**Body Font:** Inter Variable (la misma pila)
+**Display Font:** Sora Variable (`--font-heading`, con `ui-sans-serif`, `system-ui`, `-apple-system`, Segoe UI y Roboto)
+**Body Font:** Geist Variable (`--font-sans`, la misma pila de respaldo)
 
-**Character:** Una sola familia autoalojada, sin terceros. Títulos en negrita con interletra apenas cerrada (`-0.025em`) y texto corrido neutro. La voz técnica sale de la disciplina tipográfica, no de una fuente "con personalidad".
+**Character:** Dos familias autoalojadas (Fontsource), sin terceros. Sora va en `h1`-`h6`, en los títulos de tarjetas, diálogos y paneles (`[data-slot$='-title']`) y en el logo (`font-heading`). Todo lo demás, incluidos precios, botones y labels, va en Geist. Títulos en negrita con interletra apenas cerrada (`-0.025em`). El hero usa `-0.02em`, porque Sora es más ancha y a ese tamaño las letras se tocaban.
 
 ### Hierarchy
 
-- **Display** (700; fluido `clamp(2.25rem, 1.75rem + 2.5vw, 4rem)`: ≈38 px en celular, ≈60 px a 1280 px y 64 px desde 1440 px; interlineado 1.05; `-0.03em`): solo el título del hero. Con `text-balance`. La parte en `vw` se mantiene chica frente a la de rem porque no crece con el zoom (WCAG 1.4.4). Como el título se edita desde el panel, corta palabras largas (`overflow-wrap: break-word` y guiones) para no generar scroll horizontal a 320 px.
+- **Display** (700; fluido `clamp(2.25rem, 1.75rem + 2.5vw, 4rem)`: ≈38 px en celular, ≈60 px a 1280 px y 64 px desde 1440 px; interlineado 1.05; `-0.02em`): solo el título del hero. Con `text-balance`. La parte en `vw` se mantiene chica frente a la de rem porque no crece con el zoom (WCAG 1.4.4). Como el título se edita desde el panel, corta palabras largas (`overflow-wrap: break-word` y guiones) para no generar scroll horizontal a 320 px.
 - **Headline** (700; 1.5 rem en celular y 1.875 rem desde 640 px; ≈1.2; `-0.025em`): títulos de sección ("¿Qué necesitás?", "Servicios destacados") y encabezados de página del panel.
 - **Title** (600; 1.125 a 1.25 rem; 1.375): nombre del servicio en la tarjeta, títulos de las tarjetas de línea y de las secciones de formularios.
 - **Price** (700; 1.25 rem; `-0.025em`; cifras tabulares): el monto del servicio, un paso por encima del nombre. La unidad ("por equipo") lo sigue en Body small con Lápiz Pizarra, en línea (no flex, que descarta el espacio) y sin cortes internos, para que se lea de corrido y baje entera si no entra.
@@ -243,7 +243,7 @@ Neutros pizarra con un único azul de acción y un verde que solo significa "esc
 
 ### Named Rules
 
-**La Regla de Una Sola Familia.** Inter para todo. La jerarquía se arma con peso (400, 500, 600 y 700) y tamaño, nunca con una segunda fuente decorativa.
+**La Regla de las Dos Familias.** Sora solo para títulos y logo; Geist para todo lo demás. No se suma una tercera fuente ni se usa Sora en texto corrido, botones o precios. Dentro de cada familia, la jerarquía se arma con peso (400, 500, 600 y 700) y tamaño.
 
 **La Regla del Precio con Peso.** El monto de un servicio va en Price (700, 1.25 rem, cifras tabulares), un paso más grande que el nombre y en el color del texto principal; nunca apagado ni en letra chica. Solo la unidad baja a texto secundario.
 
