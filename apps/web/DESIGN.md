@@ -188,7 +188,7 @@ Neutros pizarra con un único azul de acción y un verde que solo significa "esc
 ### Primary
 
 - **Azul Señal** (`signal-blue`; en oscuro, `signal-blue-dark`): el color que marca dónde actuar.
-  - Dónde se usa: botón principal, links activos de la navegación, el cuadrado del logo, el número de paso en "Cómo funciona", la banda final de llamado a la acción y los estados de trabajo avanzados (Terminado, Entregado).
+  - Dónde se usa: botón principal, links activos de la navegación, las letras "SCH" del logo, el número de paso en "Cómo funciona", la banda final de llamado a la acción y los estados de trabajo avanzados (Terminado, Entregado).
   - En modo oscuro se aclara para mantener el contraste, y el texto encima pasa a pizarra noche.
 - **Azul Foco** (`focus-blue`): solo para el aro de foco. Garantiza al menos 3:1 contra fondo blanco y tarjetas.
 - **Lavado Azul** (`blue-wash`): fondo del hover de botones secundarios y el tinte del degradado del hero (al 60 %, hacia el fondo).
@@ -271,6 +271,7 @@ Neutros pizarra con un único azul de acción y un verde que solo significa "esc
   - **Aparición al scrollear** (`.reveal`, `lib/reveal-on-scroll.ts`): títulos de sección, tarjetas, pasos y la banda final suben 1.5 rem y aparecen (700 ms) una sola vez al entrar en pantalla; los que entran juntos se escalonan 80 ms (tope de 4 pasos). Se ocultan solo si el script corrió (`html.reveal-ready`) y sin "reducir movimiento". El hero no la lleva. Un elemento con el foco de teclado adentro se muestra aunque no haya entrado. (Se probó antes una versión ligada al scroll con `animation-timeline`: se descartó porque, al terminar en el borde inferior de la pantalla, no se notaba.)
   - **Respuestas**: la tarjeta de servicio tiñe el borde de azul sin moverse. El botón principal del hero cede al 98 % al presionar. Los chips de filtro se rellenan de azul desde el centro.
   - **Íconos animados** (sitio público, noviembre de 2026): los íconos dentro de links, botones y labels son de `@animateicons/react` (`AnimatedIcon`, `components/icons/animated-icon.tsx`) y hacen un gesto corto (la flecha avanza, la de reintentar gira), con la curva y duración propias de la librería (excepción al easing de abajo), al apuntar o enfocar con teclado el elemento entero, no solo el ícono. Las tarjetas de línea animan los suyos con toda la tarjeta (`data-icon-trigger`). Los íconos que no están en algo interactivo (reloj, ubicación, pasos, estados vacíos) quedan estáticos de lucide; el panel también. Con "reducir movimiento" o en táctil no se animan.
+  - **Logo del header** (noviembre de 2026): el logo es solo texto, sin ícono, con "SCH" en Azul Señal (`.brand-reveal`, `index.css`). Al cargar, "SCH" se descubre de izquierda a derecha y pasa de borroso a nítido (700 ms, una vez). Después, cada 15 s, una franja translúcida (máscara al 40 %, sin cambiar el color) lo recorre en el mismo sentido en ~900 ms; el resto del ciclo queda quieto. Es el único movimiento automático que se repite en el sitio: un loop sin pausa, excepción a WCAG 2.2.2 aceptada por el usuario. Con "reducir movimiento", solo un fundido de 300 ms y sin repetición.
   - Easing `cubic-bezier(0.16, 1, 0.3, 1)` para respuestas y entradas. Con "reducir movimiento" no hay desplazamientos; quedan solo fundidos o cambios de color.
 
 ## Elevation & Depth
@@ -297,7 +298,7 @@ Esquinas suaves y consistentes, derivadas de un radio base de 10 px:
 - **Diálogos**: 10 px.
 - **Píldoras**: badges, chips de categoría, botón flotante de WhatsApp y número de paso.
 
-Los íconos son de lucide (o su versión animada, con el mismo trazo; ver Movimiento), de trazo de 2 px y puntas redondeadas, a 16 px en botones y 20-24 px en encabezados de tarjeta. Van solos o dentro de un cuadrado de 8-10 px de radio con fondo Azul Señal. El logo provisorio (llave inglesa sobre cuadrado azul) sigue esa misma forma.
+Los íconos son de lucide (o su versión animada, con el mismo trazo; ver Movimiento), de trazo de 2 px y puntas redondeadas, a 16 px en botones y 20-24 px en encabezados de tarjeta. Van solos o dentro de un cuadrado de 8-10 px de radio con fondo Azul Señal. El logo ya no lleva ícono: es el nombre del negocio con "SCH" en Azul Señal (ver Movimiento).
 
 ## Components
 

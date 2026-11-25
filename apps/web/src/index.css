@@ -242,6 +242,68 @@
 }
 
 /*
+ * Entrada de "SCH" en el logo del header: se descubre de izquierda a derecha y pasa de borroso
+ * a nítido, una sola vez al cargar (el header no se remonta al navegar). El recorte se extiende
+ * 0.15em por fuera para no cortar los bordes de las letras. Después, cada 15 s, una franja
+ * translúcida (máscara, sin cambiar el color) recorre las letras en el mismo sentido en menos de
+ * 1 s: recuerda la entrada sin ocultar el texto. Con "reducir movimiento", solo un fundido y sin repetición.
+ * El loop sin pausa es una excepción a WCAG 2.2.2 aceptada por el usuario (ver CLAUDE.md).
+ */
+@keyframes brand-reveal {
+  from {
+    clip-path: inset(-0.15em 100% -0.15em -0.15em);
+    filter: blur(3px);
+  }
+  to {
+    clip-path: inset(-0.15em);
+    filter: none;
+  }
+}
+/*
+ * La máscara mide 3 veces la palabra; mover su posición de 100 % a 0 % lleva la franja (al 50 %
+ * del degradé) de la izquierda hacia la derecha, entrando y saliendo por fuera. Va dentro de los
+ * keyframes para que la máscara no exista durante la entrada (recortaría el desenfoque de los bordes).
+ */
+@keyframes brand-sweep {
+  0%,
+  6%,
+  100% {
+    mask-image: linear-gradient(100deg, #000 40%, rgb(0 0 0 / 0.4) 50%, #000 60%);
+    mask-size: 300% 100%;
+  }
+  /* 6 % de 15 s ≈ 900 ms de barrido; el resto del ciclo, quieto. */
+  0% {
+    mask-position: 100% 0;
+    animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1);
+  }
+  6%,
+  100% {
+    mask-position: 0% 0;
+  }
+}
+@keyframes brand-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@layer components {
+  .brand-reveal {
+    display: inline-block;
+    animation:
+      brand-reveal 700ms cubic-bezier(0.16, 1, 0.3, 1) both,
+      brand-sweep 15s linear 4s infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .brand-reveal {
+      animation: brand-fade 300ms ease-out both;
+    }
+  }
+}
+
+/*
  * Aparición al scrollear (`.reveal`, ver lib/reveal-on-scroll.ts): cada elemento sube y aparece
  * una sola vez al entrar en pantalla; los que entran juntos se escalonan (`--reveal-delay`).
  * Solo se ocultan con `html.reveal-ready` (el script corrió) y sin "reducir movimiento": si el

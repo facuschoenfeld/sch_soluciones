@@ -1,5 +1,4 @@
 import { MenuIcon } from '@animateicons/react/lucide/menu-icon';
-import { WrenchIcon } from '@animateicons/react/lucide/wrench-icon';
 import { useState } from 'react';
 import { Link, NavLink } from 'react-router';
 import { AnimatedIcon } from '@/components/icons/animated-icon';
@@ -25,6 +24,20 @@ function navLinkClass({ isActive }: { isActive: boolean }) {
   );
 }
 
+const BRAND_PREFIX = 'SCH';
+
+// Resalta la palabra "SCH" con el color de marca; si el nombre del negocio
+// cambia y no empieza con esa palabra (ej. "Schmidt"), se muestra tal cual.
+function BrandName({ name }: { name: string }) {
+  if (name !== BRAND_PREFIX && !name.startsWith(`${BRAND_PREFIX} `)) return name;
+  return (
+    <>
+      <span className="brand-reveal text-primary">{BRAND_PREFIX}</span>
+      {name.slice(BRAND_PREFIX.length)}
+    </>
+  );
+}
+
 export function SiteHeader() {
   const businessName = useBusinessName();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -37,12 +50,9 @@ export function SiteHeader() {
       <div className="mx-auto flex h-(--sticky-header-height) max-w-6xl items-center justify-between gap-4 px-4">
         <Link
           to="/"
-          className="flex min-w-0 items-center gap-2 rounded-md font-semibold tracking-tight focus-ring"
+          className="-mx-1 block min-w-0 truncate rounded-md px-1 py-2.5 font-heading font-semibold tracking-tight focus-ring"
         >
-          <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-primary text-primary-foreground">
-            <AnimatedIcon icon={WrenchIcon} />
-          </span>
-          <span className="truncate">{businessName}</span>
+          <BrandName name={businessName} />
         </Link>
 
         <div className="flex shrink-0 items-center gap-1">

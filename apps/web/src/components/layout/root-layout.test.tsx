@@ -33,9 +33,9 @@ afterEach(() => {
   document.documentElement.classList.remove('dark');
 });
 
-function setup() {
+function setup(businessName = settingsFixture.businessName) {
   const queryClient = createTestQueryClient();
-  queryClient.setQueryData(publicQueryKeys.settings, settingsFixture);
+  queryClient.setQueryData(publicQueryKeys.settings, { ...settingsFixture, businessName });
   const user = userEvent.setup();
   renderWithProviders(<RootLayout />, { queryClient });
   return { user };
@@ -67,6 +67,19 @@ describe('RootLayout', () => {
     await user.click(screen.getByRole('button', { name: 'Activar modo claro' }));
     expect(root.classList.contains('dark')).toBe(false);
     expect(localStorage.getItem('theme')).toBe('light');
+  });
+
+  it.each([
+    ['SCH Soluciones', 'SCH'],
+    ['SCH', 'SCH'],
+    ['Schmidt Reparaciones', null],
+    ['Taller Pepe', null],
+  ])('el logo del header con el nombre "%s" resalta %s', (businessName, highlighted) => {
+    setup(businessName);
+
+    const logo = screen.getByRole('link', { name: businessName });
+    expect(logo.textContent).toBe(businessName);
+    expect(logo.querySelector('.brand-reveal')?.textContent ?? null).toBe(highlighted);
   });
 
   it('arranca en modo oscuro si <html> ya tiene la clase dark', () => {
